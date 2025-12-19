@@ -6,7 +6,7 @@ date: '2025-12-19'
 surface: agent
 model: claude-sonnet-4-5-20250929
 feature: todo-cli
-branch: 01-todo-cli
+branch: 001-todo-cli
 user: claude
 command: /sp.specify Initialize phase-1-todo-cli with uv
 labels: ["specification", "todo-cli", "cli-app"]
@@ -16,8 +16,8 @@ links:
   adr: "null"
   pr: "null"
 files:
-  - "specs/01-todo-cli/spec.md"
-  - "specs/01-todo-cli/checklists/requirements.md"
+  - "specs/001-todo-cli/spec.md"
+  - "specs/001-todo-cli/checklists/requirements.md"
 tests: []
 ---
 
@@ -76,7 +76,7 @@ The specification follows the template structure and includes all mandatory sect
 
 - ✅ Impact: Complete feature specification created for CLI Todo application with all required sections (user scenarios, functional requirements, success criteria)
 - 🧪 Tests: No tests created yet (specification phase)
-- 📁 Files: specs/01-todo-cli/spec.md, specs/01-todo-cli/checklists/requirements.md created successfully
+- 📁 Files: specs/001-todo-cli/spec.md, specs/001-todo-cli/checklists/requirements.md created successfully
 - 🔁 Next prompts: Ready for /sp.plan to create implementation plan
 - 🧠 Reflection: Specification follows template structure and includes all mandatory sections
 
