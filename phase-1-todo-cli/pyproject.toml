@@ -1,0 +1,22 @@
+[project]
+name = "phase-1-todo-cli"
+version = "0.1.0"
+description = "A menu-driven CLI Todo application with SQLite persistence"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "sqlmodel>=0.0.14",
+    "sqlalchemy>=2.0.0,<2.1.0",
+    "rich>=13.0.0",
+    "inquirer>=3.0.0",
+]
+
+[project.scripts]
+todo = "src.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
