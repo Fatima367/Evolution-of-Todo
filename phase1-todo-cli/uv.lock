@@ -133,7 +133,7 @@ wheels = [
 ]
 
 [[package]]
-name = "phase-1-todo-cli"
+name = "phase1-todo-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

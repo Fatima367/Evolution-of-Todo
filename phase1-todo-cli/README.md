@@ -22,7 +22,7 @@ A menu-driven command-line todo application with SQLite persistence, built with 
 
 1. Clone the repository:
 ```bash
-cd phase-1-todo-cli
+cd phase1-todo-cli
 ```
 
 2. Install dependencies using `uv`:
@@ -74,7 +74,7 @@ On first launch, the application will create a default task with your username t
 ## Project Structure
 
 ```
-phase-1-todo-cli/
+phase1-todo-cli/
 ├── src/
 │   ├── models/
 │   │   └── task.py              # Task model with SQLModel

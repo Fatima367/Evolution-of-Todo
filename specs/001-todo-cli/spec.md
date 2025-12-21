@@ -3,7 +3,7 @@
 **Feature Branch**: `001-todo-cli`
 **Created**: 2025-12-19
 **Status**: Draft
-**Input**: User description: "Initialize phase-1-todo-cli with uv Build a menu-driven CLI Todo app with in-memory storage with sqlmodel."
+**Input**: User description: "Initialize phase1-todo-cli with uv Build a menu-driven CLI Todo app with in-memory storage with sqlmodel."
 
 ## User Scenarios & Testing *(mandatory)*
 

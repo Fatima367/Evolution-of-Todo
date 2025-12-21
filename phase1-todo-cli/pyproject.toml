@@ -1,5 +1,5 @@
 [project]
-name = "phase-1-todo-cli"
+name = "phase1-todo-cli"
 version = "0.1.0"
 description = "A menu-driven CLI Todo application with SQLite persistence"
 readme = "README.md"

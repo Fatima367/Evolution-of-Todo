@@ -16,19 +16,19 @@ links:
   adr: null
   pr: null
 files:
-  - phase-1-todo-cli/src/models/task.py
-  - phase-1-todo-cli/src/models/__init__.py
-  - phase-1-todo-cli/src/services/todo_service.py
-  - phase-1-todo-cli/src/services/__init__.py
-  - phase-1-todo-cli/src/lib/utils.py
-  - phase-1-todo-cli/src/lib/__init__.py
-  - phase-1-todo-cli/src/cli/main.py
-  - phase-1-todo-cli/src/cli/__init__.py
-  - phase-1-todo-cli/pyproject.toml
-  - phase-1-todo-cli/README.md
+  - phase1-todo-cli/src/models/task.py
+  - phase1-todo-cli/src/models/__init__.py
+  - phase1-todo-cli/src/services/todo_service.py
+  - phase1-todo-cli/src/services/__init__.py
+  - phase1-todo-cli/src/lib/utils.py
+  - phase1-todo-cli/src/lib/__init__.py
+  - phase1-todo-cli/src/cli/main.py
+  - phase1-todo-cli/src/cli/__init__.py
+  - phase1-todo-cli/pyproject.toml
+  - phase1-todo-cli/README.md
   - .gitignore
 tests:
-  - phase-1-todo-cli/test_import.py (basic functionality validation)
+  - phase1-todo-cli/test_import.py (basic functionality validation)
 ---
 
 # Prompt History Record
@@ -48,7 +48,7 @@ User requested implementation of the Todo CLI application from specs/001-todo-cl
 Successfully implemented complete Todo CLI application with all 5 user stories and SQLite persistence:
 
 ### Phase 1: Setup (T001-T004)
-- Created project structure in `phase-1-todo-cli/`
+- Created project structure in `phase1-todo-cli/`
 - Initialized Python project with uv
 - Installed dependencies: SQLModel, Rich, Inquirer
 - Created src/ directory structure (models/, services/, cli/, lib/)

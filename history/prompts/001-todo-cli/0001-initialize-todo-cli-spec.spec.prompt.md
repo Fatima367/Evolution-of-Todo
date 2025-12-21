@@ -8,7 +8,7 @@ model: claude-sonnet-4-5-20250929
 feature: todo-cli
 branch: 001-todo-cli
 user: claude
-command: /sp.specify Initialize phase-1-todo-cli with uv
+command: /sp.specify Initialize phase1-todo-cli with uv
 labels: ["specification", "todo-cli", "cli-app"]
 links:
   spec: "null"
@@ -24,7 +24,7 @@ tests: []
 ## Prompt
 
 ```
-Initialize phase-1-todo-cli with uv
+Initialize phase1-todo-cli with uv
 Build a menu-driven CLI Todo app with in-memory storage with sqlmodel.
 - Modular: Task dataclass, TodoApp class with methods
 - Good, colored and well designed user interface on CLI.
