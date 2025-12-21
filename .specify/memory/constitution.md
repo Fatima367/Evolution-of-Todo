@@ -1,34 +1,26 @@
 <!--
 Sync Impact Report:
 ===================
-Version Change: 0.0.0 → 1.0.0 (Initial constitution ratification)
-Modified Principles: N/A (initial creation)
-Added Sections:
-  - Core Principles (7 principles defined)
-  - Technical & Non-Functional Standards
-  - Architecture Principles
-  - Coding Standards
-  - Security & Hardening
-  - Quality Standards
-  - Success Criteria
-  - Constraints
-  - Non-Negotiable Rules
-  - AI Agent Rules
-  - Evaluation Alignment
-  - Governance
+Version Change: 1.0.0 → 1.0.1 (Security clarification for AI agents)
+Modified Principles:
+  - Security & Hardening → API Key Management (added AI agent .env restriction)
+
+Added Sections: None
+
+Removed Sections: None
 
 Templates Requiring Updates:
-  ✅ .specify/templates/plan-template.md - Constitution Check section aligned
-  ✅ .specify/templates/spec-template.md - Requirements sections aligned
-  ✅ .specify/templates/tasks-template.md - Task organization aligned
+  ✅ .specify/templates/plan-template.md - No changes needed (security already referenced)
+  ✅ .specify/templates/spec-template.md - No changes needed
+  ✅ .specify/templates/tasks-template.md - No changes needed
+  ✅ CLAUDE.md - Already includes general security guidance
 
 Follow-up TODOs:
-  - Define specific success criteria measurements once Phase I is complete
-  - Review and update constitution after Phase II authentication implementation
-  - Establish ADR review cadence once /sp.adr command is used
+  - None (clarification only, existing templates compatible)
 
-Rationale: MAJOR version (1.0.0) selected as this is the initial formal ratification
-of the project constitution establishing all foundational principles.
+Rationale: PATCH version (1.0.1) selected as this is a clarification to existing
+security principles, not a new principle or breaking change. Explicitly restricts
+AI agents from reading .env files to prevent accidental secret exposure.
 -->
 
 # Evolution of Todo Constitution
@@ -190,6 +182,7 @@ Development workflow MUST leverage Claude Code subagents:
 ### API Key Management
 - **DO NOT** commit secrets to repository
 - Use `.env` files for local development (excluded from git)
+- **CRITICAL**: AI agents MUST NOT read `.env` files - only `.env.example` is allowed for reference
 - Cloud deployments use secret management (Kubernetes Secrets, cloud provider vaults)
 
 ### Input Validation
@@ -362,4 +355,4 @@ Development workflow MUST leverage Claude Code subagents:
 - README.md provides setup, demo, architecture overview
 - This constitution is the authoritative source for all governance and principles
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-18 | **Last Amended**: 2025-12-18
+**Version**: 1.0.1 | **Ratified**: 2025-12-18 | **Last Amended**: 2025-12-21
