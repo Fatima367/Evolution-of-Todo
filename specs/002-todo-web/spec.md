@@ -71,10 +71,10 @@ Tasks persist across browser sessions and page reloads. When a user returns to t
 
 ### Edge Cases
 
-- What happens when a user tries to create a task with an empty title?
-- How does the system handle concurrent modifications to the same task by the same user?
-- What occurs when a user's session expires during task management?
-- How does the system handle network failures during task operations?
+- **Empty title validation**: System rejects task creation/update with empty or whitespace-only titles (validation rule: 1-200 characters as defined in data-model.md). Returns 400 Bad Request with error message "Task title is required and must be 1-200 characters."
+- **Concurrent modifications**: System uses last-write-wins strategy for Phase II (simplicity over optimistic locking). The most recent update overwrites previous changes. Future phases may implement version-based conflict detection.
+- **Session expiry during task management**: JWT tokens expire after 1 hour. Frontend detects 401 Unauthorized responses and redirects to login page with return URL. Unsaved changes show warning prompt before navigation. Refresh tokens (7-day expiry) enable silent re-authentication.
+- **Network failures during task operations**: Frontend implements retry logic with exponential backoff (3 attempts: 500ms, 1s, 2s delays). Displays user-friendly error messages after final failure. State mutations use optimistic updates with rollback on error.
 
 ## Requirements *(mandatory)*
 
@@ -82,7 +82,7 @@ Tasks persist across browser sessions and page reloads. When a user returns to t
 
 - **FR-001**: System MUST provide user registration with email and password authentication
 - **FR-002**: System MUST provide secure user login and session management
-- **FR-003**: Users MUST be able to create tasks with title, description, priority, tags, and due date
+- **FR-003**: Users MUST be able to create tasks with title (1-200 chars), description (optional, max 10000 chars), priority (enum: low/medium/high/urgent), tags (array, max 10 tags of 1-50 chars each), and due date (ISO 8601 format, future dates only) per validation rules in data-model.md
 - **FR-004**: Users MUST be able to view their own tasks in a list format
 - **FR-005**: Users MUST be able to update task details including completion status
 - **FR-006**: Users MUST be able to delete their own tasks
@@ -91,7 +91,7 @@ Tasks persist across browser sessions and page reloads. When a user returns to t
 - **FR-009**: System MUST provide API endpoints that require authentication for all task operations
 - **FR-010**: System MUST handle authentication tokens securely using JWT
 - **FR-011**: System MUST validate all user inputs to prevent security vulnerabilities
-- **FR-012**: System MUST provide responsive UI that works on desktop and mobile devices
+- **FR-012**: System MUST provide responsive UI that works across mobile (<768px), tablet (768px-1024px), and desktop (>1024px) devices with adaptive layouts using Tailwind CSS breakpoints (sm, md, lg, xl)
 
 ### Key Entities
 
@@ -105,7 +105,7 @@ Tasks persist across browser sessions and page reloads. When a user returns to t
 - **SC-001**: Users can register for a new account and begin using the application within 3 minutes
 - **SC-002**: Users can create, update, or delete a task within 5 seconds under normal network conditions
 - **SC-003**: 95% of users can successfully complete the registration and login process on their first attempt
-- **SC-004**: The system maintains 99% uptime during peak usage hours
+- **SC-004**: The system maintains 99% uptime during peak usage hours (defined as 9am-5pm UTC Monday-Friday), measured via health check endpoints and monitored through backend logging (T064)
 - **SC-005**: All user data persists reliably with zero data loss incidents during normal operation
 - **SC-006**: The application loads and displays user tasks within 3 seconds for 95% of page views
 - **SC-007**: Users can access their tasks from different devices and browsers while maintaining data consistency

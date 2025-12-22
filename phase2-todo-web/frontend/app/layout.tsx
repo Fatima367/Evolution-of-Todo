@@ -4,6 +4,7 @@ import './globals.css'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 import { SignUpModal } from '@/components/auth/SignUpModal'
 import { LoginModal } from '@/components/auth/LoginModal'
+import { CreateTaskModal } from '@/components/tasks/CreateTaskModal'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
           {/* Global Modals */}
           <SignUpModal />
           <LoginModal />
+          <CreateTaskModal />
         </QueryProvider>
       </body>
     </html>

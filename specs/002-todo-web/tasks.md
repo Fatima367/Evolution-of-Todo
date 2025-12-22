@@ -85,8 +85,8 @@ A new user can visit the application, create an account with email and password,
 - [X] T021 [P] [US1] Create authentication API tests for registration in backend/tests/integration/test_auth.py
 - [X] T022 [P] [US1] Create authentication API tests for login/logout in backend/tests/integration/test_auth.py
 - [X] T023 [P] [US1] Create user model validation tests in backend/tests/unit/test_user_model.py
-- [X] T024 [US1] Create Register page component in frontend/src/app/auth/register/page.tsx
-- [X] T025 [US1] Create Login page component in frontend/src/app/auth/login/page.tsx
+- [X] T024 [US1] Create Register page component in frontend/app/(auth)/register/page.tsx
+- [X] T025 [US1] Create Login page component in frontend/app/(auth)/login/page.tsx
 - [X] T026 [US1] Implement authentication context and hooks in frontend/src/contexts/auth.ts
 - [X] T027 [US1] Create reusable authentication form components in frontend/src/components/auth/
 - [X] T028 [US1] Implement authentication state management and persistence in frontend/src/lib/auth.ts
@@ -111,7 +111,7 @@ A logged-in user can create a new task with a title and description, view all th
 - [X] T036 [P] [US2] Create task API tests for CRUD operations in backend/tests/integration/test_tasks.py
 - [X] T037 [P] [US2] Create task service unit tests in backend/tests/unit/test_task_service.py
 - [X] T038 [P] [US2] Create task model validation tests in backend/tests/unit/test_task_model.py
-- [X] T039 [US2] Create Tasks page component in frontend/src/app/tasks/page.tsx
+- [X] T039 [US2] Create Tasks page component in frontend/app/(dashboard)/tasks/page.tsx
 - [X] T040 [US2] Create Task form component in frontend/src/components/tasks/TaskForm.tsx
 - [X] T041 [US2] Create Task list component in frontend/src/components/tasks/TaskList.tsx
 - [X] T042 [US2] Create Task item component in frontend/src/components/tasks/TaskItem.tsx

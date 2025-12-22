@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     # JWT
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
-    jwt_access_token_expire_minutes: int = 10080
+    jwt_access_token_expire_minutes: int = 60  # 1 hour as per spec (plan.md operational parameters)
 
     # CORS
     cors_origins: List[str] = ["http://localhost:3000"]

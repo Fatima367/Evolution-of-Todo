@@ -21,11 +21,16 @@ Implementation of a multi-user, full-stack web application with persistent stora
 **Primary Dependencies**: Next.js 16+ (Frontend), FastAPI (Backend), SQLModel ORM, Neon Serverless PostgreSQL, Better Auth
 **Storage**: Neon Serverless PostgreSQL database with SQLModel ORM
 **Testing**: pytest (Backend), Jest/React Testing Library (Frontend)
-**Target Platform**: Web application (responsive, mobile/tablet/desktop compatible)
+**Target Platform**: Web application with responsive design (mobile <768px, tablet 768-1024px, desktop >1024px using Tailwind breakpoints: sm/md/lg/xl)
 **Project Type**: Full-stack web application (frontend + backend)
 **Performance Goals**: <500ms API response time (p95), <3 seconds Time to Interactive on mobile
 **Constraints**: Free tier usage limits, JWT-based authentication, user data isolation, WCAG 2.1 AA compliance
 **Scale/Scope**: Multi-user support, responsive UI, persistent storage
+**Operational Parameters**:
+- JWT tokens: 1 hour access token expiration, 7-day refresh token expiration
+- Network retry policy: 3 attempts with exponential backoff (500ms, 1s, 2s delays)
+- Concurrency strategy: Last-write-wins (Phase II simplicity; no optimistic locking)
+- Peak hours definition: 9am-5pm UTC Monday-Friday (for uptime SLA monitoring)
 
 ## Constitution Check
 
