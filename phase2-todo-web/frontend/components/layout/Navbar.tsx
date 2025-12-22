@@ -22,9 +22,9 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2 group">
             <div className="relative">
               <CheckSquare className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
-              <div className="absolute inset-0 glow-blue blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 glow-primary blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               TodoEvo
             </span>
           </Link>
@@ -62,7 +62,7 @@ export function Navbar() {
                   variant="primary"
                   size="sm"
                   onClick={openSignUpModal}
-                  className="glow-blue"
+                  className="glow-primary bg-primary hover:bg-primary/90"
                 >
                   Sign Up
                 </Button>
@@ -130,7 +130,7 @@ export function Navbar() {
                   </Button>
                   <Button
                     variant="primary"
-                    className="w-full glow-blue"
+                    className="w-full glow-primary bg-primary hover:bg-primary/90"
                     onClick={() => {
                       openSignUpModal()
                       setIsMobileMenuOpen(false)
