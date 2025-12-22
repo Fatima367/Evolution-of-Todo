@@ -3,22 +3,22 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
+  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 hover:scale-105',
   {
     variants: {
       variant: {
         primary:
-          'bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:from-blue-700 hover:to-blue-800 focus-visible:ring-blue-500',
+          'relative overflow-hidden bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white shadow-lg hover:shadow-xl focus-visible:ring-[#6EB8E1]',
         secondary:
-          'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-900 shadow-md hover:shadow-lg hover:from-slate-200 hover:to-slate-300 focus-visible:ring-slate-400',
+          'bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 text-[#252E8A] dark:text-purple-300 border-2 border-[#C8ABE6] dark:border-purple-700 shadow-md hover:shadow-lg focus-visible:ring-[#C8ABE6]',
         success:
-          'bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:from-emerald-700 hover:to-emerald-800 focus-visible:ring-emerald-500',
+          'relative overflow-hidden bg-gradient-to-r from-[#4EB5A9] to-[#48ADB7] text-white shadow-lg hover:shadow-xl focus-visible:ring-[#4EB5A9]',
         danger:
-          'bg-gradient-to-br from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:from-red-700 hover:to-red-800 focus-visible:ring-red-500',
+          'bg-gradient-to-br from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 focus-visible:ring-red-500',
         ghost:
-          'text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
+          'text-[#201761] dark:text-[#F7F6F7] hover:bg-[#E6E5E1] dark:hover:bg-[#252E8A] focus-visible:ring-[#6EB8E1]',
         outline:
-          'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 focus-visible:ring-slate-400',
+          'border-2 border-[#6EB8E1] text-[#5A7FC8] dark:text-[#6EB8E1] hover:bg-[#6EB8E1] hover:text-white focus-visible:ring-[#6EB8E1]',
       },
       size: {
         sm: 'h-9 px-4 text-sm',
