@@ -16,6 +16,7 @@ A modern, full-stack todo application built with Next.js 16+, FastAPI, and Postg
 
 - **Frontend**: Next.js 16+ with App Router, TypeScript, Tailwind CSS
 - **Backend**: FastAPI with SQLModel ORM, Pydantic validation
+- **Package Manager**: uv (recommended for backend dependency management)
 - **Database**: Neon Serverless PostgreSQL (production), PostgreSQL (local dev)
 - **Authentication**: Better Auth with JWT tokens
 - **Testing**: pytest (backend), Jest + Playwright (frontend)
@@ -40,14 +41,27 @@ See [specs/002-todo-web/quickstart.md](../specs/002-todo-web/quickstart.md) for 
 2. **Backend Setup**:
    ```bash
    cd backend
+   # Create virtual environment using standard venv
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+
+   # Alternative: Using uv venv (recommended)
+   # uv venv
+   # source .venv/bin/activate
+
+   # Install dependencies
+   uv pip install -r requirements.txt
+   # Alternative: pip install -r requirements.txt
    cp .env.example .env
    # Edit .env with your database credentials
-   alembic upgrade head
-   uvicorn src.main:app --reload
+   # Run with uv (recommended)
+   uv run alembic upgrade head
+   # Alternative: alembic upgrade head
+   # Run with uv (recommended)
+   uv run uvicorn src.main:app --reload
+   # Alternative: uvicorn src.main:app --reload
    ```
+   Note: Ensure all Python dependencies and tools are managed using uv for a consistent development experience.
 
 3. **Frontend Setup**:
    ```bash
@@ -98,7 +112,9 @@ phase2-todo-web/
 
 ```bash
 # Backend tests
-cd backend && pytest
+# Run with uv (recommended)
+cd backend && uv run pytest
+# Alternative: cd backend && pytest
 
 # Frontend tests
 cd frontend && npm test

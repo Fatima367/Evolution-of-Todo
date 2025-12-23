@@ -73,14 +73,25 @@ The frontend structure follows Next.js 16+ App Router. You need to create these 
 **Backend:**
 ```bash
 cd backend
+# Using standard venv
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+
+# Alternative: Using uv venv (recommended)
+# uv venv
+# source .venv/bin/activate
+
+uv pip install -r requirements.txt
+# Alternative: pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your Neon database URL
-alembic upgrade head
-uvicorn src.main:app --reload
+# Run with uv (recommended)
+uv run alembic upgrade head
+# Alternative: alembic upgrade head
+uv run uvicorn src.main:app --reload
+# Alternative: uvicorn src.main:app --reload
 ```
+Note: All Python dependencies and tools should be managed using uv for a consistent development experience.
 
 **Frontend:**
 ```bash

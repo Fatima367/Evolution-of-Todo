@@ -244,6 +244,7 @@ phase2-todo-web/
 ### Backend Architecture
 - **Framework**: FastAPI (modern, async, auto-docs)
 - **ORM**: SQLModel (type-safe, Pydantic integration)
+- **Package Manager**: uv (recommended for dependency management)
 - **Database**: Neon Serverless PostgreSQL (autoscaling, free tier)
 - **Authentication**: JWT tokens (stateless, scalable)
 - **Password Hashing**: bcrypt (industry standard, configurable rounds)
@@ -317,7 +318,9 @@ CREATE INDEX idx_users_email ON users(email);
 ### Test Infrastructure
 ```bash
 # Backend
-pytest tests/ --cov=src --cov-report=html
+# Run with uv (recommended)
+uv run pytest tests/ --cov=src --cov-report=html
+# Alternative: pytest tests/ --cov=src --cov-report=html
 
 # Frontend unit tests
 npm run test
@@ -364,22 +367,33 @@ All task endpoints require JWT authentication and automatically filter by user_i
 cd phase2-todo-web/backend
 
 # Create virtual environment
+# Using standard venv
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
+# Alternative: Using uv venv (recommended)
+# uv venv
+# source .venv/bin/activate
+
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+# Alternative: pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your Neon database URL and JWT secret
 
 # Run migrations
-alembic upgrade head
+# Run with uv (recommended)
+uv run alembic upgrade head
+# Alternative: alembic upgrade head
 
 # Start server
-uvicorn src.main:app --reload --port 8000
+# Run with uv (recommended)
+uv run uvicorn src.main:app --reload --port 8000
+# Alternative: uvicorn src.main:app --reload --port 8000
 ```
+Note: All Python dependencies and tools should be managed using uv for a consistent development experience.
 
 ### Frontend Setup
 ```bash
@@ -462,24 +476,32 @@ git checkout -b feature/add-task-tags
 # 3. Ensure tests pass
 
 # Run tests
-pytest tests/                    # Backend
+# Run with uv (recommended)
+uv run pytest tests/             # Backend
+# Alternative: pytest tests/     # Backend
 npm test                         # Frontend
 
 # Format code
-black src/ tests/                # Backend
+# Run with uv (recommended)
+uv run black src/ tests/         # Backend
+# Alternative: black src/ tests/ # Backend
 npm run format                   # Frontend
 ```
 
 ### 2. Database Changes
 ```bash
 # Create migration
-alembic revision --autogenerate -m "Add tags column"
+# Run with uv (recommended)
+uv run alembic revision --autogenerate -m "Add tags column"
+# Alternative: alembic revision --autogenerate -m "Add tags column"
 
 # Review migration file
 # Edit if needed
 
 # Apply migration
-alembic upgrade head
+# Run with uv (recommended)
+uv run alembic upgrade head
+# Alternative: alembic upgrade head
 ```
 
 ### 3. Deployment

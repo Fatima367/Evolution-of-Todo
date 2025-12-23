@@ -13,6 +13,7 @@ This document outlines the technical stack, architectural patterns, and API desi
 | **Authentication** | Better Auth / JWT | Token-based authentication to secure endpoints. |
 | **Migrations** | Alembic | For managing database schema changes. |
 | **Testing** | Pytest | For unit, integration, and contract testing. |
+| **Package Manager** | uv | For backend dependency management. |
 
 ---
 
@@ -97,14 +98,20 @@ The schema is defined using SQLModel in `/src/models` and managed with Alembic m
 ## 6. Development Workflow
 
 ### Setup & Running
-1.  Create and activate a virtual environment:
+1.  Create and activate a virtual environment (using uv for package management):
     ```bash
+    # Using standard venv
     python -m venv .venv
+    source .venv/bin/activate
+
+    # Alternative: Using uv venv (recommended)
+    uv venv
     source .venv/bin/activate
     ```
 2.  Install dependencies:
     ```bash
-    pip install -r requirements.txt
+    uv pip install -r requirements.txt
+    # Alternative: pip install -r requirements.txt
     ```
 3.  Set up your `.env` file with the `DATABASE_URL` and `BETTER_AUTH_SECRET`.
 4.  Run database migrations:
@@ -113,6 +120,10 @@ The schema is defined using SQLModel in `/src/models` and managed with Alembic m
     ```
 5.  Start the development server:
     ```bash
-    uvicorn src.main:app --reload
+    # Run with uv (recommended)
+    uv run uvicorn src.main:app --reload
+    # Alternative: uvicorn src.main:app --reload
     ```
 The API will be available at `http://127.0.0.1:8000`.
+
+Note: All Python packages and tools (like uvicorn, pytest, etc.) can be managed using uv for a consistent development experience.

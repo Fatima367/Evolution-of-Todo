@@ -10,6 +10,7 @@ FastAPI backend for the Todo Full-Stack Web Application with user authentication
 - User isolation and data security
 - Automatic API documentation (Swagger/ReDoc)
 - Database migrations with Alembic
+- Package management with uv (recommended)
 
 ## Project Structure
 
@@ -41,11 +42,17 @@ backend/
 
 ```bash
 # Create virtual environment
+# Using standard venv
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
+# Alternative: Using uv venv (recommended)
+# uv venv
+# source .venv/bin/activate
+
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+# Alternative: pip install -r requirements.txt
 
 # Copy environment variables
 cp .env.example .env
@@ -59,21 +66,30 @@ cp .env.example .env
 # alembic init alembic
 
 # Create initial migration
-alembic revision --autogenerate -m "Initial migration"
+# Run with uv (recommended)
+uv run alembic revision --autogenerate -m "Initial migration"
+# Alternative: alembic revision --autogenerate -m "Initial migration"
 
 # Apply migrations
-alembic upgrade head
+# Run with uv (recommended)
+uv run alembic upgrade head
+# Alternative: alembic upgrade head
 ```
 
 ### Running
 
 ```bash
 # Development mode with auto-reload
-uvicorn src.main:app --reload --port 8000
+# Run with uv (recommended)
+uv run uvicorn src.main:app --reload --port 8000
+# Alternative: uvicorn src.main:app --reload --port 8000
 
 # Production mode
-uvicorn src.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
+# Alternative: uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
+
+Note: Ensure all Python packages and tools (like uvicorn, pytest, etc.) are installed using uv for a consistent development experience.
 
 ## API Documentation
 
@@ -101,26 +117,38 @@ All task endpoints require JWT authentication.
 
 ```bash
 # Run all tests
-pytest
+# Run with uv (recommended)
+uv run pytest
+# Alternative: pytest
 
 # Run with coverage
-pytest --cov=src tests/
+# Run with uv (recommended)
+uv run pytest --cov=src tests/
+# Alternative: pytest --cov=src tests/
 
 # Run specific test file
-pytest tests/unit/test_task_service.py -v
+# Run with uv (recommended)
+uv run pytest tests/unit/test_task_service.py -v
+# Alternative: pytest tests/unit/test_task_service.py -v
 ```
 
 ## Code Quality
 
 ```bash
 # Format code
-black src/ tests/
+# Run with uv (recommended)
+uv run black src/ tests/
+# Alternative: black src/ tests/
 
 # Lint code
-ruff check src/ tests/ --fix
+# Run with uv (recommended)
+uv run ruff check src/ tests/ --fix
+# Alternative: ruff check src/ tests/ --fix
 
 # Type checking
-mypy src/
+# Run with uv (recommended)
+uv run mypy src/
+# Alternative: mypy src/
 ```
 
 ## Environment Variables
@@ -148,7 +176,9 @@ See `.env.example` for required environment variables:
 uvicorn src.main:app --reload
 
 # Run tests in watch mode
-pytest-watch
+# Run with uv (recommended)
+uv run pytest-watch
+# Alternative: pytest-watch
 
 # Format on save (configure your IDE)
 ```

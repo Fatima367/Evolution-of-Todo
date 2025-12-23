@@ -4,7 +4,8 @@
 
 - Python 3.13+ installed
 - Node.js 18+ installed
-- npm or yarn package manager
+- npm or yarn package manager (for frontend)
+- uv package manager (for backend dependency management)
 - Access to Neon Serverless PostgreSQL (free tier available)
 
 ## Local Development Setup
@@ -23,11 +24,17 @@ cd phase2-todo-web
 cd backend
 
 # Create virtual environment
+# Using standard venv
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
+# Alternative: Using uv venv (recommended)
+# uv venv
+# source .venv/bin/activate
+
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+# Alternative: pip install -r requirements.txt
 
 # Set up environment variables
 cp .env.example .env
@@ -64,8 +71,11 @@ cp .env.example .env.local
 ```bash
 cd backend
 source venv/bin/activate  # Activate virtual environment
-uvicorn src.main:app --reload --port 8000
+# Run with uv (recommended)
+uv run uvicorn src.main:app --reload --port 8000
+# Alternative: uvicorn src.main:app --reload --port 8000
 ```
+Note: All Python dependencies and tools should be managed using uv for a consistent development experience.
 
 #### Frontend (in another terminal):
 ```bash
