@@ -16,6 +16,9 @@ class UserCreate(BaseModel):
         """Validate password complexity"""
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')
+        # Check for bcrypt password length limitation (72 bytes)
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must be 72 bytes or less when encoded in UTF-8')
         return v
 
 

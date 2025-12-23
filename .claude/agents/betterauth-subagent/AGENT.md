@@ -455,6 +455,9 @@ export const config = {
 
 ### 3. Password Security
 - ✅ Enforce minimum password length (8+ characters)
+- ✅ Enforce maximum password length (72 characters) due to bcrypt limitation
+- ✅ Implement proper validation at schema level to reject passwords > 72 bytes when UTF-8 encoded
+- ✅ Handle multi-byte character truncation properly to avoid cutting characters in the middle
 - ✅ Better Auth handles password hashing automatically
 - ✅ Implement password complexity requirements if needed
 - ✅ Never store or log plain-text passwords
@@ -549,6 +552,7 @@ curl -X GET http://localhost:8000/api/user123/tasks \
 | CORS errors | Missing CORS headers | Add CORS middleware to FastAPI |
 | Token not sent | Missing Authorization header | Ensure API client includes Bearer token |
 | Secret mismatch | Different secrets on frontend/backend | Use same BETTER_AUTH_SECRET everywhere |
+| 500 Internal Server Error during registration/login | Password longer than 72 bytes when UTF-8 encoded (bcrypt limitation) | Implement password length validation at schema level to reject passwords > 72 bytes when UTF-8 encoded, with proper handling of multi-byte characters |
 
 ## Summary
 

@@ -34,6 +34,13 @@ export default function RegisterPage() {
       return
     }
 
+    // Check for bcrypt password length limitation (72 bytes)
+    const passwordBytes = new TextEncoder().encode(password);
+    if (passwordBytes.length > 72) {
+      setError('Password must be 72 characters or less')
+      return
+    }
+
     setLoading(true)
 
     try {

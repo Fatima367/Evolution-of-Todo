@@ -164,6 +164,7 @@ See `.env.example` for required environment variables:
 ## Security
 
 - All passwords are hashed using bcrypt
+- Password length limited to 72 bytes when UTF-8 encoded (due to bcrypt limitation)
 - JWT tokens for authentication
 - User isolation enforced at database query level
 - Input validation with Pydantic models
