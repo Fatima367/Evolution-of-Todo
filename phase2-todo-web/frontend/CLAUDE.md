@@ -22,11 +22,16 @@ This document outlines the technical stack, architectural patterns, and UI/UX vi
 ```
 /frontend
 ├── /app                  # App Router: pages, layouts, and API routes
-│   ├── (auth)/           # Route group for authentication pages (e.g., /login)
-│   ├── (dashboard)/      # Route group for protected dashboard pages
+│   ├── /auth/            # Authentication pages (e.g., /auth/login, /auth/register)
+│   │   ├── /login/
+│   │   ├── /register/
+│   │   └── layout.tsx    # Auth layout
+│   ├── /dashboard/       # Protected dashboard pages
+│   │   ├── /page.tsx     # Dashboard overview
 │   │   ├── /tasks/
 │   │   ├── /settings/
 │   │   └── layout.tsx    # Dashboard layout with sidebar
+│   ├── page.tsx          # Landing page
 │   └── layout.tsx        # Root layout
 ├── /components           # Reusable UI components
 │   ├── /ui/              # Generic, shadcn-like components (Button, Card, etc.)

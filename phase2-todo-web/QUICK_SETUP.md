@@ -42,9 +42,10 @@ The frontend structure follows Next.js 16+ App Router. You need to create these 
 - `app/auth/login/page.tsx` - Login page
 - `app/auth/register/page.tsx` - Register page
 
-**Task Pages:**
-- `app/tasks/page.tsx` - Tasks list
-- `app/tasks/[id]/page.tsx` - Individual task
+**Dashboard Pages:**
+- `app/dashboard/page.tsx` - Dashboard overview
+- `app/dashboard/tasks/page.tsx` - Tasks list
+- `app/dashboard/settings/page.tsx` - Settings page
 
 **Components:**
 - `components/ui/Button.tsx`

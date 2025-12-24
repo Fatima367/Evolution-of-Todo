@@ -101,10 +101,13 @@ phase2-todo-web/
 │   │   │   │   └── page.tsx
 │   │   │   └── register/
 │   │   │       └── page.tsx
-│   │   └── tasks/               # Task management pages
-│   │       ├── page.tsx         # Tasks list
-│   │       └── [id]/
-│   │           └── page.tsx     # Individual task
+│   │   └── dashboard/           # Protected dashboard pages
+│   │       ├── page.tsx         # Dashboard overview
+│   │       ├── layout.tsx       # Dashboard layout with sidebar
+│   │       ├── tasks/
+│   │       │   └── page.tsx     # Tasks list
+│   │       └── settings/
+│   │           └── page.tsx     # Settings page
 │   ├── components/              # React components
 │   │   ├── ui/                  # Reusable UI components
 │   │   │   ├── Button.tsx
@@ -548,9 +551,9 @@ npm start
 **Remediations Applied:**
 
 1. **File Structure Cleanup** ✅
-   - Removed redundant `frontend/app/auth/` directory
-   - Only route groups `(auth)` and `(dashboard)` remain
-   - Clean Next.js 16 App Router structure
+   - Updated to use regular folders `auth/` and `dashboard/` (not route groups)
+   - Clean Next.js 16 App Router structure with proper URL paths
+   - `/dashboard/tasks` and `/auth/login` now work correctly
 
 2. **Documentation Updates** ✅
    - Updated tasks.md paths for T024, T025, T039

@@ -45,8 +45,16 @@ export function Navbar() {
                 >
                   Tasks
                 </Link>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/auth/login">Logout</Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const { clearAuth } = useAuthStore.getState()
+                    clearAuth()
+                    window.location.href = '/'
+                  }}
+                >
+                  Logout
                 </Button>
               </>
             ) : (
@@ -112,8 +120,17 @@ export function Navbar() {
                   >
                     Tasks
                   </Link>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/auth/login">Logout</Link>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      const { clearAuth } = useAuthStore.getState()
+                      clearAuth()
+                      setIsMobileMenuOpen(false)
+                      window.location.href = '/'
+                    }}
+                  >
+                    Logout
                   </Button>
                 </>
               ) : (

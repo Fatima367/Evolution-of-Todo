@@ -13,22 +13,24 @@ All three remediation items identified in the post-implementation analysis have 
 
 ## Remediation 1: Remove Redundant Directory ✅
 
-**Issue**: Redundant `frontend/app/auth/` directory existed alongside new `(auth)` route group
+**Issue**: Redundant and incorrect directory structure - using route groups `(auth)` and `(dashboard)` which don't create proper URL paths
 
 **Action Taken**:
 ```bash
-rm -rf phase2-todo-web/frontend/app/auth/
+# Renamed route groups to regular folders for proper URL routing
+mv app/(auth) app/auth
+mv app/(dashboard) app/dashboard
 ```
 
 **Result**:
-- ✅ Old directory structure removed
-- ✅ Only route group `frontend/app/(auth)/` remains
+- ✅ Auth routes now accessible at `/auth/login`, `/auth/register`
+- ✅ Dashboard routes now accessible at `/dashboard`, `/dashboard/tasks`, `/dashboard/settings`
 - ✅ File structure now matches Next.js 16 App Router best practices
 
 **Verification**:
 ```bash
 ls -la phase2-todo-web/frontend/app/
-# Shows only (auth) and (dashboard) route groups
+# Shows auth/ and dashboard/ regular folders (not route groups)
 ```
 
 ---
@@ -41,20 +43,20 @@ ls -la phase2-todo-web/frontend/app/
 
 1. **T024 - Register Page Path**:
    - Old: `frontend/src/app/auth/register/page.tsx`
-   - New: `frontend/app/(auth)/register/page.tsx`
+   - Updated: `frontend/app/auth/register/page.tsx` (no route group)
 
 2. **T025 - Login Page Path**:
    - Old: `frontend/src/app/auth/login/page.tsx`
-   - New: `frontend/app/(auth)/login/page.tsx`
+   - Updated: `frontend/app/auth/login/page.tsx` (no route group)
 
 3. **T039 - Tasks Page Path**:
    - Old: `frontend/src/app/tasks/page.tsx`
-   - New: `frontend/app/(dashboard)/tasks/page.tsx`
+   - Updated: `frontend/app/dashboard/tasks/page.tsx` (no route group)
 
 **Result**:
 - ✅ All task descriptions now reference correct file paths
 - ✅ Documentation accurately reflects implementation structure
-- ✅ Route groups properly documented in tasks.md
+- ✅ Uses regular folders `auth/` and `dashboard/` (not route groups)
 
 **Files Modified**:
 - `specs/002-todo-web/tasks.md` (3 path updates)
@@ -136,7 +138,8 @@ retryDelay: (attemptIndex) => {
 
 | File | Changes | Type |
 |------|---------|------|
-| `frontend/app/auth/` (directory) | Removed (redundant) | Cleanup |
+| `frontend/app/(auth)` → `auth/` | Renamed (route group to regular folder) | Structure fix |
+| `frontend/app/(dashboard)` → `dashboard/` | Renamed (route group to regular folder) | Structure fix |
 | `specs/002-todo-web/tasks.md` | Updated 3 file paths (T024, T025, T039) | Documentation |
 | `backend/src/config.py` | JWT expiration: 10080 → 60 minutes | Configuration |
 | `frontend/lib/queryClient.ts` | Retry: 1 → 3 with exponential backoff | Configuration |
@@ -145,8 +148,8 @@ retryDelay: (attemptIndex) => {
 
 ## Verification Checklist
 
-- [x] Redundant `app/auth/` directory removed
-- [x] Only route groups `(auth)` and `(dashboard)` exist
+- [x] Route groups renamed to regular folders `auth/` and `dashboard/`
+- [x] Routes now accessible at `/auth/login`, `/dashboard/tasks` etc.
 - [x] tasks.md references correct file paths
 - [x] JWT access token expiration set to 60 minutes (1 hour)
 - [x] React Query retry count set to 3 attempts

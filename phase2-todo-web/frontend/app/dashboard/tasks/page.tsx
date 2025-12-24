@@ -96,8 +96,8 @@ export default function TasksPage() {
             <FilterDropdown
               label="Status"
               options={statusOptions}
-              selectedValues={filters.statuses || []}
-              onChange={(values) => updateFilter('statuses', values)}
+              selectedValues={filters.status || []}
+              onChange={(values) => updateFilter('status', values)}
               icon={<Filter size={18} />}
             />
 
@@ -105,8 +105,8 @@ export default function TasksPage() {
             <FilterDropdown
               label="Priority"
               options={priorityOptions}
-              selectedValues={filters.priorities || []}
-              onChange={(values) => updateFilter('priorities', values)}
+              selectedValues={filters.priority || []}
+              onChange={(values) => updateFilter('priority', values)}
               icon={<Filter size={18} />}
             />
 
@@ -140,8 +140,8 @@ export default function TasksPage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   updateFilter('searchQuery', '');
-                  updateFilter('statuses', []);
-                  updateFilter('priorities', []);
+                  updateFilter('status', []);
+                  updateFilter('priority', []);
                   updateFilter('tags', []);
                 }}
                 className="text-sm text-purple-500 hover:text-purple-600 font-medium"

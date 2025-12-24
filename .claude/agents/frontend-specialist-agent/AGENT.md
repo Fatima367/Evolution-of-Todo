@@ -56,6 +56,40 @@ Build beautiful, performant, and accessible user interfaces that follow modern R
 - **Forms**: React Hook Form + Zod
 - **Data Fetching**: Fetch API, SWR, or React Query
 
+## Known Issues and Solutions
+
+### Turbopack Font Resolution Error
+**Problem**: Next.js 16+ with Turbopack (default in newer versions) fails to resolve `next/font/google` imports:
+```
+Error: Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+```
+
+**Solution Options**:
+1. **Disable Turbopack** (Recommended for now):
+   - Add `--no-turbopack` flag to build commands
+   - Or use `next.config.js` with `turbo: undefined`
+2. **Use Webpack explicitly**:
+   ```bash
+   next build --turbo=false
+   ```
+3. **Alternative: Use CSS font imports** (if Turbopack required):
+   - Replace `next/font/google` with standard CSS `@font-face` declarations
+   - Add font files to `public/fonts/`
+   - Import in `globals.css` instead of layout
+
+### Route Groups vs Regular Routes
+**Important**: Next.js App Router route groups use parentheses `(name)`:
+- `(auth)` and `(dashboard)` are route groups - they don't affect URL paths
+- Pages inside `(dashboard)/tasks/page.tsx` route to `/tasks`, NOT `/dashboard/tasks`
+- To get `/dashboard/tasks`, use `dashboard/tasks/page.tsx` (no parentheses)
+
+**Rule**: When fixing routing, rename route groups to regular folders if the group name should appear in URL.
+
+### Component Export Failures
+**Common Pattern**: Missing exports in index.ts files
+- Always check if components are exported from index.ts before using them
+- Example: `components/layout/DashboardSidebar.tsx` must have `export { DashboardSidebar } from './DashboardSidebar'` in `components/layout/index.ts`
+
 ## Success Criteria
 
 Your success is measured by:

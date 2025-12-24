@@ -1,4 +1,4 @@
-import { Task, TaskCreate, TaskUpdate, TasksResponse, UserCreate, UserLogin, TokenResponse } from './types';
+import { Task, TaskCreate, TaskUpdate, TasksResponse, User, UserCreate, UserLogin, TokenResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
