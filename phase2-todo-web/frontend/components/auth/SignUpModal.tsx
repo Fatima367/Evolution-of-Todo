@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Lock, User, UserPlus } from 'lucide-react'
-import { useAuthStore, useUIStore } from '@/store'
+import { useAuth } from '@/contexts/auth'
+import { useUIStore } from '@/store'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 
 export function SignUpModal() {
   const { isSignUpModalOpen, closeSignUpModal } = useUIStore()
-  const { setAuth } = useAuthStore()
+  const { register } = useAuth()
   const router = useRouter()
 
   const [name, setName] = useState('')
@@ -25,16 +26,7 @@ export function SignUpModal() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      })
-
-      if (!response.ok) throw new Error('Registration failed')
-
-      const data = await response.json()
-      setAuth(data.user, data.token)
+      await register({ name, email, password })
       closeSignUpModal()
       router.push('/dashboard')
     } catch (err) {

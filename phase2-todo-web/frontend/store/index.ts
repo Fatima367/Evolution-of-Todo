@@ -1,2 +1,2 @@
-export { useAuthStore } from './authStore'
+export { useDashboardStats } from '@/hooks/useDashboardStats'
 export { useUIStore } from './uiStore'

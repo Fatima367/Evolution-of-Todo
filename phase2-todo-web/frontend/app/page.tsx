@@ -19,7 +19,8 @@ import {
   Pencil,
   CalendarCheck,
 } from "lucide-react";
-import { useAuthStore, useUIStore } from "@/store";
+import { useAuth } from "@/hooks/useAuth";
+import { useUIStore } from "@/store";
 import { Button } from "@/components/ui/Button";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -111,7 +112,7 @@ const benefits = [
 ];
 
 export default function LandingPage() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuth();
   const { openSignUpModal } = useUIStore();
 
   const handleCTAClick = () => {

@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Lock, LogIn } from 'lucide-react'
-import { useAuthStore, useUIStore } from '@/store'
+import { useAuth } from '@/contexts/auth'
+import { useUIStore } from '@/store'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 
 export function LoginModal() {
   const { isLoginModalOpen, closeLoginModal } = useUIStore()
-  const { setAuth } = useAuthStore()
+  const { login } = useAuth()
   const router = useRouter()
 
   const [email, setEmail] = useState('')
@@ -24,16 +25,7 @@ export function LoginModal() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) throw new Error('Invalid credentials')
-
-      const data = await response.json()
-      setAuth(data.user, data.token)
+      await login({ email, password })
       closeLoginModal()
       router.push('/dashboard')
     } catch (err) {

@@ -1,7 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useAuthStore } from '@/store'
+import { useAuth } from '@/hooks/useAuth'
+import { useDashboardStats } from '@/store'
+import { useTasks } from '@/hooks/useTasks'
 import {
   TaskCompletionChart,
   PriorityPieChart,
@@ -10,40 +12,85 @@ import {
 } from '@/components/dashboard'
 import { CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-
-const stats = [
-  {
-    name: 'Total Tasks',
-    value: '80',
-    change: '+12%',
-    icon: CheckCircle,
-    color: 'blue',
-  },
-  {
-    name: 'In Progress',
-    value: '15',
-    change: '+5%',
-    icon: Clock,
-    color: 'yellow',
-  },
-  {
-    name: 'Completed',
-    value: '57',
-    change: '+18%',
-    icon: TrendingUp,
-    color: 'green',
-  },
-  {
-    name: 'High Priority',
-    value: '8',
-    change: '-3%',
-    icon: AlertCircle,
-    color: 'red',
-  },
-]
+import { Skeleton } from '@/components/ui/Loading'
 
 export default function DashboardPage() {
-  const { user } = useAuthStore()
+  const { user } = useAuth()
+  const { stats, loading, error } = useDashboardStats()
+  const { tasks } = useTasks()
+
+  // Define stats configuration
+  const statConfigs = [
+    {
+      name: 'Total Tasks',
+      value: stats.totalTasks,
+      change: '+0%',
+      icon: CheckCircle,
+      color: 'blue',
+    },
+    {
+      name: 'In Progress',
+      value: stats.inProgressTasks,
+      change: '+0%',
+      icon: Clock,
+      color: 'yellow',
+    },
+    {
+      name: 'Completed',
+      value: stats.completedTasks,
+      change: '+0%',
+      icon: TrendingUp,
+      color: 'green',
+    },
+    {
+      name: 'High Priority',
+      value: stats.highPriorityTasks,
+      change: '+0%',
+      icon: AlertCircle,
+      color: 'red',
+    },
+  ]
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        {/* Welcome Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Welcome back, {user?.name || 'User'}!
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Here's what's happening with your tasks today
+          </p>
+        </motion.div>
+
+        {/* Stats Grid Skeletons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((_, index) => (
+            <div key={index}>
+              <Skeleton className="h-32 w-full" />
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Grid Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+        </div>
+
+        {/* Activity and Progress Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-80 w-full" />
+          <Skeleton className="h-80 w-full" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -63,7 +110,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
+        {statConfigs.map((stat, index) => {
           const Icon = stat.icon
           return (
             <motion.div
@@ -102,7 +149,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <TaskCompletionChart />
+          <TaskCompletionChart tasks={tasks} />
         </motion.div>
 
         <motion.div
@@ -110,7 +157,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <PriorityPieChart />
+          <PriorityPieChart tasks={tasks} />
         </motion.div>
       </div>
 
@@ -121,7 +168,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <ActivityFeed />
+          <ActivityFeed tasks={tasks} />
         </motion.div>
 
         <motion.div
@@ -129,7 +176,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <ProgressOverview />
+          <ProgressOverview tasks={tasks} />
         </motion.div>
       </div>
     </div>

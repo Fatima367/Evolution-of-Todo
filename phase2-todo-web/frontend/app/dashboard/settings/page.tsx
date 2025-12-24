@@ -3,13 +3,14 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { User, Mail, Lock, Bell, Moon, Sun } from 'lucide-react'
-import { useAuthStore, useUIStore } from '@/store'
+import { useAuth } from '@/hooks/useAuth'
+import { useUIStore } from '@/store'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
 export default function SettingsPage() {
-  const { user } = useAuthStore()
+  const { user } = useAuth()
   const { theme, toggleTheme } = useUIStore()
   const [name, setName] = useState(user?.name || '')
   const [email, setEmail] = useState(user?.email || '')

@@ -120,7 +120,7 @@ export function CreateTaskModal() {
           exit={{ opacity: 0 }}
           onClick={handleClose}
           onKeyDown={handleKeyDown}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -128,11 +128,11 @@ export function CreateTaskModal() {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl glass-card rounded-2xl shadow-2xl overflow-hidden"
+            className="w-full max-w-2xl max-h-[90vh] glass-card rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Create New Task
               </h2>
               <motion.button
@@ -146,8 +146,9 @@ export function CreateTaskModal() {
               </motion.button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            {/* Form - Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               {/* Title */}
               <div>
                 <label htmlFor="title" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -338,6 +339,7 @@ export function CreateTaskModal() {
                 </motion.button>
               </div>
             </form>
+            </div>
           </motion.div>
         </motion.div>
       )}

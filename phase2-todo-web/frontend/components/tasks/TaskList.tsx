@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { FileText } from 'lucide-react';
 import { TaskItem } from './TaskItem';
 import type { Task } from '@/lib/types';
 
@@ -44,9 +45,9 @@ export function TaskList({ tasks, loading, onUpdate, onDelete }: TaskListProps) 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className="text-6xl mb-4"
+          className="flex justify-center mb-4"
         >
-          📝
+          <FileText size={64} className="text-gray-400 dark:text-gray-500" />
         </motion.div>
         <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
           No tasks yet

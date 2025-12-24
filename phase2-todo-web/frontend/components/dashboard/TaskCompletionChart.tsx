@@ -11,24 +11,53 @@ import {
 } from 'recharts'
 import { Card } from '../ui/Card'
 import { TrendingUp } from 'lucide-react'
+import { Task } from '@/lib/types'
 
 interface TaskCompletionChartProps {
-  data?: Array<{ date: string; completed: number }>
+  tasks?: Task[]
 }
 
-// Mock data for last 7 days
-const mockData = [
-  { date: 'Mon', completed: 5 },
-  { date: 'Tue', completed: 8 },
-  { date: 'Wed', completed: 6 },
-  { date: 'Thu', completed: 12 },
-  { date: 'Fri', completed: 9 },
-  { date: 'Sat', completed: 7 },
-  { date: 'Sun', completed: 10 },
-]
+// Generate data for last 7 days
+const generateLast7DaysData = () => {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const today = new Date()
+  const data = []
 
-export function TaskCompletionChart({ data = mockData }: TaskCompletionChartProps) {
-  const total = data.reduce((sum, item) => sum + item.completed, 0)
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - i)
+
+    data.push({
+      date: days[date.getDay()],
+      completed: 0
+    })
+  }
+
+  return data
+}
+
+export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
+  // Filter completed tasks from the last 7 days
+  const last7DaysData = generateLast7DaysData()
+
+  // Update the data with actual completed tasks
+  const completedTasksByDay = tasks
+    .filter(task => task.completed_at) // Only completed tasks
+    .reduce((acc, task) => {
+      if (!task.completed_at) return acc
+
+      const taskDate = new Date(task.completed_at)
+      const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][taskDate.getDay()]
+
+      const dayEntry = acc.find(entry => entry.date === dayOfWeek)
+      if (dayEntry) {
+        dayEntry.completed += 1
+      }
+
+      return acc
+    }, [...last7DaysData])
+
+  const total = completedTasksByDay.reduce((sum, item) => sum + item.completed, 0)
 
   return (
     <Card className="glass-card p-6">
@@ -43,39 +72,49 @@ export function TaskCompletionChart({ data = mockData }: TaskCompletionChartProp
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
-          <XAxis
-            dataKey="date"
-            stroke="#9ca3af"
-            style={{ fontSize: '12px' }}
-          />
-          <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              border: 'none',
-              borderRadius: '8px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="completed"
-            stroke="url(#colorGradient)"
-            strokeWidth={3}
-            dot={{ fill: '#3B82F6', r: 4 }}
-            activeDot={{ r: 6 }}
-          />
-          <defs>
-            <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="#A855F7" />
-            </linearGradient>
-          </defs>
-        </LineChart>
-      </ResponsiveContainer>
+      {total === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[250px] text-center">
+          <TrendingUp className="h-12 w-12 text-gray-400 mb-4" />
+          <h4 className="text-lg font-medium text-gray-500">No completed tasks</h4>
+          <p className="text-sm text-gray-500 max-w-xs">
+            Complete tasks to see your progress over the last 7 days
+          </p>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={completedTasksByDay}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
+            <XAxis
+              dataKey="date"
+              stroke="#9ca3af"
+              style={{ fontSize: '12px' }}
+            />
+            <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}
+            />
+            <Line
+              type="monotone"
+              dataKey="completed"
+              stroke="url(#colorGradient)"
+              strokeWidth={3}
+              dot={{ fill: '#3B82F6', r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#3B82F6" />
+                <stop offset="100%" stopColor="#A855F7" />
+              </linearGradient>
+            </defs>
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </Card>
   )
 }

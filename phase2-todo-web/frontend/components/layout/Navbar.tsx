@@ -4,12 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, CheckSquare } from 'lucide-react'
-import { useAuthStore, useUIStore } from '@/store'
+import { useAuth } from '@/hooks/useAuth'
+import { useUIStore } from '@/store'
 import { Button } from '../ui/Button'
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, logout } = useAuth()
   const { openSignUpModal, openLoginModal } = useUIStore()
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -48,9 +49,8 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    const { clearAuth } = useAuthStore.getState()
-                    clearAuth()
+                  onClick={async () => {
+                    await logout()
                     window.location.href = '/'
                   }}
                 >
@@ -123,9 +123,8 @@ export function Navbar() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => {
-                      const { clearAuth } = useAuthStore.getState()
-                      clearAuth()
+                    onClick={async () => {
+                      await logout()
                       setIsMobileMenuOpen(false)
                       window.location.href = '/'
                     }}

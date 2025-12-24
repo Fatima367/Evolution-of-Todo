@@ -1,48 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CheckCircle, Circle, Clock, AlertCircle } from 'lucide-react'
+import { CheckCircle, Circle, Clock, AlertCircle, Activity } from 'lucide-react'
 import { Card } from '../ui/Card'
 import { formatRelativeDate } from '@/lib/utils/dateUtils'
-
-interface Activity {
-  id: string
-  type: 'created' | 'completed' | 'updated' | 'deleted'
-  title: string
-  timestamp: Date
-}
+import { Task } from '@/lib/types'
 
 interface ActivityFeedProps {
-  activities?: Activity[]
+  tasks?: Task[]
 }
-
-// Mock activities
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    type: 'completed',
-    title: 'Deploy to Vercel',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
-  },
-  {
-    id: '2',
-    type: 'created',
-    title: 'Review pull request #123',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-  },
-  {
-    id: '3',
-    type: 'updated',
-    title: 'Update documentation',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-  },
-  {
-    id: '4',
-    type: 'completed',
-    title: 'Fix authentication bug',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-  },
-]
 
 const activityConfig = {
   created: {
@@ -71,43 +37,77 @@ const activityConfig = {
   },
 }
 
-export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps) {
+export function ActivityFeed({ tasks = [] }: ActivityFeedProps) {
+  // Create activity log from tasks based on their status and timestamps
+  const activities = tasks
+    .map(task => {
+      let type: 'created' | 'completed' | 'updated' | 'deleted' = 'created'
+
+      // Determine activity type based on task properties
+      if (task.completed_at) {
+        type = 'completed'
+      } else if (task.updated_at && new Date(task.updated_at).getTime() > new Date(task.created_at).getTime()) {
+        type = 'updated'
+      } else {
+        type = 'created'
+      }
+
+      return {
+        id: task.id,
+        type,
+        title: task.title,
+        timestamp: new Date(task.updated_at || task.created_at),
+      }
+    })
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // Sort by most recent
+    .slice(0, 4) // Limit to 4 most recent activities
+
   return (
     <Card className="glass-card p-6">
       <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
 
-      <div className="space-y-4">
-        {activities.map((activity, index) => {
-          const config = activityConfig[activity.type]
-          const Icon = config.icon
+      {activities.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <Activity className="h-12 w-12 text-gray-400 mb-4" />
+          <h4 className="text-lg font-medium text-gray-500">No recent activity</h4>
+          <p className="text-sm text-gray-500 max-w-xs">
+            Your recent task activities will appear here
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {activities.map((activity, index) => {
+            const config = activityConfig[activity.type]
+            const Icon = config.icon
 
-          return (
-            <motion.div
-              key={activity.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-start space-x-3"
-            >
-              <div className={`${config.bg} p-2 rounded-full flex-shrink-0`}>
-                <Icon className={`h-4 w-4 ${config.color}`} />
-              </div>
+            return (
+              <motion.div
+                key={activity.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-start space-x-3"
+              >
+                <div className={`${config.bg} p-2 rounded-full flex-shrink-0`}>
+                  <Icon className={`h-4 w-4 ${config.color}`} />
+                </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-gray-100">
-                  <span className="text-gray-500 dark:text-gray-400">{config.text}</span>
-                  {' "'}
-                  <span className="font-medium">{activity.title}</span>
-                  {'"'}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {formatRelativeDate(activity.timestamp)}
-                </p>
-              </div>
-            </motion.div>
-          )
-        })}
-      </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-gray-100">
+                    <span className="text-gray-500 dark:text-gray-400">{config.text}</span>
+                    {' "'}
+                    <span className="font-medium">{activity.title}</span>
+                    {'"'}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {formatRelativeDate(activity.timestamp)}
+                  </p>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
     </Card>
   )
 }

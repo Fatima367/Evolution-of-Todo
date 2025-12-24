@@ -64,7 +64,7 @@ export function SearchBar({ value, onChange, placeholder = 'Search tasks...' }: 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-md text-xs text-gray-500 dark:text-gray-400 font-mono"
+            className="absolute right-4 top-4 px-2 py-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-md text-xs text-gray-500 dark:text-gray-400 font-mono"
           >
             ⌘K
           </motion.div>
@@ -81,7 +81,7 @@ export function SearchBar({ value, onChange, placeholder = 'Search tasks...' }: 
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-300/50 dark:hover:bg-gray-600/50 text-gray-500 dark:text-gray-400 transition-colors"
+            className="absolute right-4 top-4 p-1 rounded-full bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-300/50 dark:hover:bg-gray-600/50 text-gray-500 dark:text-gray-400 transition-colors"
             aria-label="Clear search"
           >
             <X size={16} />

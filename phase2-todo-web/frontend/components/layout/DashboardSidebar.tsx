@@ -13,7 +13,8 @@ import {
   ChevronRight,
   User
 } from 'lucide-react'
-import { useAuthStore, useUIStore } from '@/store'
+import { useAuth } from '@/hooks/useAuth'
+import { useUIStore } from '@/store'
 import { Button } from '../ui/Button'
 
 const navigation = [
@@ -25,12 +26,11 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, clearAuth } = useAuthStore()
+  const { user, logout } = useAuth()
   const { isSidebarOpen, toggleSidebar, setSidebarOpen } = useUIStore()
 
-  const handleLogout = () => {
-    clearAuth()
-    router.push('/')
+  const handleLogout = async () => {
+    await logout()
   }
 
   return (
