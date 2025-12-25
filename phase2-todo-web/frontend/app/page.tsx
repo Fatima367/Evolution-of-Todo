@@ -184,14 +184,14 @@ export default function LandingPage() {
               className="space-y-6 text-center lg:text-left"
             >
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold leading-[1.1] tracking-tight">
-                <span className="text-foreground">Organize Your World,</span>
+                <span className="text-foreground dark:text-[#F7F6F7]">Organize Your World,</span>
                 <br />
                 <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                   Evolve Your Workflow
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg text-muted-foreground dark:text-[#C8C8D8] leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 From simple lists to intelligent insights, the last todo app
                 you'll ever need. Stay focused, get organized, and achieve more
                 every day.
@@ -346,7 +346,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <section
         id="features"
-        className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#FBE5E7] dark:from-[#0E0E34] dark:to-[#252E8A]"
+        className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#FBE5E7] dark:from-[#0E0E34] dark:to-[#252E8A]/20"
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -370,10 +370,10 @@ export default function LandingPage() {
                 Features
               </span>
             </motion.div>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
               Everything You Need
             </h2>
-            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
               Powerful features designed to supercharge your productivity
             </p>
           </motion.div>
@@ -392,7 +392,7 @@ export default function LandingPage() {
                 >
                   <motion.div
                     whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="h-full bg-white dark:bg-[#252E8A]/30 p-8 rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300"
+                    className="h-full bg-white dark:bg-[#1A1A3A]/80 p-8 rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300"
                     style={{ borderColor: "#BAD0CC" }}
                   >
                     <div className="relative space-y-4">
@@ -411,11 +411,11 @@ export default function LandingPage() {
                         />
                       </motion.div>
 
-                      <h3 className="text-lg font-display font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] group-hover:text-primary dark:group-hover:text-[#6EB8E1] transition-colors">
                         {feature.title}
                       </h3>
 
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-sm text-muted-foreground dark:text-[#C8C8D8] leading-relaxed">
                         {feature.description}
                       </p>
                     </div>
@@ -436,7 +436,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F6F7] to-[#E6E5E1] dark:from-[#252E8A] dark:to-[#0E0E34]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F6F7] to-[#E6E5E1] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -451,10 +451,10 @@ export default function LandingPage() {
             >
               How It Works
             </span>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
               Get Started in Minutes
             </h2>
-            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
               Four simple steps to transform your productivity
             </p>
           </motion.div>
@@ -497,7 +497,7 @@ export default function LandingPage() {
                 >
                   <motion.div
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative bg-white dark:bg-[#252E8A]/30 p-8 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300"
+                    className="relative bg-white dark:bg-[#1A1A3A]/80 p-8 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300"
                     style={{ borderColor: colorSet.border }}
                   >
                     {/* Step Number Badge */}
@@ -523,11 +523,11 @@ export default function LandingPage() {
 
                     {/* Content */}
                     <div className="space-y-3 text-center">
-                      <h3 className="text-lg font-display font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] group-hover:text-primary dark:group-hover:text-[#6EB8E1] transition-colors">
                         {item.title}
                       </h3>
 
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-sm text-muted-foreground dark:text-[#C8C8D8] leading-relaxed">
                         {item.description}
                       </p>
                     </div>
@@ -551,7 +551,7 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E6E5E1] via-[#F7F6F7] to-white dark:from-[#0E0E34] dark:to-[#252E8A]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E6E5E1] via-[#F7F6F7] to-white dark:from-[#0E0E34] dark:to-[#252E8A]/20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -566,10 +566,10 @@ export default function LandingPage() {
             >
               Benefits
             </span>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
               Why Choose TodoEvo
             </h2>
-            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
               Experience the difference with our powerful platform
             </p>
           </motion.div>
@@ -616,9 +616,8 @@ export default function LandingPage() {
                 >
                   <motion.div
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative h-full p-8 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+                    className="relative h-full p-8 bg-white dark:bg-[#1A1A3A]/80 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
                     style={{
-                      background: "white",
                       borderColor: colorSet.border,
                     }}
                   >
@@ -646,11 +645,11 @@ export default function LandingPage() {
                         <Icon className="h-7 w-7 text-white" />
                       </motion.div>
 
-                      <h3 className="text-lg font-display font-bold text-center mb-3 text-[#201761] group-hover:text-white transition-colors duration-300">
+                      <h3 className="text-lg font-display font-bold text-center mb-3 text-[#201761] dark:text-[#F7F6F7] group-hover:text-white transition-colors duration-300">
                         {benefit.title}
                       </h3>
 
-                      <p className="text-sm text-center leading-relaxed text-[#201761]/80 group-hover:text-white transition-colors duration-300">
+                      <p className="text-sm text-center leading-relaxed text-[#201761]/80 dark:text-[#F7F6F7]/80 group-hover:text-white transition-colors duration-300">
                         {benefit.description}
                       </p>
                     </div>
@@ -669,7 +668,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-white to-[#D6E6F2] dark:from-[#252E8A] dark:to-[#0E0E34]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-white to-[#D6E6F2] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
         <div className="absolute inset-0 pointer-events-none">
           <div
             className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
@@ -689,7 +688,7 @@ export default function LandingPage() {
           className="max-w-4xl mx-auto text-center relative"
         >
           <div
-            className="bg-white/80 dark:bg-[#252E8A]/80 backdrop-blur-xl p-12 lg:p-16 rounded-2xl border shadow-xl"
+            className="bg-white/80 dark:bg-[#1A1A3A]/80 backdrop-blur-xl p-12 lg:p-16 rounded-2xl border shadow-xl"
             style={{ borderColor: "#6EB8E1" }}
           >
             <motion.div
@@ -706,7 +705,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight mb-4">
-                  <span className="text-foreground">Ready to Get </span>
+                  <span className="text-foreground dark:text-[#F7F6F7]">Ready to Get </span>
                   <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                     Started?
                   </span>
@@ -718,7 +717,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="text-base text-muted-foreground max-w-2xl mx-auto"
+                className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto"
               >
                 Join thousands of productive people who transformed their
                 workflow. Start organizing today.
@@ -745,14 +744,14 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-2 flex-wrap"
+                className="text-sm font-medium text-muted-foreground dark:text-[#C8C8D8] flex items-center justify-center gap-2 flex-wrap"
               >
                 <CheckCircle2
                   className="h-4 w-4"
                   style={{ color: "#4EB5A9" }}
                 />
                 No credit card required
-                <span className="text-gray-400">•</span>
+                <span className="text-gray-400 dark:text-[#5A7FC8]">•</span>
                 <CheckCircle2
                   className="h-4 w-4"
                   style={{ color: "#4EB5A9" }}

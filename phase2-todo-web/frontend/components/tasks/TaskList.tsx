@@ -24,7 +24,7 @@ export function TaskList({ tasks, loading, onUpdate, onDelete }: TaskListProps) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full"
+            className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 dark:border-[#C8ABE6]/30 dark:border-t-[#C8ABE6] rounded-full"
           />
         </div>
         <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">

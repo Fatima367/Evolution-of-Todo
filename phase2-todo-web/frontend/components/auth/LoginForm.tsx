@@ -149,7 +149,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ redirectTo, onSuccess }) =
 
           {error && (
             <div
-              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
+              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm dark:bg-red-900/20 dark:border-red-800 dark:text-red-400"
               role="alert"
             >
               {error}
@@ -169,18 +169,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ redirectTo, onSuccess }) =
       </CardContent>
 
       <CardFooter separator className="flex-col items-center gap-3">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-[#C8C8D8]">
           Don't have an account?{' '}
           <Link
             href="/auth/register"
-            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            className="font-medium text-blue-600 dark:text-[#6EB8E1] hover:text-blue-700 dark:hover:text-[#5A7FC8] hover:underline"
           >
             Sign up
           </Link>
         </p>
         <Link
           href="/auth/forgot-password"
-          className="text-sm text-slate-500 hover:text-slate-700 hover:underline"
+          className="text-sm text-slate-500 dark:text-[#C8C8D8] hover:text-slate-700 dark:hover:text-[#F7F6F7] hover:underline"
         >
           Forgot your password?
         </Link>

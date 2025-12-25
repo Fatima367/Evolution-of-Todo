@@ -41,7 +41,7 @@ export function SearchBar({ value, onChange, placeholder = 'Search tasks...' }: 
       }`}
     >
       {/* Search Icon */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
         <Search size={20} />
       </div>
 
@@ -54,7 +54,7 @@ export function SearchBar({ value, onChange, placeholder = 'Search tasks...' }: 
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
-        className="w-full pl-12 pr-24 py-3 glass-card rounded-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+        className="w-full pl-12 pr-24 py-3 glass-card rounded-xl border border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:focus:ring-[#C8ABE6]/50 transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
       />
 
       {/* Keyboard Shortcut Badge */}

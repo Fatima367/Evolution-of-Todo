@@ -161,27 +161,27 @@ export default function TasksPage() {
           transition={{ delay: 0.2 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4"
         >
-          <div className="glass-card p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
+            <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Total</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-[#F7F6F7] mt-1">
               {tasks.length}
             </p>
           </div>
-          <div className="glass-card p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Pending</p>
-            <p className="text-2xl font-bold text-yellow-500 mt-1">
+          <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
+            <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Pending</p>
+            <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400 mt-1">
               {tasks.filter((t) => t.status === 'pending').length}
             </p>
           </div>
-          <div className="glass-card p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">In Progress</p>
-            <p className="text-2xl font-bold text-blue-500 mt-1">
+          <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
+            <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">In Progress</p>
+            <p className="text-2xl font-bold text-blue-500 dark:text-blue-400 mt-1">
               {tasks.filter((t) => t.status === 'in_progress').length}
             </p>
           </div>
-          <div className="glass-card p-4 rounded-xl">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Completed</p>
-            <p className="text-2xl font-bold text-green-500 mt-1">
+          <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
+            <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Completed</p>
+            <p className="text-2xl font-bold text-green-500 dark:text-green-400 mt-1">
               {tasks.filter((t) => t.status === 'completed').length}
             </p>
           </div>

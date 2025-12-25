@@ -4,12 +4,33 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { Card } from '../ui/Card'
 import { AlertCircle, Clock } from 'lucide-react'
 import { Task } from '@/lib/types'
+import { useEffect } from 'react'
 
 interface PriorityPieChartProps {
   tasks?: Task[]
 }
 
 export function PriorityPieChart({ tasks = [] }: PriorityPieChartProps) {
+  // Update legend colors based on theme
+  useEffect(() => {
+    const updateLegendColors = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      const legendItems = document.querySelectorAll('.recharts-legend-item-text')
+
+      legendItems.forEach(el => {
+        if (el instanceof SVGTextElement) {
+          el.setAttribute('fill', isDark ? '#F7F6F7' : '#374151')
+        }
+      })
+    }
+
+    updateLegendColors()
+    window.addEventListener('themeChange', updateLegendColors)
+
+    return () => {
+      window.removeEventListener('themeChange', updateLegendColors)
+    }
+  }, [])
   // Calculate priority distribution
   const priorityData = [
     { name: 'High', value: tasks.filter(t => t.priority === 'high').length, color: '#EF4444' },
@@ -30,19 +51,19 @@ export function PriorityPieChart({ tasks = [] }: PriorityPieChartProps) {
     <Card className="glass-card p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold">Tasks by Priority</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="text-lg font-semibold dark:text-[#F7F6F7]">Tasks by Priority</h3>
+          <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">
             Total: {total} tasks
           </p>
         </div>
-        <AlertCircle className="h-5 w-5 text-gray-400" />
+        <AlertCircle className="h-5 w-5 text-gray-400 dark:text-[#C8C8D8]" />
       </div>
 
       {total === 0 ? (
         <div className="flex flex-col items-center justify-center h-[250px] text-center">
-          <Clock className="h-12 w-12 text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-500">No tasks</h4>
-          <p className="text-sm text-gray-500 max-w-xs">
+          <Clock className="h-12 w-12 text-gray-400 mb-4 dark:text-[#C8C8D8]" />
+          <h4 className="text-lg font-medium text-gray-500 dark:text-[#C8C8D8]">No tasks</h4>
+          <p className="text-sm text-gray-500 max-w-xs dark:text-[#C8C8D8]">
             Add tasks to see how they are distributed by priority
           </p>
         </div>
@@ -68,17 +89,14 @@ export function PriorityPieChart({ tasks = [] }: PriorityPieChartProps) {
                 border: 'none',
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                color: '#0E0E34',
               }}
             />
             <Legend
               verticalAlign="bottom"
               height={36}
               iconType="circle"
-              formatter={(value, entry: any) => (
-                <span className="text-sm">
-                  {value} ({entry.payload.value})
-                </span>
-              )}
+              formatter={(value, entry: any) => `${value} (${entry.payload.value})`}
             />
           </PieChart>
         </ResponsiveContainer>

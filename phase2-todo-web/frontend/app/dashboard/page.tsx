@@ -127,12 +127,12 @@ export default function DashboardPage() {
               <Card className="bg-white dark:bg-[#1A1A3A] p-6 border-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ borderColor: stat.color === 'blue' ? '#6EB8E1' : stat.color === 'yellow' ? '#F59E0B' : stat.color === 'green' ? '#10B981' : '#EF4444' }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-[#C8C8D8]">
                       {stat.name}
                     </p>
-                    <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stat.value}</p>
+                    <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-[#F7F6F7]">{stat.value}</p>
                     <p className={`text-sm mt-2 ${
-                      stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600'
+                      stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                     }`}>
                       {stat.change} from last week
                     </p>

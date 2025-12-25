@@ -12,6 +12,7 @@ import {
 import { Card } from '../ui/Card'
 import { TrendingUp } from 'lucide-react'
 import { Task } from '@/lib/types'
+import { useEffect } from 'react'
 
 interface TaskCompletionChartProps {
   tasks?: Task[]
@@ -37,6 +38,33 @@ const generateLast7DaysData = () => {
 }
 
 export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
+  // Update chart colors based on theme
+  useEffect(() => {
+    const updateChartColors = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      const chartElements = document.querySelectorAll('.recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line')
+
+      chartElements.forEach(el => {
+        if (el instanceof SVGElement) {
+          el.setAttribute('stroke', isDark ? '#C8C8D8' : '#9ca3af')
+        }
+      })
+
+      const tickElements = document.querySelectorAll('.recharts-cartesian-axis-tick-value')
+      tickElements.forEach(el => {
+        if (el instanceof SVGTextElement) {
+          el.setAttribute('fill', isDark ? '#C8C8D8' : '#9ca3af')
+        }
+      })
+    }
+
+    updateChartColors()
+    window.addEventListener('themeChange', updateChartColors)
+
+    return () => {
+      window.removeEventListener('themeChange', updateChartColors)
+    }
+  }, [])
   // Filter completed tasks from the last 7 days
   const last7DaysData = generateLast7DaysData()
 
@@ -63,10 +91,10 @@ export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
     <Card className="glass-card p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold">Task Completion</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Last 7 days</p>
+          <h3 className="text-lg font-semibold dark:text-[#F7F6F7]">Task Completion</h3>
+          <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Last 7 days</p>
         </div>
-        <div className="flex items-center space-x-2 text-green-600">
+        <div className="flex items-center space-x-2 text-green-600 dark:text-[#4EB5A9]">
           <TrendingUp className="h-5 w-5" />
           <span className="text-2xl font-bold">{total}</span>
         </div>
@@ -74,9 +102,9 @@ export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
 
       {total === 0 ? (
         <div className="flex flex-col items-center justify-center h-[250px] text-center">
-          <TrendingUp className="h-12 w-12 text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-500">No completed tasks</h4>
-          <p className="text-sm text-gray-500 max-w-xs">
+          <TrendingUp className="h-12 w-12 text-gray-400 mb-4 dark:text-[#C8C8D8]" />
+          <h4 className="text-lg font-medium text-gray-500 dark:text-[#C8C8D8]">No completed tasks</h4>
+          <p className="text-sm text-gray-500 max-w-xs dark:text-[#C8C8D8]">
             Complete tasks to see your progress over the last 7 days
           </p>
         </div>
@@ -96,6 +124,7 @@ export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
                 border: 'none',
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                color: '#0E0E34',
               }}
             />
             <Line

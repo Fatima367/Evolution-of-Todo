@@ -142,7 +142,7 @@ export function CreateTaskModal() {
                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 aria-label="Close modal"
               >
-                <X size={24} className="text-gray-500" />
+                <X size={24} className="text-gray-500 dark:text-gray-400" />
               </motion.button>
             </div>
 

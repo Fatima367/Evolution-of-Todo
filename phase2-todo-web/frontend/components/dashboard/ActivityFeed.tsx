@@ -64,13 +64,13 @@ export function ActivityFeed({ tasks = [] }: ActivityFeedProps) {
 
   return (
     <Card className="glass-card p-6">
-      <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+      <h3 className="text-lg font-semibold mb-4 dark:text-[#F7F6F7]">Recent Activity</h3>
 
       {activities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Activity className="h-12 w-12 text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-500">No recent activity</h4>
-          <p className="text-sm text-gray-500 max-w-xs">
+          <Activity className="h-12 w-12 text-gray-400 mb-4 dark:text-[#C8C8D8]" />
+          <h4 className="text-lg font-medium text-gray-500 dark:text-[#C8C8D8]">No recent activity</h4>
+          <p className="text-sm text-gray-500 max-w-xs dark:text-[#C8C8D8]">
             Your recent task activities will appear here
           </p>
         </div>
@@ -93,13 +93,13 @@ export function ActivityFeed({ tasks = [] }: ActivityFeedProps) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 dark:text-gray-100">
-                    <span className="text-gray-500 dark:text-gray-400">{config.text}</span>
+                  <p className="text-sm text-gray-900 dark:text-[#F7F6F7]">
+                    <span className="text-gray-500 dark:text-[#C8C8D8]">{config.text}</span>
                     {' "'}
                     <span className="font-medium">{activity.title}</span>
                     {'"'}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-[#C8C8D8] mt-1">
                     {formatRelativeDate(activity.timestamp)}
                   </p>
                 </div>

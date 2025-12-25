@@ -60,9 +60,9 @@ export function LoginModal() {
             >
               <button
                 onClick={closeLoginModal}
-                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/10 dark:hover:bg-white/10 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </button>
 
               <div className="text-center mb-6">

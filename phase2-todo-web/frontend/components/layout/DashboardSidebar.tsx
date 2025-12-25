@@ -91,7 +91,7 @@ export function DashboardSidebar() {
                     flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
                     ${isActive
                       ? 'bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white shadow-lg'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-[#D6E6F2] dark:hover:bg-[#252E3F]/30'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-[#D6E6F2] dark:hover:bg-[#252E8A]/40'
                     }
                   `}
                 >

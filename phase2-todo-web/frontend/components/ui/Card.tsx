@@ -20,7 +20,7 @@ const cardVariants = cva(
         lg: 'p-8',
       },
       bordered: {
-        true: 'border border-[#BAD0CC] dark:border-[#3A3A4A]',
+        true: 'border border-[#BAD0CC] dark:border-[#5A7FC8]',
         false: '',
       },
       interactive: {
@@ -76,7 +76,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
         ref={ref}
         className={cn(
           'flex flex-col space-y-1.5',
-          separator && 'pb-4 border-b border-[#BAD0CC] dark:border-[#3A3A4A]',
+          separator && 'pb-4 border-b border-[#BAD0CC] dark:border-[#5A7FC8]',
           className
         )}
         {...props}
@@ -101,7 +101,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
       <Comp
         ref={ref}
         className={cn(
-          'text-xl font-semibold leading-tight tracking-tight text-gray-900 dark:text-gray-100',
+          'text-xl font-semibold leading-tight tracking-tight text-gray-900 dark:text-[#F7F6F7]',
           className
         )}
         {...props}
@@ -122,7 +122,7 @@ const CardDescription = React.forwardRef<
   return (
     <p
       ref={ref}
-      className={cn('text-sm text-gray-600 dark:text-gray-400', className)}
+      className={cn('text-sm text-gray-600 dark:text-[#C8C8D8]', className)}
       {...props}
     >
       {children}

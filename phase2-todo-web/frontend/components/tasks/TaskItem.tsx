@@ -24,18 +24,18 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
 
   // Priority-based neon border colors
   const priorityBorders = {
-    low: 'border-green-400/50 hover:shadow-green-500/30',
-    medium: 'border-yellow-400/50 hover:shadow-yellow-500/30',
-    high: 'border-orange-400/50 hover:shadow-orange-500/30',
-    urgent: 'border-red-400/50 hover:shadow-red-500/30',
+    low: 'border-green-400/50 dark:border-green-400/30 hover:shadow-green-500/30 dark:hover:shadow-green-500/20',
+    medium: 'border-yellow-400/50 dark:border-yellow-400/30 hover:shadow-yellow-500/30 dark:hover:shadow-yellow-500/20',
+    high: 'border-orange-400/50 dark:border-orange-400/30 hover:shadow-orange-500/30 dark:hover:shadow-orange-500/20',
+    urgent: 'border-red-400/50 dark:border-red-400/30 hover:shadow-red-500/30 dark:hover:shadow-red-500/20',
   };
 
   // Priority badge colors
   const priorityColors = {
-    low: 'bg-green-500/20 text-green-400 border-green-400/50',
-    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/50',
-    high: 'bg-orange-500/20 text-orange-400 border-orange-400/50',
-    urgent: 'bg-red-500/20 text-red-400 border-red-400/50',
+    low: 'bg-green-500/20 text-green-400 border-green-400/50 dark:bg-green-500/30 dark:text-green-300 dark:border-green-400/30',
+    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/50 dark:bg-yellow-500/30 dark:text-yellow-300 dark:border-yellow-400/30',
+    high: 'bg-orange-500/20 text-orange-400 border-orange-400/50 dark:bg-orange-500/30 dark:text-orange-300 dark:border-orange-400/30',
+    urgent: 'bg-red-500/20 text-red-400 border-red-400/50 dark:bg-red-500/30 dark:text-red-300 dark:border-red-400/30',
   };
 
   return (
@@ -126,7 +126,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
               {task.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-500/10 text-purple-400 rounded-lg text-xs font-medium border border-purple-400/30"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-500/10 text-purple-400 rounded-lg text-xs font-medium border border-purple-400/30 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-400/40"
                 >
                   <Tag size={12} />
                   {tag}
@@ -147,7 +147,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => openEditTaskModal(task.id)}
-            className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-400/50 transition-all"
+            className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-400/50 dark:bg-blue-500/30 dark:text-blue-300 dark:border-blue-400/40 transition-all"
             aria-label="Edit task"
           >
             <Edit2 size={16} />
@@ -156,7 +156,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => openDeleteConfirmModal(task.id, task.title)}
-            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-400/50 transition-all"
+            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-400/50 dark:bg-red-500/30 dark:text-red-300 dark:border-red-400/40 transition-all"
             aria-label="Delete task"
           >
             <Trash2 size={16} />

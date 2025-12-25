@@ -255,7 +255,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
           {error && (
             <div
-              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
+              className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm dark:bg-red-900/20 dark:border-red-800 dark:text-red-400"
               role="alert"
             >
               {error}
@@ -275,11 +275,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       </CardContent>
 
       <CardFooter separator className="justify-center">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-[#C8C8D8]">
           Already have an account?{' '}
           <Link
             href="/auth/login"
-            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            className="font-medium text-blue-600 dark:text-[#6EB8E1] hover:text-blue-700 dark:hover:text-[#5A7FC8] hover:underline"
           >
             Sign in
           </Link>

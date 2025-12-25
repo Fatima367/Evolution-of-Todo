@@ -123,14 +123,14 @@ export const Loading: React.FC<LoadingProps> = ({
   const content = (
     <div
       className={cn('flex flex-col items-center justify-center gap-3', {
-        'fixed inset-0 z-50 bg-white/80 backdrop-blur-sm': fullScreen,
+        'fixed inset-0 z-50 bg-white/80 dark:bg-[#0E0E34]/80 backdrop-blur-sm': fullScreen,
       })}
       role="status"
       aria-live="polite"
     >
       {renderLoader()}
       {text && (
-        <p className="text-sm font-medium text-slate-600">{text}</p>
+        <p className="text-sm font-medium text-slate-600 dark:text-[#F7F6F7]">{text}</p>
       )}
       <span className="sr-only">Loading...</span>
     </div>
@@ -158,7 +158,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   return (
     <div
       className={cn(
-        'bg-slate-200',
+        'bg-slate-200 dark:bg-[#3A3A4A]',
         {
           'rounded-lg': variant === 'rectangular',
           'rounded-full': variant === 'circular',
@@ -198,7 +198,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     <div className="relative">
       {children}
       {loading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-[#0E0E34]/80 backdrop-blur-sm rounded-lg">
           <Loading size={size} variant={variant} text={text} />
         </div>
       )}

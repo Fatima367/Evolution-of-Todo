@@ -10,10 +10,10 @@ interface ProgressOverviewProps {
 }
 
 const colorMap: Record<string, { bg: string; fill: string }> = {
-  blue: { bg: 'bg-blue-200 dark:bg-blue-900/30', fill: 'bg-blue-600' },
-  purple: { bg: 'bg-purple-200 dark:bg-purple-900/30', fill: 'bg-purple-600' },
-  green: { bg: 'bg-green-200 dark:bg-green-900/30', fill: 'bg-green-600' },
-  pink: { bg: 'bg-pink-200 dark:bg-pink-900/30', fill: 'bg-pink-600' },
+  blue: { bg: 'bg-blue-200 dark:bg-[#6EB8E1]/30', fill: 'bg-blue-600 dark:bg-[#5A7FC8]' },
+  purple: { bg: 'bg-purple-200 dark:bg-[#C8ABE6]/30', fill: 'bg-purple-600 dark:bg-[#201761]' },
+  green: { bg: 'bg-green-200 dark:bg-[#BAD0CC]/30', fill: 'bg-green-600 dark:bg-[#4EB5A9]' },
+  pink: { bg: 'bg-pink-200 dark:bg-[#FBE5E7]/30', fill: 'bg-pink-600 dark:bg-[#F8CEC0]' },
 }
 
 export function ProgressOverview({ tasks = [] }: ProgressOverviewProps) {
@@ -49,19 +49,19 @@ export function ProgressOverview({ tasks = [] }: ProgressOverviewProps) {
     <Card className="glass-card p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold">Progress Overview</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="text-lg font-semibold dark:text-[#F7F6F7]">Progress Overview</h3>
+          <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">
             Track your progress across categories
           </p>
         </div>
-        <Target className="h-5 w-5 text-gray-400" />
+        <Target className="h-5 w-5 text-gray-400 dark:text-[#C8C8D8]" />
       </div>
 
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Target className="h-12 w-12 text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-500">No progress data</h4>
-          <p className="text-sm text-gray-500 max-w-xs">
+          <Target className="h-12 w-12 text-gray-400 dark:text-[#C8C8D8] mb-4" />
+          <h4 className="text-lg font-medium text-gray-500 dark:text-[#C8C8D8]">No progress data</h4>
+          <p className="text-sm text-gray-500 dark:text-[#C8C8D8] max-w-xs">
             Add tasks to different categories to track your progress
           </p>
         </div>
@@ -79,8 +79,8 @@ export function ProgressOverview({ tasks = [] }: ProgressOverviewProps) {
                 transition={{ delay: index * 0.1 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{item.category}</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm font-medium dark:text-[#F7F6F7]">{item.category}</span>
+                  <span className="text-sm text-gray-500 dark:text-[#C8C8D8]">
                     {item.completed}/{item.total}
                   </span>
                 </div>
@@ -95,9 +95,9 @@ export function ProgressOverview({ tasks = [] }: ProgressOverviewProps) {
                 </div>
 
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-500">{percentage}% complete</span>
+                  <span className="text-xs text-gray-500 dark:text-[#C8C8D8]">{percentage}% complete</span>
                   {percentage === 100 && (
-                    <span className="text-xs text-green-600 font-medium">✓ Done!</span>
+                    <span className="text-xs text-green-600 dark:text-[#4EB5A9] font-medium">✓ Done!</span>
                   )}
                 </div>
               </motion.div>

@@ -119,7 +119,7 @@ export function FilterDropdown({
                   </span>
                   <button
                     onClick={handleClearAll}
-                    className="text-sm text-purple-500 hover:text-purple-600 font-medium"
+                    className="text-sm text-purple-500 dark:text-[#C8ABE6] hover:text-purple-600 dark:hover:text-[#C8ABE6] font-medium"
                   >
                     Clear all
                   </button>
@@ -146,7 +146,7 @@ export function FilterDropdown({
                           transition-all duration-200
                           ${
                             isSelected
-                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500'
+                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500 dark:from-[#C8ABE6] dark:to-[#F8CEC0] dark:border-[#C8ABE6]'
                               : 'border-gray-300 dark:border-gray-600'
                           }
                         `}

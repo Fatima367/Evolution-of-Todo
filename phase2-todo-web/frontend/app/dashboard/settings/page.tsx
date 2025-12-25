@@ -44,8 +44,8 @@ export default function SettingsPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Card className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-6 flex items-center">
-              <User className="h-5 w-5 mr-2" />
+            <h2 className="text-xl font-semibold mb-6 flex items-center text-gray-900 dark:text-[#F7F6F7]">
+              <User className="h-5 w-5 mr-2 text-[#6EB8E1]" />
               Profile Settings
             </h2>
 
@@ -56,7 +56,7 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                leftIcon={<User className="h-4 w-4" />}
+                leftIcon={<User className="h-4 w-4 text-gray-400 dark:text-gray-500" />}
               />
 
               <Input
@@ -65,7 +65,7 @@ export default function SettingsPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                leftIcon={<Mail className="h-4 w-4" />}
+                leftIcon={<Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />}
               />
 
               <Button type="submit" className="w-full glow-blue">
@@ -82,11 +82,11 @@ export default function SettingsPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Card className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-6 flex items-center">
+            <h2 className="text-xl font-semibold mb-6 flex items-center text-gray-900 dark:text-[#F7F6F7]">
               {theme === 'dark' ? (
-                <Moon className="h-5 w-5 mr-2" />
+                <Moon className="h-5 w-5 mr-2 text-[#C8ABE6]" />
               ) : (
-                <Sun className="h-5 w-5 mr-2" />
+                <Sun className="h-5 w-5 mr-2 text-[#6EB8E1]" />
               )}
               Appearance
             </h2>
@@ -94,8 +94,8 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Theme</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="font-medium text-gray-900 dark:text-[#F7F6F7]">Theme</p>
+                  <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">
                     Choose your preferred theme
                   </p>
                 </div>
@@ -128,8 +128,8 @@ export default function SettingsPage() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <Card className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-6 flex items-center">
-              <Bell className="h-5 w-5 mr-2" />
+            <h2 className="text-xl font-semibold mb-6 flex items-center text-gray-900 dark:text-[#F7F6F7]">
+              <Bell className="h-5 w-5 mr-2 text-[#F59E0B]" />
               Notifications
             </h2>
 
@@ -141,14 +141,14 @@ export default function SettingsPage() {
               ].map((item, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{item.label}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="font-medium text-gray-900 dark:text-[#F7F6F7]">{item.label}</p>
+                    <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">
                       {item.description}
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-[#5A7FC8]"></div>
                   </label>
                 </div>
               ))}
@@ -163,8 +163,8 @@ export default function SettingsPage() {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-6 flex items-center">
-              <Lock className="h-5 w-5 mr-2" />
+            <h2 className="text-xl font-semibold mb-6 flex items-center text-gray-900 dark:text-[#F7F6F7]">
+              <Lock className="h-5 w-5 mr-2 text-[#4EB5A9]" />
               Security
             </h2>
 
