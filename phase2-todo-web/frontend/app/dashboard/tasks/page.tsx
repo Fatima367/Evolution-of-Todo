@@ -46,8 +46,8 @@ export default function TasksPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-            <ListChecks size={32} className="text-purple-600" />
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] bg-clip-text text-transparent flex items-center gap-3">
+            <ListChecks size={32} className="text-[#6EB8E1]" />
             My Tasks
           </h1>
           <motion.p
@@ -58,7 +58,7 @@ export default function TasksPage() {
           >
             {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
             {activeFilterCount > 0 && (
-              <span className="ml-2 text-purple-500">
+              <span className="ml-2 text-[#5A7FC8]">
                 ({activeFilterCount} {activeFilterCount === 1 ? 'filter' : 'filters'} active)
               </span>
             )}
@@ -68,7 +68,7 @@ export default function TasksPage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={openCreateTaskModal}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all glow-purple"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
         >
           <Plus size={20} />
           New Task
@@ -144,7 +144,7 @@ export default function TasksPage() {
                   updateFilter('priority', []);
                   updateFilter('tags', []);
                 }}
-                className="text-sm text-purple-500 hover:text-purple-600 font-medium"
+                className="text-sm text-[#5A7FC8] hover:text-[#4EB5A9] font-medium"
               >
                 Clear all filters
               </motion.button>

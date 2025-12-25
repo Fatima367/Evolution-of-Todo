@@ -122,8 +122,9 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
             >
-              <Card className="glass-card p-6 hover:shadow-lg transition-shadow">
+              <Card className="bg-white dark:bg-[#1A1A3A] p-6 border-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ borderColor: stat.color === 'blue' ? '#6EB8E1' : stat.color === 'yellow' ? '#F59E0B' : stat.color === 'green' ? '#10B981' : '#EF4444' }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -136,8 +137,8 @@ export default function DashboardPage() {
                       {stat.change} from last week
                     </p>
                   </div>
-                  <div className={`p-3 rounded-xl bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}>
-                    <Icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                  <div className={`p-3 rounded-xl transition-transform hover:scale-110`} style={{ backgroundColor: stat.color === 'blue' ? '#D6E6F2' : stat.color === 'yellow' ? '#FEF3C7' : stat.color === 'green' ? '#D1FAE5' : '#FEE2E2' }}>
+                    <Icon className={`h-6 w-6`} style={{ color: stat.color === 'blue' ? '#6EB8E1' : stat.color === 'yellow' ? '#F59E0B' : stat.color === 'green' ? '#10B981' : '#EF4444' }} />
                   </div>
                 </div>
               </Card>
@@ -152,6 +153,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
+          whileHover={{ scale: 1.01 }}
         >
           <TaskCompletionChart tasks={tasks} />
         </motion.div>
@@ -160,6 +162,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
+          whileHover={{ scale: 1.01 }}
         >
           <PriorityPieChart tasks={tasks} />
         </motion.div>
@@ -171,6 +174,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
+          whileHover={{ scale: 1.01 }}
         >
           <ActivityFeed tasks={tasks} />
         </motion.div>
@@ -179,6 +183,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
+          whileHover={{ scale: 1.01 }}
         >
           <ProgressOverview tasks={tasks} />
         </motion.div>

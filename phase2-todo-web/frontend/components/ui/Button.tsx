@@ -10,13 +10,13 @@ const buttonVariants = cva(
         primary:
           'relative overflow-hidden bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white shadow-lg hover:shadow-xl focus-visible:ring-[#6EB8E1]',
         secondary:
-          'bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 text-[#252E8A] dark:text-purple-300 border-2 border-[#C8ABE6] dark:border-purple-700 shadow-md hover:shadow-lg focus-visible:ring-[#C8ABE6]',
+          'bg-gradient-to-br from-[#D6E6F2] to-[#BAD0CC] dark:from-[#252E3F]/30 dark:to-[#3A3A4A]/30 text-[#5A7FC8] dark:text-[#6EB8E1] border-2 border-[#6EB8E1] dark:border-[#5A7FC8] shadow-md hover:shadow-lg focus-visible:ring-[#6EB8E1]',
         success:
           'relative overflow-hidden bg-gradient-to-r from-[#4EB5A9] to-[#48ADB7] text-white shadow-lg hover:shadow-xl focus-visible:ring-[#4EB5A9]',
         danger:
           'bg-gradient-to-br from-red-600 to-red-700 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 focus-visible:ring-red-500',
         ghost:
-          'text-[#201761] dark:text-[#F7F6F7] hover:bg-[#E6E5E1] dark:hover:bg-[#252E8A] focus-visible:ring-[#6EB8E1]',
+          'text-[#252E3F] dark:text-[#F7F6F7] hover:bg-[#D6E6F2] dark:hover:bg-[#252E3F]/30 focus-visible:ring-[#6EB8E1]',
         outline:
           'border-2 border-[#6EB8E1] text-[#5A7FC8] dark:text-[#6EB8E1] hover:bg-[#6EB8E1] hover:text-white focus-visible:ring-[#6EB8E1]',
       },

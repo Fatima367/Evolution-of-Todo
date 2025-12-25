@@ -230,10 +230,9 @@ export default function LandingPage() {
                 >
                   {/* Card 1 - Blue */}
                   <div
-                    className="absolute top-0 left-0 right-12 glass-card p-6 rounded-2xl border-2 shadow-2xl"
+                    className="absolute top-0 left-0 right-12 bg-white dark:bg-[#1A1A3A] p-6 rounded-2xl border-2 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     style={{
                       borderColor: "#6EB8E1",
-                      boxShadow: "0 20px 60px rgba(110, 184, 225, 0.2)",
                     }}
                   >
                     <div className="flex items-start space-x-4">
@@ -262,10 +261,9 @@ export default function LandingPage() {
 
                   {/* Card 2 - Purple */}
                   <div
-                    className="absolute top-24 left-12 right-0 glass-card p-6 rounded-2xl border-2 shadow-2xl"
+                    className="absolute top-24 left-12 right-0 bg-white dark:bg-[#1A1A3A] p-6 rounded-2xl border-2 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     style={{
                       borderColor: "#C8ABE6",
-                      boxShadow: "0 20px 60px rgba(200, 171, 230, 0.2)",
                     }}
                   >
                     <div className="flex items-start space-x-4">
@@ -290,10 +288,9 @@ export default function LandingPage() {
 
                   {/* Card 3 - Teal */}
                   <div
-                    className="absolute top-44 left-0 right-12 glass-card p-6 rounded-2xl border-2 shadow-2xl"
+                    className="absolute top-44 left-0 right-12 bg-white dark:bg-[#1A1A3A] p-6 rounded-2xl border-2 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     style={{
                       borderColor: "#4EB5A9",
-                      boxShadow: "0 20px 60px rgba(78, 181, 169, 0.2)",
                     }}
                   >
                     <div className="flex items-start space-x-4">
@@ -315,10 +312,9 @@ export default function LandingPage() {
 
                   {/* Card 4 - Purple */}
                   <div
-                    className="absolute top-64 left-8 right-0 glass-card p-6 rounded-2xl border-2 shadow-2xl"
+                    className="absolute top-64 left-8 right-0 bg-white dark:bg-[#1A1A3A] p-6 rounded-2xl border-2 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     style={{
                       borderColor: "#C8ABE6",
-                      boxShadow: "0 20px 60px rgba(200, 171, 230, 0.2)",
                     }}
                   >
                     <div className="flex items-start space-x-4">

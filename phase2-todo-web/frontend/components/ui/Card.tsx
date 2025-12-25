@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const cardVariants = cva(
-  'rounded-xl bg-white transition-all duration-300',
+  'rounded-xl bg-white dark:bg-[#1A1A3A] transition-all duration-300',
   {
     variants: {
       elevation: {
@@ -20,7 +20,7 @@ const cardVariants = cva(
         lg: 'p-8',
       },
       bordered: {
-        true: 'border border-slate-200',
+        true: 'border border-[#BAD0CC] dark:border-[#3A3A4A]',
         false: '',
       },
       interactive: {
@@ -76,7 +76,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
         ref={ref}
         className={cn(
           'flex flex-col space-y-1.5',
-          separator && 'pb-4 border-b border-slate-200',
+          separator && 'pb-4 border-b border-[#BAD0CC] dark:border-[#3A3A4A]',
           className
         )}
         {...props}
@@ -101,7 +101,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
       <Comp
         ref={ref}
         className={cn(
-          'text-xl font-semibold leading-tight tracking-tight text-slate-900',
+          'text-xl font-semibold leading-tight tracking-tight text-gray-900 dark:text-gray-100',
           className
         )}
         {...props}
@@ -122,7 +122,7 @@ const CardDescription = React.forwardRef<
   return (
     <p
       ref={ref}
-      className={cn('text-sm text-slate-600', className)}
+      className={cn('text-sm text-gray-600 dark:text-gray-400', className)}
       {...props}
     >
       {children}
@@ -158,7 +158,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
         ref={ref}
         className={cn(
           'flex items-center gap-2 pt-4',
-          separator && 'border-t border-slate-200',
+          separator && 'border-t border-[#BAD0CC] dark:border-[#3A3A4A]',
           className
         )}
         {...props}
