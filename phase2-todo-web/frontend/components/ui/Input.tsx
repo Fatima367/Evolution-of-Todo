@@ -3,16 +3,16 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const inputVariants = cva(
-  'w-full rounded-lg border bg-white px-4 py-2.5 text-base text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
+  'w-full rounded-lg border bg-white dark:bg-[#252E8A]/30 px-4 py-2.5 text-base text-[#201761] dark:text-[#F7F6F7] placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
         default:
-          'border-slate-300 hover:border-slate-400 focus:border-blue-500 focus:ring-blue-500/20',
+          'border-[#BAD0CC] dark:border-[#5A7FC8]/50 hover:border-[#6EB8E1] focus:border-[#6EB8E1] focus:ring-[#6EB8E1]/20',
         error:
           'border-red-400 hover:border-red-500 focus:border-red-500 focus:ring-red-500/20',
         success:
-          'border-emerald-400 hover:border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500/20',
+          'border-[#4EB5A9] hover:border-[#48ADB7] focus:border-[#4EB5A9] focus:ring-[#4EB5A9]/20',
       },
       inputSize: {
         sm: 'h-9 text-sm px-3 py-1.5',
@@ -65,7 +65,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-700 mb-1.5"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
           >
             {label}
             {props.required && (
@@ -78,7 +78,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               {leftIcon}
             </div>
           )}
@@ -100,7 +100,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
 
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">
               {rightIcon}
             </div>
           )}
@@ -109,7 +109,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p
             id={errorId}
-            className="mt-1.5 text-sm text-red-600 flex items-center gap-1"
+            className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
             role="alert"
           >
             <svg
@@ -129,7 +129,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
 
         {helperText && !error && (
-          <p id={helperTextId} className="mt-1.5 text-sm text-slate-500">
+          <p id={helperTextId} className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
             {helperText}
           </p>
         )}

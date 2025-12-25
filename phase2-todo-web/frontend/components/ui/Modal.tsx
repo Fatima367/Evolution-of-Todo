@@ -97,7 +97,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         {/* Backdrop with animation */}
         <div
           className={cn(
-            'absolute inset-0 bg-slate-900/60 backdrop-blur-sm',
+            'absolute inset-0 bg-[#0E0E34]/60 backdrop-blur-sm dark:bg-black/70',
             'animate-in fade-in duration-200'
           )}
           onClick={handleOverlayClick}
@@ -108,7 +108,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         <div
           ref={modalRef}
           className={cn(
-            'relative w-full bg-white rounded-2xl shadow-2xl',
+            'relative w-full bg-white dark:bg-[#252E8A] rounded-2xl shadow-2xl border border-[#BAD0CC] dark:border-[#5A7FC8]/30',
             'animate-in fade-in zoom-in-95 duration-300',
             'max-h-[90vh] overflow-hidden flex flex-col',
             sizeClasses[size],
@@ -118,12 +118,12 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         >
           {/* Header */}
           {(title || description || showCloseButton) && (
-            <div className="flex items-start justify-between p-6 border-b border-slate-200">
+            <div className="flex items-start justify-between p-6 border-b border-[#BAD0CC] dark:border-[#5A7FC8]/30">
               <div className="flex-1">
                 {title && (
                   <h2
                     id="modal-title"
-                    className="text-2xl font-semibold text-slate-900 leading-tight"
+                    className="text-2xl font-semibold text-[#201761] dark:text-[#F7F6F7] leading-tight"
                   >
                     {title}
                   </h2>
@@ -131,7 +131,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
                 {description && (
                   <p
                     id="modal-description"
-                    className="mt-2 text-sm text-slate-600"
+                    className="mt-2 text-sm text-gray-600 dark:text-gray-400"
                   >
                     {description}
                   </p>
@@ -142,9 +142,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
                 <button
                   onClick={onClose}
                   className={cn(
-                    'ml-4 p-2 rounded-lg text-slate-400',
-                    'hover:text-slate-600 hover:bg-slate-100',
-                    'focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    'ml-4 p-2 rounded-lg text-gray-400 dark:text-gray-500',
+                    'hover:text-gray-600 dark:hover:text-gray-300 hover:bg-[#E6E5E1] dark:hover:bg-[#252E8A]/50',
+                    'focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]',
                     'transition-all duration-200'
                   )}
                   aria-label="Close modal"
@@ -173,7 +173,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
           {/* Footer */}
           {footer && (
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50">
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-[#BAD0CC] dark:border-[#5A7FC8]/30 bg-[#F7F6F7]/30 dark:bg-[#0E0E34]/30">
               {footer}
             </div>
           )}
@@ -214,7 +214,6 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       open={open}
       onClose={onClose}
       title={title}
-      description={description}
       size="sm"
       footer={
         <>
@@ -232,7 +231,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       }
     >
       <div className="py-4">
-        <p className="text-slate-600">{description}</p>
+        <p className="text-gray-600 dark:text-gray-400">{description}</p>
       </div>
     </Modal>
   )

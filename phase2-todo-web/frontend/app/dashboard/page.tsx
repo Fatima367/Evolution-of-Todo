@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
-import { useDashboardStats } from '@/store'
 import { useTasks } from '@/hooks/useTasks'
 import {
   TaskCompletionChart,
@@ -16,35 +15,40 @@ import { Skeleton } from '@/components/ui/Loading'
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const { stats, loading, error } = useDashboardStats()
-  const { tasks } = useTasks()
+  const { tasks, loading } = useTasks()
+
+  // Calculate stats directly from tasks to ensure sync
+  const totalTasks = tasks.length
+  const inProgressTasks = tasks.filter(task => task.status === 'in_progress').length
+  const completedTasks = tasks.filter(task => task.status === 'completed').length
+  const highPriorityTasks = tasks.filter(task => task.priority === 'high' || task.priority === 'urgent').length
 
   // Define stats configuration
   const statConfigs = [
     {
       name: 'Total Tasks',
-      value: stats.totalTasks,
+      value: totalTasks,
       change: '+0%',
       icon: CheckCircle,
       color: 'blue',
     },
     {
       name: 'In Progress',
-      value: stats.inProgressTasks,
+      value: inProgressTasks,
       change: '+0%',
       icon: Clock,
       color: 'yellow',
     },
     {
       name: 'Completed',
-      value: stats.completedTasks,
+      value: completedTasks,
       change: '+0%',
       icon: TrendingUp,
       color: 'green',
     },
     {
       name: 'High Priority',
-      value: stats.highPriorityTasks,
+      value: highPriorityTasks,
       change: '+0%',
       icon: AlertCircle,
       color: 'red',
@@ -60,7 +64,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] bg-clip-text text-transparent">
             Welcome back, {user?.name || 'User'}!
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -100,7 +104,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] bg-clip-text text-transparent">
           Welcome back, {user?.name || 'User'}!
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -125,15 +129,15 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {stat.name}
                     </p>
-                    <p className="text-3xl font-bold mt-2">{stat.value}</p>
+                    <p className="text-3xl font-bold mt-2 text-gray-900 dark:text-white">{stat.value}</p>
                     <p className={`text-sm mt-2 ${
-                      stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                      stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600'
                     }`}>
                       {stat.change} from last week
                     </p>
                   </div>
                   <div className={`p-3 rounded-xl bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}>
-                    <Icon className={`h-6 w-6 text-${stat.color}-600`} />
+                    <Icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
                   </div>
                 </div>
               </Card>

@@ -4,6 +4,8 @@ import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { EditTaskModal } from '@/components/tasks/EditTaskModal'
+import { DeleteConfirmModal } from '@/components/tasks/DeleteConfirmModal'
 
 export default function DashboardLayout({
   children,
@@ -24,7 +26,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F6F7] via-white to-[#D6E6F2] dark:from-[#0E0E34] dark:via-[#1A1A3A] dark:to-[#0E0E34] flex">
       <DashboardSidebar />
 
       <main className="flex-1 p-8 overflow-x-hidden">
@@ -32,6 +34,10 @@ export default function DashboardLayout({
           {children}
         </div>
       </main>
+
+      {/* Dashboard Modals */}
+      <EditTaskModal />
+      <DeleteConfirmModal />
     </div>
   )
 }

@@ -5,6 +5,11 @@ interface UIState {
   isSignUpModalOpen: boolean
   isLoginModalOpen: boolean
   isCreateTaskModalOpen: boolean
+  isEditTaskModalOpen: boolean
+  editingTaskId: string | null
+  isDeleteConfirmModalOpen: boolean
+  deletingTaskId: string | null
+  deletingTaskTitle: string | null
   theme: 'light' | 'dark'
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
@@ -14,16 +19,35 @@ interface UIState {
   closeLoginModal: () => void
   openCreateTaskModal: () => void
   closeCreateTaskModal: () => void
+  openEditTaskModal: (taskId: string) => void
+  closeEditTaskModal: () => void
+  openDeleteConfirmModal: (taskId: string, taskTitle: string) => void
+  closeDeleteConfirmModal: () => void
   toggleTheme: () => void
   setTheme: (theme: 'light' | 'dark') => void
 }
+
+// Initialize theme from localStorage or system preference
+const getInitialTheme = (): 'light' | 'dark' => {
+  if (typeof window !== 'undefined') {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) return savedTheme;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
+};
 
 export const useUIStore = create<UIState>((set) => ({
   isSidebarOpen: true,
   isSignUpModalOpen: false,
   isLoginModalOpen: false,
   isCreateTaskModalOpen: false,
-  theme: 'light',
+  isEditTaskModalOpen: false,
+  editingTaskId: null,
+  isDeleteConfirmModalOpen: false,
+  deletingTaskId: null,
+  deletingTaskTitle: null,
+  theme: getInitialTheme(),
 
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   setSidebarOpen: (open) => set({ isSidebarOpen: open }),
@@ -37,6 +61,33 @@ export const useUIStore = create<UIState>((set) => ({
   openCreateTaskModal: () => set({ isCreateTaskModalOpen: true }),
   closeCreateTaskModal: () => set({ isCreateTaskModalOpen: false }),
 
-  toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
-  setTheme: (theme) => set({ theme }),
+  openEditTaskModal: (taskId) => set({ isEditTaskModalOpen: true, editingTaskId: taskId }),
+  closeEditTaskModal: () => set({ isEditTaskModalOpen: false, editingTaskId: null }),
+
+  openDeleteConfirmModal: (taskId, taskTitle) => set({ isDeleteConfirmModalOpen: true, deletingTaskId: taskId, deletingTaskTitle: taskTitle }),
+  closeDeleteConfirmModal: () => set({ isDeleteConfirmModalOpen: false, deletingTaskId: null, deletingTaskTitle: null }),
+
+  toggleTheme: () => set((state) => {
+    const newTheme = state.theme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('theme', newTheme);
+    // Apply class to html immediately
+    const root = document.documentElement;
+    if (newTheme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    return { theme: newTheme };
+  }),
+  setTheme: (theme) => set((state) => {
+    localStorage.setItem('theme', theme);
+    // Apply class to html immediately
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    return { theme };
+  }),
 }))

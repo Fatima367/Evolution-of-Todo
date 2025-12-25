@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Edit2, Trash2, Tag } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Task } from '@/lib/types';
+import { useUIStore } from '@/store/uiStore';
 
 interface TaskItemProps {
   task: Task;
@@ -14,6 +15,7 @@ interface TaskItemProps {
 
 export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { openEditTaskModal, openDeleteConfirmModal } = useUIStore();
 
   const toggleComplete = () => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
@@ -144,10 +146,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => {
-              // TODO: Open edit modal
-              console.log('Edit task:', task.id);
-            }}
+            onClick={() => openEditTaskModal(task.id)}
             className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-400/50 transition-all"
             aria-label="Edit task"
           >
@@ -156,7 +155,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => onDelete(task.id)}
+            onClick={() => openDeleteConfirmModal(task.id, task.title)}
             className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-400/50 transition-all"
             aria-label="Delete task"
           >

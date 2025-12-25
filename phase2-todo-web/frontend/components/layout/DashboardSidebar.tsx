@@ -56,14 +56,14 @@ export function DashboardSidebar() {
           width: isSidebarOpen ? 280 : 0,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-0 h-screen glass-card border-r border-white/20 z-50 lg:sticky lg:top-0"
+        className="fixed left-0 top-0 h-screen bg-white/95 dark:bg-[#1A1A3A] border-r border-[#BAD0CC] dark:border-[#3A3A4A] z-50 lg:sticky lg:top-0 backdrop-blur-xl"
       >
         <div className="flex flex-col h-full p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <CheckSquare className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <CheckSquare className="h-8 w-8 text-[#6EB8E1]" />
+              <span className="text-xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] bg-clip-text text-transparent">
                 TodoEvo
               </span>
             </Link>
@@ -71,9 +71,9 @@ export function DashboardSidebar() {
             {/* Close button (mobile) / Collapse button (desktop) */}
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors lg:hidden"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors lg:hidden"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
 
@@ -88,10 +88,10 @@ export function DashboardSidebar() {
                   key={item.name}
                   href={item.href}
                   className={`
-                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-all
+                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
                     ${isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg glow-blue'
-                      : 'hover:bg-white/10 text-gray-700 dark:text-gray-300'
+                      ? 'bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white shadow-lg'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-[#D6E6F2] dark:hover:bg-[#252E3F]/30'
                     }
                   `}
                 >
@@ -103,13 +103,13 @@ export function DashboardSidebar() {
           </nav>
 
           {/* User Section */}
-          <div className="border-t border-white/20 pt-4 space-y-4">
-            <div className="flex items-center space-x-3 px-4 py-3 rounded-lg glass-card">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+            <div className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#252E3F]/30">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#6EB8E1] to-[#4EB5A9] flex items-center justify-center text-white font-semibold">
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
+                <p className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">
                   {user?.name || 'User'}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -133,12 +133,12 @@ export function DashboardSidebar() {
       {/* Desktop Collapse Toggle */}
       <button
         onClick={toggleSidebar}
-        className="hidden lg:block fixed left-4 top-4 z-50 p-2 rounded-lg glass-card hover:bg-white/10 transition-colors"
+        className="hidden lg:block fixed left-4 top-4 z-50 p-2 rounded-lg bg-white/90 dark:bg-[#1A1A3A] border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300 hover:scale-105"
       >
         {isSidebarOpen ? (
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         ) : (
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         )}
       </button>
     </>

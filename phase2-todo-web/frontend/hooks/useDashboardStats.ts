@@ -23,8 +23,8 @@ export function useDashboardStats() {
 
   const calculateStats = (tasks: Task[]) => {
     const totalTasks = tasks.length;
-    const inProgressTasks = tasks.filter(task => !task.completed).length;
-    const completedTasks = tasks.filter(task => task.completed).length;
+    const inProgressTasks = tasks.filter(task => task.status === 'in_progress').length;
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
     const highPriorityTasks = tasks.filter(task => task.priority === 'high').length;
 
     setStats({
