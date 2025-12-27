@@ -1,4 +1,4 @@
-import { Task, TaskCreate, TaskUpdate, TasksResponse, User, UserCreate, UserLogin, TokenResponse } from './types';
+import { Task, TaskCreate, TaskUpdate, TasksResponse, User, UserCreate, UserLogin, TokenResponse, SortField, SortDirection } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -65,12 +65,16 @@ class ApiClient {
   async getTasks(params?: {
     status?: string;
     priority?: string;
+    sort_by?: SortField;
+    sort_order?: SortDirection;
     limit?: number;
     offset?: number;
   }): Promise<TasksResponse> {
     const query = new URLSearchParams();
     if (params?.status) query.append('status', params.status);
     if (params?.priority) query.append('priority', params.priority);
+    if (params?.sort_by) query.append('sort_by', params.sort_by);
+    if (params?.sort_order) query.append('sort_order', params.sort_order);
     if (params?.limit) query.append('limit', params.limit.toString());
     if (params?.offset) query.append('offset', params.offset.toString());
 

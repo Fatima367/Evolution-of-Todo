@@ -31,18 +31,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T001 [P] [US1,US2,US3] Create integration test for sort by due_date in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T002 [P] [US1,US2,US3] Create integration test for sort by priority in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T003 [P] [US1,US2,US3] Create integration test for sort by title in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T004 [P] [US1,US2,US3] Create integration test for sort direction toggle (asc/desc) in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T005 [P] [US1,US2,US3] Create integration test for sorting with NULL due_date values in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T006 [P] [US1,US2,US3] Create integration test for sorting combined with existing filters in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T001 [P] [US1,US2,US3] Create integration test for sort by due_date in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T002 [P] [US1,US2,US3] Create integration test for sort by priority in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T003 [P] [US1,US2,US3] Create integration test for sort by title in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T004 [P] [US1,US2,US3] Create integration test for sort direction toggle (asc/desc) in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T005 [P] [US1,US2,US3] Create integration test for sorting with NULL due_date values in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T006 [P] [US1,US2,US3] Create integration test for sorting combined with existing filters in phase2-todo-web/backend/tests/integration/test_task_sorting.py
 
 ### Backend Implementation
 
-- [ ] T007 [US1,US2,US3] Add sort parameters (sort_by, sort_order) to task query request schema in phase2-todo-web/backend/src/schemas/task_schemas.py
-- [ ] T008 [US1,US2,US3] Implement dynamic sorting logic in get_user_tasks function in phase2-todo-web/backend/src/services/task_service.py (depends on T007)
-- [ ] T009 [US1,US2,US3] Add sort_by and sort_order query parameters to GET /api/tasks endpoint in phase2-todo-web/backend/src/api/task_router.py (depends on T007, T008)
+- [X] T007 [US1,US2,US3] Add sort parameters (sort_by, sort_order) to task query request schema in phase2-todo-web/backend/src/schemas/task_schemas.py
+- [X] T008 [US1,US2,US3] Implement dynamic sorting logic in get_user_tasks function in phase2-todo-web/backend/src/services/task_service.py (depends on T007)
+- [X] T009 [US1,US2,US3] Add sort_by and sort_order query parameters to GET /api/tasks endpoint in phase2-todo-web/backend/src/api/task_router.py (depends on T007, T008)
 
 **Checkpoint**: Backend sorting is functional and tested - all sort options work with database queries
 
@@ -54,8 +54,8 @@
 
 ### Frontend Types & Hook
 
-- [ ] T010 [P] [US1,US2,US3] Define SortField, SortDirection, SortOption types in phase2-todo-web/frontend/src/lib/types.ts
-- [ ] T011 [US1,US2,US3] Implement useTaskSort hook with localStorage persistence in phase2-todo-web/frontend/src/lib/hooks/useTaskSort.ts (depends on T010)
+- [X] T010 [P] [US1,US2,US3] Define SortField, SortDirection, SortOption types in phase2-todo-web/frontend/src/lib/types.ts
+- [X] T011 [US1,US2,US3] Implement useTaskSort hook with localStorage persistence in phase2-todo-web/frontend/src/lib/hooks/useTaskSort.ts (depends on T010)
 
 **Checkpoint**: Frontend sort state management is ready for component integration
 
@@ -67,7 +67,7 @@
 
 ### Sort Component
 
-- [ ] T012 [P] [US1,US2,US3] Create SortDropdown component in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx (depends on T010, T011)
+- [X] T012 [P] [US1,US2,US3] Create SortDropdown component in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx (depends on T010, T011)
 
 ### Frontend Tests for Sorting (Optional)
 
@@ -77,9 +77,9 @@
 
 ### Tasks Page Integration
 
-- [ ] T014 [US1,US2,US3] Import and render SortDropdown in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T011, T012)
-- [ ] T015 [US1,US2,US3] Wire sort state from useTaskSort to API query in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T014)
-- [ ] T016 [US1,US2,US3] Display current sort option with direction indicator in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T015)
+- [X] T014 [US1,US2,US3] Import and render SortDropdown in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T011, T012)
+- [X] T015 [US1,US2,US3] Wire sort state from useTaskSort to API query in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T014)
+- [X] T016 [US1,US2,US3] Display current sort option with direction indicator in phase2-todo-web/frontend/app/dashboard/tasks/page.tsx (depends on T015)
 
 **Checkpoint**: Frontend sort UI is complete and integrated with backend API
 
@@ -89,14 +89,14 @@
 
 **Purpose**: Improvements that affect all sorting functionality
 
-- [ ] T017 [P] [US1,US2,US3] Add keyboard navigation support to SortDropdown in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
-- [ ] T018 [P] [US1,US2,US3] Add ARIA labels to SortDropdown for accessibility in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
-- [ ] T019 [P] [US1,US2,US3] Add Framer Motion animations to SortDropdown transitions in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
-- [ ] T020 [US1,US2,US3] Add visual indicator for sort direction (arrow icon) in SortDropdown in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
-- [ ] T021 [US1,US2,US3] Verify sort state persists across page navigations in phase2-todo-web/frontend/src/lib/hooks/useTaskSort.ts
-- [ ] T022 [US1,US2,US3] Update API client to accept and pass sort parameters in phase2-todo-web/frontend/lib/api.ts
-- [ ] T023 [US1,US2,US3] Test sorting with 100+ tasks for performance in phase2-todo-web/backend/tests/integration/test_task_sorting.py
-- [ ] T024 [US1,US2,US3] Run all sorting integration tests to validate functionality
+- [X] T017 [P] [US1,US2,US3] Add keyboard navigation support to SortDropdown in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
+- [X] T018 [P] [US1,US2,US3] Add ARIA labels to SortDropdown for accessibility in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
+- [X] T019 [P] [US1,US2,US3] Add Framer Motion animations to SortDropdown transitions in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
+- [X] T020 [US1,US2,US3] Add visual indicator for sort direction (arrow icon) in SortDropdown in phase2-todo-web/frontend/src/components/tasks/SortDropdown.tsx
+- [X] T021 [US1,US2,US3] Verify sort state persists across page navigations in phase2-todo-web/frontend/src/lib/hooks/useTaskSort.ts
+- [X] T022 [US1,US2,US3] Update API client to accept and pass sort parameters in phase2-todo-web/frontend/lib/api.ts
+- [X] T023 [US1,US2,US3] Test sorting with 100+ tasks for performance in phase2-todo-web/backend/tests/integration/test_task_sorting.py
+- [X] T024 [US1,US2,US3] Run all sorting integration tests to validate functionality
 
 **Final Checkpoint**: All sorting features are complete, accessible, performant, and tested
 

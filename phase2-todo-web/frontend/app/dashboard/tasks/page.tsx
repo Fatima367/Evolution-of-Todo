@@ -1,18 +1,21 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Plus, Filter, ListChecks } from 'lucide-react';
+import { Plus, Filter, ListChecks, ArrowUpDown } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useTaskFilters } from '@/lib/hooks/useTaskFilters';
+import { useTaskSort } from '@/lib/hooks/useTaskSort';
 import { useUIStore } from '@/store/uiStore';
 import { TaskList } from '@/components/tasks/TaskList';
 import { SearchBar } from '@/components/tasks/SearchBar';
 import { FilterDropdown } from '@/components/tasks/FilterDropdown';
+import { SortDropdown } from '@/components/tasks/SortDropdown';
 import { TASK_STATUSES, TASK_PRIORITIES } from '@/lib/constants/taskOptions';
 
 export default function TasksPage() {
   const openCreateTaskModal = useUIStore((state) => state.openCreateTaskModal);
-  const { tasks, loading, updateTask, deleteTask } = useTasks();
+  const { sort, onChange, toggleDirection } = useTaskSort();
+  const { tasks, loading, updateTask, deleteTask } = useTasks(undefined, sort.field, sort.direction);
   const { filteredTasks, filters, updateFilter, activeFilterCount } = useTaskFilters(tasks);
 
   // Prepare filter options
@@ -90,7 +93,7 @@ export default function TasksPage() {
             placeholder="Search tasks by title or description..."
           />
 
-          {/* Filter Dropdowns */}
+          {/* Filter and Sort Dropdowns */}
           <div className="flex flex-wrap gap-3">
             {/* Status Filter */}
             <FilterDropdown
@@ -120,6 +123,13 @@ export default function TasksPage() {
                 icon={<Filter size={18} />}
               />
             )}
+
+            {/* Sort Dropdown */}
+            <SortDropdown
+              currentSort={sort}
+              onChange={onChange}
+              onToggleDirection={toggleDirection}
+            />
           </div>
         </div>
 
