@@ -102,6 +102,90 @@ Subagents are specialized AI agents that handle specific domains of the project.
 
 ---
 
+### 5. **Frontend Specialist Agent** (New)
+**Location:** `.claude/agents/frontend-specialist-agent/`
+
+**Purpose:** Expert in modern web frontend development using Next.js 16+, TypeScript, and Tailwind CSS.
+
+**When to Use:**
+- Building or modifying the web UI
+- Implementing responsive components
+- Optimizing frontend performance and accessibility
+
+---
+
+### 6. **Backend Specialist Agent** (New)
+**Location:** `.claude/agents/backend-specialist-agent/`
+
+**Purpose:** Specialized backend engineer for building robust APIs with FastAPI, SQLModel, and Neon DB.
+
+**When to Use:**
+- Backend API development
+- Database schema design and optimization
+- Security and authentication logic implementation
+
+---
+
+### 7. **MCP & AI Systems Agent** (New)
+**Location:** `.claude/agents/mcp-agentic-agent/`
+
+**Purpose:** Building AI-powered systems using MCP and OpenAI Agents SDK.
+
+**When to Use:**
+- Building MCP servers
+- Integrating AI agents into the app
+- Designing complex conversational workflows
+
+---
+
+### 8. **QA & Automation Agent** (New)
+**Location:** `.claude/agents/qa-automation-agent/`
+
+**Purpose:** Quality assurance agent focused on automated testing and quality standards.
+
+**When to Use:**
+- Verifying implementations with automated tests
+- Writing test suites (Pytest, Playwright)
+- Ensuring high quality standards across the stack
+
+---
+
+### 9. **Event-Driven Systems Agent** (New)
+**Location:** `.claude/agents/event-driven-agent/`
+
+**Purpose:** Specialized architect for event-driven microservices using Kafka and Dapr.
+
+**When to Use:**
+- Phase V implementation
+- Designing event schemas and topics
+- Implementing asynchronous reminders and recurring task engines
+
+---
+
+### 10. **Infrastructure Blueprint Agent** (New)
+**Location:** `.claude/agents/infra-blueprint-agent/`
+
+**Purpose:** Creating "Cloud-Native Blueprints" using IaC for maximum bonus points.
+
+**When to Use:**
+- Phase IV and V automation
+- Creating reusable Terraform/OpenTofu modules
+- Defining 1-click cloud deployment patterns
+
+---
+
+### 11. **Multilingual & Voice Agent** (New)
+**Location:** `.claude/agents/multilingual-voice-agent/`
+
+**Purpose:** UX agent for bonus features: Urdu support and Voice commands.
+
+**When to Use:**
+- Implementing Urdu localization and RTL support
+- Integrating Web Speech API for voice-to-task commands
+- Adding bidirectional AI translation logic
+
+---
+
 ## Skills
 
 Skills are focused, reusable expertise modules for specific technologies or patterns.
@@ -111,40 +195,12 @@ Skills are focused, reusable expertise modules for specific technologies or patt
 
 **Purpose:** Building RESTful APIs with FastAPI, SQLModel ORM, and Neon Serverless PostgreSQL.
 
-**Key Features:**
-- Complete FastAPI project structure
-- SQLModel database models
-- Neon PostgreSQL connection handling
-- CRUD endpoint implementations
-- JWT authentication integration
-- Pydantic schemas for validation
-- Error handling patterns
-
-**Use Cases:**
-- Phase II: Full-stack web app backend
-- Phase III: Chat API endpoints
-- Phase V: Advanced features backend
-
 ---
 
 ### 2. **Next.js App Router Skill** (New)
 **Location:** `.claude/skills/nextjs-app-router/`
 
 **Purpose:** Modern Next.js 16+ applications using App Router, Server Components, and TypeScript.
-
-**Key Features:**
-- App Router project structure
-- Server vs Client Components
-- API client with JWT integration
-- Better Auth frontend integration
-- Task management UI components
-- Tailwind CSS styling patterns
-- TypeScript type definitions
-
-**Use Cases:**
-- Phase II: Full-stack web app frontend
-- Phase III: ChatKit integration
-- Phase V: Advanced features UI
 
 ---
 
@@ -153,64 +209,79 @@ Skills are focused, reusable expertise modules for specific technologies or patt
 
 **Purpose:** Building Model Context Protocol servers with tool definitions for AI agents.
 
-**Key Features:**
-- Official MCP SDK (Python) implementation
-- Tool schema design with Pydantic
-- 5 required tools: add_task, list_tasks, complete_task, delete_task, update_task
-- OpenAI Agents SDK integration
-- Stateless tool design (database-backed)
-- Natural language command handling
+---
 
-**Use Cases:**
-- Phase III: AI Chatbot with MCP tools
-- Natural language task management
-- Agent-based interactions
+### 4. **Kafka & Redpanda Skill** (New)
+**Location:** `.claude/skills/kafka-redpanda-skill/`
+
+**Purpose:** Technical expertise for implementing event-driven todo systems.
 
 ---
 
-### 4. **BetterAuth Integration Skill** (Existing - Keep)
+### 5. **Dapr Building Blocks Skill** (New)
+**Location:** `.claude/skills/dapr-components-skill/`
+
+**Purpose:** Integrating Dapr sidecars (Pub/Sub, State, Jobs, Secrets) into the app.
+
+---
+
+### 6. **Cloud-Native Blueprint Skill** (New)
+**Location:** `.claude/skills/iac-blueprints-skill/`
+
+**Purpose:** Creating reusable IaC modules (Terraform/OpenTofu) for cloud deployment.
+
+---
+
+### 7. **Urdu & Voice Integration Skill** (New)
+**Location:** `.claude/skills/urdu-voice-skill/`
+
+**Purpose:** Implementing Urdu localization (RTL) and Voice-to-Task functionality.
+
+---
+
+### 8. **BetterAuth Integration Skill** (Existing - Keep)
 **Location:** `.claude/skills/betterauth-integration/`
 
 **Purpose:** Better Auth setup and configuration.
 
 ---
 
-### 5. **MCP Builder Skill** (Existing - Keep)
+### 9. **MCP Builder Skill** (Existing - Keep)
 **Location:** `.claude/skills/mcp-builder/`
 
 **Purpose:** General MCP server creation guidance.
 
 ---
 
-### 6. **Frontend Design Skill** (Existing - Keep)
+### 10. **Frontend Design Skill** (Existing - Keep)
 **Location:** `.claude/skills/frontend-design/`
 
 **Purpose:** Production-grade frontend design patterns.
 
 ---
 
-### 7. **Skill Creator Skill** (Existing - Keep)
+### 11. **Skill Creator Skill** (Existing - Keep)
 **Location:** `.claude/skills/skill-creator/`
 
 **Purpose:** Creating new Claude Code skills.
 
 ---
 
-### 8. **Doc Co-authoring Skill** (Existing - Keep)
+### 12. **Doc Co-authoring Skill** (Existing - Keep)
 **Location:** `.claude/skills/doc-coauthoring/`
 
 **Purpose:** Structured documentation workflow.
 
 ---
 
-### 9. **Web Artifacts Builder Skill** (Existing - Keep)
+### 13. **Web Artifacts Builder Skill** (Existing - Keep)
 **Location:** `.claude/skills/web-artifacts-builder/`
 
 **Purpose:** Complex React artifacts with shadcn/ui.
 
 ---
 
-### 10. **WebApp Testing Skill** (Existing - Keep)
+### 14. **WebApp Testing Skill** (Existing - Keep)
 **Location:** `.claude/skills/webapp-testing/`
 
 **Purpose:** Playwright-based frontend testing.

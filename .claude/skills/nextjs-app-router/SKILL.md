@@ -73,10 +73,11 @@ frontend/
 **app/layout.tsx:**
 ```tsx
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Evolution of Todo',
@@ -90,13 +91,33 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
         <div className="min-h-screen bg-gray-50">
           {children}
         </div>
       </body>
     </html>
   )
+}
+```
+
+**⚠️ Turbopack Font Issue**: Next.js 16+ with Turbopack may fail to resolve `next/font/google` imports:
+```
+Error: Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'
+```
+
+**Solution**: Disable Turbopack when building:
+```bash
+next build --turbo=false
+```
+
+Or modify `package.json` scripts:
+```json
+{
+  "scripts": {
+    "build": "next build --turbo=false",
+    "dev": "next dev --turbo=false"
+  }
 }
 ```
 
@@ -758,6 +779,37 @@ export function useTasks(userId: string, filter: string = 'all') {
   - Browser APIs (localStorage, etc.)
   - React hooks (useState, useEffect)
 - ✅ Add `'use client'` directive at top of client component files
+
+### 1.5 Route Groups vs Regular Routes (CRITICAL)
+**⚠️ Common Routing Error**: Route groups with parentheses `(name)` do NOT affect URL paths:
+- `app/(dashboard)/tasks/page.tsx` → routes to `/tasks`, NOT `/dashboard/tasks`
+- `app/(auth)/login/page.tsx` → routes to `/login`, NOT `/auth/login`
+- Parentheses are for layout grouping only, NOT URL segments
+
+**Correct Pattern for URL Visibility**:
+```
+app/
+├── dashboard/              # Regular folder: URL = /dashboard/*
+│   ├── layout.tsx
+│   ├── page.tsx         # URL: /dashboard
+│   ├── tasks/
+│   │   └── page.tsx     # URL: /dashboard/tasks
+│   └── settings/
+│       └── page.tsx         # URL: /dashboard/settings
+└── auth/                  # Regular folder: URL = /auth/*
+    ├── layout.tsx
+    ├── login/
+    │   └── page.tsx         # URL: /auth/login
+    └── register/
+        └── page.tsx         # URL: /auth/register
+```
+
+**Use Route Groups Only When**:
+- You want to share a layout across multiple routes
+- But the group name should NOT appear in the URL
+- Example: `(marketing)/`, `(protected)/` - these don't affect URLs
+
+**Rule of Thumb**: If login page should be at `/auth/login`, use `auth/login/page.tsx`. If `/(auth)/login/page.tsx`, it routes to `/login`.
 
 ### 2. Data Fetching
 - ✅ Fetch data in Server Components when possible

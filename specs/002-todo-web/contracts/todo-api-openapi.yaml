@@ -1,0 +1,515 @@
+openapi: 3.0.3
+info:
+  title: Todo Web Application API
+  description: API for the Todo Full-Stack Web Application with user authentication and task management
+  version: 1.0.0
+  contact:
+    name: Development Team
+    email: dev@example.com
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.todoapp.com
+    description: Production server
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account with email and password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+        '400':
+          description: Invalid input or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticates user and returns JWT token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: securePassword123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  token_type:
+                    type: string
+                    example: bearer
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: User logout
+      description: Invalidates the current user session
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully logged out
+
+  /tasks/:
+    get:
+      summary: Get user's tasks
+      description: Retrieves all tasks for the authenticated user with optional filtering
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, in_progress, completed]
+          description: Filter tasks by status
+        - name: priority
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [low, medium, high, urgent]
+          description: Filter tasks by priority
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of tasks to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of tasks to skip
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaskRead'
+                  total:
+                    type: integer
+                    example: 5
+        '401':
+          description: Unauthorized - invalid or missing token
+    post:
+      summary: Create a new task
+      description: Creates a new task for the authenticated user
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRead'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid or missing token
+
+  /tasks/{id}:
+    get:
+      summary: Get a specific task
+      description: Retrieves a specific task by ID for the authenticated user
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Task ID
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRead'
+        '401':
+          description: Unauthorized - invalid or missing token
+        '404':
+          description: Task not found
+    put:
+      summary: Update a task
+      description: Updates an existing task for the authenticated user
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Task ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskRead'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - invalid or missing token
+        '404':
+          description: Task not found
+    delete:
+      summary: Delete a task
+      description: Deletes an existing task for the authenticated user
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Task ID
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Task deleted successfully
+        '401':
+          description: Unauthorized - invalid or missing token
+        '404':
+          description: Task not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserCreate:
+      type: object
+      required:
+        - email
+        - name
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+          description: User's email address
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John Doe
+          description: User's display name
+        password:
+          type: string
+          minLength: 8
+          example: securePassword123
+          description: User's password (min 8 characters)
+
+    UserRead:
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: Unique user identifier
+        email:
+          type: string
+          format: email
+          example: user@example.com
+          description: User's email address
+        name:
+          type: string
+          example: John Doe
+          description: User's display name
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Timestamp when user was created
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Timestamp when user was last updated
+
+    TaskCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: Complete project proposal
+          description: Task title
+        description:
+          type: string
+          maxLength: 10000
+          example: Write and submit the project proposal document
+          description: Detailed description of the task
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          default: medium
+          example: high
+          description: Task priority level
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          description: Optional deadline for the task
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          maxItems: 10
+          example: ["work", "important"]
+          description: Array of tags for the task
+
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: Complete project proposal
+          description: Task title
+        description:
+          type: string
+          maxLength: 10000
+          example: Write and submit the project proposal document
+          description: Detailed description of the task
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
+          example: in_progress
+          description: Task status
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: high
+          description: Task priority level
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          description: Optional deadline for the task
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          maxItems: 10
+          example: ["work", "important"]
+          description: Array of tags for the task
+
+    TaskRead:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - priority
+        - user_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: Unique task identifier
+        title:
+          type: string
+          example: Complete project proposal
+          description: Task title
+        description:
+          type: string
+          example: Write and submit the project proposal document
+          description: Detailed description of the task
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
+          example: pending
+          description: Task status
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: high
+          description: Task priority level
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          description: Optional deadline for the task
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["work", "important"]
+          description: Array of tags for the task
+        user_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174001
+          description: ID of the user who owns this task
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Timestamp when task was created
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Timestamp when task was last updated
+        completed_at:
+          type: string
+          format: date-time
+          example: "2023-01-02T10:30:00Z"
+          description: Timestamp when task was marked as completed (null if not completed)
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Validation error
+          description: Error message
+        details:
+          type: object
+          description: Additional error details (optional)
+          example:
+            field: email
+            reason: Invalid email format
