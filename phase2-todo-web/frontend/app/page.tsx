@@ -146,7 +146,15 @@ function GradientCard({
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       className={`relative group ${className}`}
     >
-      {/* Gradient border layer */}
+      {/* Gradient border layer - always visible */}
+      <div
+        className="absolute inset-0 rounded-2xl transition-opacity duration-500"
+        style={{
+          background: `linear-gradient(135deg, ${gradient.from}40 0%, ${gradient.to}40 100%)`,
+          padding: "1px",
+        }}
+      />
+      {/* Gradient border on hover - brighter */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
@@ -154,8 +162,8 @@ function GradientCard({
           padding: "1px",
         }}
       />
-      {/* Inner card */}
-      <div className="relative h-full bg-white dark:bg-[#0E0E34] rounded-2xl">
+      {/* Inner card with shadow */}
+      <div className="relative h-full bg-white dark:bg-[#0E0E34] rounded-2xl shadow-md group-hover:shadow-xl transition-shadow duration-300">
         {/* Hover glow overlay */}
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
