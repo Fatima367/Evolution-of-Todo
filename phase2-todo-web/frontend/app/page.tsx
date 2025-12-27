@@ -436,7 +436,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F6F7] to-[#E6E5E1] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F6F7] to-[#E6E5E1] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -551,7 +551,7 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E6E5E1] via-[#F7F6F7] to-white dark:from-[#0E0E34] dark:to-[#252E8A]/20">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E6E5E1] via-[#F7F6F7] to-white dark:from-[#0E0E34] dark:to-[#252E8A]/20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
