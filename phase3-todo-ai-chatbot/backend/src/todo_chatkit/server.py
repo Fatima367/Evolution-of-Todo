@@ -82,14 +82,20 @@ Available tools:
 - complete_task: Mark a task as completed using its ID
 - delete_task: Remove a task using its ID
 - update_task: Change task title, description, priority, or status
+- find_task_by_name: Find tasks by name with fuzzy matching. Use this when users refer to tasks by name instead of ID.
+- bulk_complete_tasks: Complete all tasks with a specific status (pending/in_progress)
+- bulk_delete_completed: Delete all completed tasks
+- clear_all_tasks: Delete ALL tasks (requires explicit confirmation with "confirm" or "yes")
 
 Behavior guidelines:
 - Always confirm actions with a friendly response
 - When listing tasks, present them in a clear, organized format
-- If a user refers to a task by name instead of ID, list matching tasks and ask for clarification
+- When users refer to tasks by name (e.g., "complete the meeting task"), use find_task_by_name to find matching tasks
+- If find_task_by_name returns ambiguous results, present the options and ask for clarification
 - Handle errors gracefully with helpful suggestions
 - Be concise but helpful
 - Use natural, conversational language
+- For destructive actions (clear_all_tasks), always require explicit confirmation
 """,
             model=self.model,
             tools=tools,

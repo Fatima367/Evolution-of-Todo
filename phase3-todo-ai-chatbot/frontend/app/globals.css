@@ -138,7 +138,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-all;
+    @apply w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all;
   }
 
   .card {
@@ -153,6 +153,21 @@
     border: 1px solid var(--glass-border);
     box-shadow: 0 8px 32px 0 var(--glass-shadow);
     @apply rounded-xl;
+  }
+
+  /* Consistent input field styling for search bars and dropdowns */
+  input[type="text"].glass-card,
+  input[type="search"].glass-card,
+  input[type="email"].glass-card,
+  input[type="password"].glass-card,
+  textarea.glass-card,
+  select.glass-card {
+    @apply border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] placeholder:text-gray-400 dark:placeholder:text-gray-500;
+  }
+
+  /* Styling for select elements to match the beautiful color palette */
+  select {
+    @apply border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all;
   }
 
   .glass-card-hover {
