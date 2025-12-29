@@ -208,3 +208,10 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.13+ for backend, TypeScript 5+ for frontend + FastAPI, OpenAI Agents SDK, Official MCP SDK, SQLModel, Neon Serverless PostgreSQL, Better Auth (from Phase II), Groq API (LLM provider) (003-todo-ai-chatbot)
+- Neon Serverless PostgreSQL (tasks, conversations, messages) (003-todo-ai-chatbot)
+
+## Recent Changes
+- 003-todo-ai-chatbot: Added Python 3.13+ for backend, TypeScript 5+ for frontend + FastAPI, OpenAI Agents SDK, Official MCP SDK, SQLModel, Neon Serverless PostgreSQL, Better Auth (from Phase II), Groq API (LLM provider)

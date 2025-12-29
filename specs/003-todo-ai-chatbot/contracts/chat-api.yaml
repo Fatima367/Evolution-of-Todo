@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  title: Todo Chat API
+  version: 1.0.0
+  description: AI-powered chatbot API for managing todos through natural language
+  contact:
+    name: Todo Project
+    email: admin@example.com
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+  - url: https://api.example.com/api
+    description: Production server
+
+tags:
+  - name: chat
+    description: Chat endpoint operations
+
+paths:
+  /{user_id}/chat:
+    post:
+      tags:
+        - chat
+      summary: Send a message and get AI response
+      description: |
+        Processes a natural language message and returns an AI response.
+        The system is stateless - conversation history is fetched from database
+        based on the provided conversation_id. If no conversation_id is provided,
+        a new conversation is created.
+      operationId: sendMessage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The user identifier (extracted from JWT token in production)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                conversation_id:
+                  type: integer
+                  description: |
+                    Optional conversation ID to resume an existing conversation.
+                    If not provided, a new conversation is created.
+                  example: 123
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+                  description: The user's natural language message
+                  example: "Add a task to buy groceries"
+      responses:
+        '200':
+          description: Successful response with AI message and conversation info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation_id:
+                    type: integer
+                    description: The conversation ID (new if none provided)
+                    example: 123
+                  response:
+                    type: string
+                    description: The AI assistant's response
+                    example: "I've added 'Buy groceries' to your task list."
+                  tool_calls:
+                    type: array
+                    description: List of MCP tools invoked by the AI
+                    items:
+                      type: object
+                      properties:
+                        tool:
+                          type: string
+                          enum: [add_task, list_tasks, complete_task, delete_task, update_task]
+                          description: The tool that was called
+                        parameters:
+                          type: object
+                          description: Parameters passed to the tool
+                        result:
+                          type: object
+                          description: Result returned by the tool
+                    example:
+                      - tool: add_task
+                        parameters:
+                          title: "Buy groceries"
+                          user_id: "ziakhan"
+                        result:
+                          task_id: 5
+                          status: "created"
+                          title: "Buy groceries"
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                validationError:
+                  error_code: VALIDATION_ERROR
+                  message: "Message is required"
+                  details: { field: "message" }
+        '401':
+          description: Unauthorized - invalid or missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: UNAUTHORIZED
+                message: "Invalid or expired token"
+                details: {}
+        '404':
+          description: Not found - user or conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                userNotFound:
+                  error_code: USER_NOT_FOUND
+                  message: "User not found"
+                  details: { user_id: "unknown" }
+                conversationNotFound:
+                  error_code: CONVERSATION_NOT_FOUND
+                  message: "Conversation not found"
+                  details: { conversation_id: 999 }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: INTERNAL_ERROR
+                message: "An unexpected error occurred"
+                details: {}
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from Better Auth authentication
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error_code
+        - message
+      properties:
+        error_code:
+          type: string
+          description: Machine-readable error code
+          enum:
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - USER_NOT_FOUND
+            - CONVERSATION_NOT_FOUND
+            - TASK_NOT_FOUND
+            - INTERNAL_ERROR
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error details
+
+    ToolCall:
+      type: object
+      description: Represents a single MCP tool invocation
+      required:
+        - tool
+        - parameters
+        - result
+      properties:
+        tool:
+          type: string
+          enum: [add_task, list_tasks, complete_task, delete_task, update_task]
+          description: The tool that was called
+        parameters:
+          type: object
+          additionalProperties: true
+          description: Parameters passed to the tool
+        result:
+          type: object
+          additionalProperties: true
+          description: Result returned by the tool
+
+    ChatResponse:
+      type: object
+      required:
+        - conversation_id
+        - response
+        - tool_calls
+      properties:
+        conversation_id:
+          type: integer
+          description: The conversation ID
+        response:
+          type: string
+          description: The AI assistant's response
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCall'
+          description: List of MCP tools invoked by the AI
