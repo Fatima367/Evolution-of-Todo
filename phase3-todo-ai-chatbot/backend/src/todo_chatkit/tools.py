@@ -4,40 +4,50 @@ These tools are exposed to the AI agent via OpenAI Agents SDK,
 allowing natural language task management.
 """
 import uuid
-from typing import Optional, Literal
 from datetime import datetime
+from typing import Any, Optional
 
 from sqlmodel import Session, select
-from agents import Tool
+from agents import function_tool, RunContextWrapper
 
 from src.models.task import Task, TaskStatus, TaskPriority
-from src.models.user import User
 
 
-def create_task_tools(session: Session, user_id: str) -> list[Tool]:
+class TaskToolContext:
+    """Context passed to tools containing session, user_id and thread info
+
+    This context is passed via RunContextWrapper when running the agent.
+    """
+    session: Session
+    user_id: str  # UUID as string
+    thread_id: str
+
+    def __init__(self, session: Session, user_id: str, thread_id: str = ""):
+        self.session = session
+        self.user_id = user_id
+        self.thread_id = thread_id
+
+
+def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> list[Any]:
     """Create MCP tools for task management
 
     Args:
         session: Database session
         user_id: User ID for data isolation
+        thread_id: Current conversation/thread ID
 
     Returns:
-        List of Tool objects for the AI agent
+        List of decorated function tools
     """
+    context = TaskToolContext(session=session, user_id=user_id, thread_id=thread_id)
 
-    def add_task(title: str, description: Optional[str] = None, priority: str = "medium") -> dict:
-        """Create a new task
+    @function_tool(name_override="add_task")
+    def add_task(ctx: RunContextWrapper[TaskToolContext], title: str, description: str | None = None, priority: str = "medium") -> str:
+        """Create a new task with a title and optional description and priority"""
+        session = ctx.context.session
+        user_id = ctx.context.user_id
 
-        Args:
-            title: Task title (required)
-            description: Task description (optional)
-            priority: Task priority (low, medium, high, urgent)
-
-        Returns:
-            Dictionary with task_id, status, and title
-        """
         try:
-            # Validate priority
             priority_enum = TaskPriority(priority.lower())
         except ValueError:
             priority_enum = TaskPriority.MEDIUM
@@ -54,26 +64,16 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
         session.commit()
         session.refresh(task)
 
-        return {
-            "task_id": str(task.id),
-            "status": "created",
-            "title": task.title,
-            "priority": task.priority.value
-        }
+        return f"Task created successfully! ID: {task.id}, Title: {task.title}, Priority: {task.priority.value}"
 
-    def list_tasks(status: Optional[str] = None, limit: int = 20) -> dict:
-        """List user's tasks with optional filtering
+    @function_tool(name_override="list_tasks")
+    def list_tasks(ctx: RunContextWrapper[TaskToolContext], status: str | None = None, limit: int = 20) -> str:
+        """List all tasks, optionally filtered by status (pending, in_progress, completed, or omit for all)"""
+        session = ctx.context.session
+        user_id = ctx.context.user_id
 
-        Args:
-            status: Filter by status (pending, in_progress, completed, or omit for all)
-            limit: Maximum number of tasks to return (default 20)
-
-        Returns:
-            Dictionary with tasks array
-        """
         statement = select(Task).where(Task.user_id == uuid.UUID(user_id))
 
-        # Apply status filter
         if status and status.lower() != "all":
             try:
                 status_enum = TaskStatus(status.lower())
@@ -81,40 +81,32 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
             except ValueError:
                 pass
 
-        # Order by creation date (newest first)
         statement = statement.order_by(Task.created_at.desc()).limit(limit)
-
         tasks = session.exec(statement).all()
 
-        return {
-            "tasks": [
-                {
-                    "id": str(task.id),
-                    "title": task.title,
-                    "description": task.description,
-                    "status": task.status.value,
-                    "priority": task.priority.value,
-                    "due_date": task.due_date.isoformat() if task.due_date else None,
-                    "created_at": task.created_at.isoformat()
-                }
-                for task in tasks
-            ],
-            "count": len(tasks)
-        }
+        if not tasks:
+            return "No tasks found."
 
-    def complete_task(task_id: str) -> dict:
-        """Mark a task as completed
+        result = f"Found {len(tasks)} task(s):\n\n"
+        for task in tasks:
+            status_icon = "✓" if task.status == TaskStatus.COMPLETED else "○"
+            result += f"{status_icon} [{task.status.value}] *{task.priority.value}* {task.title}"
+            if task.description:
+                result += f"\n   {task.description}"
+            result += f"\n   ID: {task.id}\n\n"
 
-        Args:
-            task_id: Task ID to complete
+        return result
 
-        Returns:
-            Dictionary with task_id, status, and title
-        """
+    @function_tool(name_override="complete_task")
+    def complete_task(ctx: RunContextWrapper[TaskToolContext], task_id: str) -> str:
+        """Mark a task as completed using its ID"""
+        session = ctx.context.session
+        user_id = ctx.context.user_id
+
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return {"error": "Invalid task ID format", "status": "error"}
+            return f"Error: Invalid task ID format: {task_id}"
 
         statement = select(Task).where(
             Task.id == task_uuid,
@@ -123,7 +115,7 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
         task = session.exec(statement).first()
 
         if not task:
-            return {"error": "Task not found", "status": "error"}
+            return f"Error: Task not found with ID: {task_id}"
 
         task.status = TaskStatus.COMPLETED
         task.completed_at = datetime.utcnow()
@@ -132,25 +124,18 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
         session.add(task)
         session.commit()
 
-        return {
-            "task_id": str(task.id),
-            "status": "completed",
-            "title": task.title
-        }
+        return f"Task completed! Title: {task.title}"
 
-    def delete_task(task_id: str) -> dict:
-        """Delete a task
+    @function_tool(name_override="delete_task")
+    def delete_task(ctx: RunContextWrapper[TaskToolContext], task_id: str) -> str:
+        """Delete a task using its ID"""
+        session = ctx.context.session
+        user_id = ctx.context.user_id
 
-        Args:
-            task_id: Task ID to delete
-
-        Returns:
-            Dictionary with task_id, status, and title
-        """
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return {"error": "Invalid task ID format", "status": "error"}
+            return f"Error: Invalid task ID format: {task_id}"
 
         statement = select(Task).where(
             Task.id == task_uuid,
@@ -159,41 +144,24 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
         task = session.exec(statement).first()
 
         if not task:
-            return {"error": "Task not found", "status": "error"}
+            return f"Error: Task not found with ID: {task_id}"
 
         title = task.title
         session.delete(task)
         session.commit()
 
-        return {
-            "task_id": task_id,
-            "status": "deleted",
-            "title": title
-        }
+        return f"Task deleted! Title: {title}"
 
-    def update_task(
-        task_id: str,
-        title: Optional[str] = None,
-        description: Optional[str] = None,
-        priority: Optional[str] = None,
-        status: Optional[str] = None
-    ) -> dict:
-        """Update a task's details
+    @function_tool(name_override="update_task")
+    def update_task(ctx: RunContextWrapper[TaskToolContext], task_id: str, title: str | None = None, description: str | None = None, priority: str | None = None, status: str | None = None) -> str:
+        """Update a task's title, description, priority, or status"""
+        session = ctx.context.session
+        user_id = ctx.context.user_id
 
-        Args:
-            task_id: Task ID to update
-            title: New title (optional)
-            description: New description (optional)
-            priority: New priority (optional: low, medium, high, urgent)
-            status: New status (optional: pending, in_progress, completed)
-
-        Returns:
-            Dictionary with task_id, status, and title
-        """
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return {"error": "Invalid task ID format", "status": "error"}
+            return f"Error: Invalid task ID format: {task_id}"
 
         statement = select(Task).where(
             Task.id == task_uuid,
@@ -202,22 +170,26 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
         task = session.exec(statement).first()
 
         if not task:
-            return {"error": "Task not found", "status": "error"}
+            return f"Error: Task not found with ID: {task_id}"
 
-        # Update fields
+        updated = []
         if title is not None:
             task.title = title
+            updated.append("title")
         if description is not None:
             task.description = description
+            updated.append("description")
         if priority is not None:
             try:
                 task.priority = TaskPriority(priority.lower())
+                updated.append("priority")
             except ValueError:
                 pass
         if status is not None:
             try:
                 new_status = TaskStatus(status.lower())
                 task.status = new_status
+                updated.append("status")
                 if new_status == TaskStatus.COMPLETED:
                     task.completed_at = datetime.utcnow()
                 else:
@@ -225,45 +197,13 @@ def create_task_tools(session: Session, user_id: str) -> list[Tool]:
             except ValueError:
                 pass
 
+        if not updated:
+            return "No fields to update"
+
         task.updated_at = datetime.utcnow()
         session.add(task)
         session.commit()
 
-        return {
-            "task_id": str(task.id),
-            "status": "updated",
-            "title": task.title,
-            "priority": task.priority.value,
-            "task_status": task.status.value
-        }
+        return f"Task updated! Changed fields: {', '.join(updated)}. Title: {task.title}"
 
-    # Create Tool objects with proper schemas
-    tools = [
-        Tool(
-            name="add_task",
-            description="Create a new task with a title and optional description and priority",
-            func=add_task
-        ),
-        Tool(
-            name="list_tasks",
-            description="List all tasks, optionally filtered by status (pending/in_progress/completed/all)",
-            func=list_tasks
-        ),
-        Tool(
-            name="complete_task",
-            description="Mark a task as completed using its ID",
-            func=complete_task
-        ),
-        Tool(
-            name="delete_task",
-            description="Delete a task using its ID",
-            func=delete_task
-        ),
-        Tool(
-            name="update_task",
-            description="Update a task's title, description, priority, or status",
-            func=update_task
-        ),
-    ]
-
-    return tools
+    return [add_task, list_tasks, complete_task, delete_task, update_task]

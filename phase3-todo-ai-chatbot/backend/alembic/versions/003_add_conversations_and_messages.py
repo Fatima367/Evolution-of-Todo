@@ -1,7 +1,7 @@
 """Add conversations and messages tables for ChatKit
 
 Revision ID: 003
-Revises: 002
+Revises: 001
 Create Date: 2025-12-28
 
 """
@@ -17,10 +17,10 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Create conversations table
+    # Create conversations table with UUID primary key
     op.create_table(
         'conversations',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -31,16 +31,16 @@ def upgrade() -> None:
     op.create_index('ix_conversations_created_at', 'conversations', ['created_at'])
     op.create_index('ix_conversations_updated_at', 'conversations', ['updated_at'])
 
-    # Create messages table
+    # Create messages table with UUID primary key and UUID foreign key to conversations
     op.create_table(
         'messages',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('conversation_id', sa.Integer(), nullable=False),
+        sa.Column('conversation_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('role', sa.String(length=20), nullable=False),
         sa.Column('content', sa.Text(), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
-        sa.CheckConstraint("role IN ('user', 'assistant')", name='check_message_role'),
+        sa.CheckConstraint("LOWER(role) IN ('user', 'assistant')", name='check_message_role'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['conversation_id'], ['conversations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')

@@ -343,3 +343,77 @@
     border-width: 2px;
   }
 }
+
+/* ===================================
+   ChatKit Custom Styling
+   =================================== */
+/* Hide all SVG icons within ChatKit send buttons */
+.chatkit-wrapper svg,
+.chatkit-wrapper button svg,
+.chatkit-wrapper button[type="submit"] svg,
+.chatkit-wrapper button[aria-label*="Send"] svg,
+.chatkit-wrapper [data-slot="icon"] svg {
+  display: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Style the send button to show paper plane icon */
+.chatkit-wrapper button[type="submit"] {
+  position: relative !important;
+}
+
+/* Add paper plane emoji as the send icon */
+.chatkit-wrapper button[type="submit"]::after {
+  content: '✈' !important;
+  font-size: 18px !important;
+  display: inline-block !important;
+  transform: rotate(-45deg) !important;
+  line-height: 1 !important;
+}
+
+/* Light mode welcome text styling to match tasks page */
+.chatkit-wrapper [data-testid="start-screen"] h2,
+.chatkit-wrapper .start-screen h2,
+.chatkit-wrapper [data-testid="start-screen"] p,
+.chatkit-wrapper .start-screen p {
+  color: #0f3460 !important;
+}
+
+.chatkit-wrapper [data-testid="start-screen"] h2 {
+  font-weight: 700 !important;
+  background: linear-gradient(to right, #6EB8E1, #4EB5A9) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Dark mode adjustments for ChatKit content */
+.dark .chatkit-wrapper [data-testid="start-screen"] h2,
+.dark .chatkit-wrapper .start-screen h2 {
+  color: #4cc9f0 !important;
+  background: none !important;
+  -webkit-text-fill-color: #4cc9f0 !important;
+}
+
+.dark .chatkit-wrapper [data-testid="start-screen"] p,
+.dark .chatkit-wrapper .start-screen p {
+  color: #94a3b8 !important;
+}
+
+/* Style ChatKit prompt buttons in light mode */
+.chatkit-wrapper [data-testid="start-screen"] button,
+.chatkit-wrapper .start-screen button {
+  background: linear-gradient(to right, #6EB8E1, #4EB5A9) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+.chatkit-wrapper [data-testid="start-screen"] button:hover,
+.chatkit-wrapper .start-screen button:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.02) !important;
+}

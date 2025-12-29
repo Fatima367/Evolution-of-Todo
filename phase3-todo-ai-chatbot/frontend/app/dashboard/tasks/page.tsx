@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Filter, ListChecks } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
@@ -12,8 +13,17 @@ import { TASK_STATUSES, TASK_PRIORITIES } from '@/lib/constants/taskOptions';
 
 export default function TasksPage() {
   const openCreateTaskModal = useUIStore((state) => state.openCreateTaskModal);
-  const { tasks, loading, updateTask, deleteTask } = useTasks();
+  const taskRefreshTrigger = useUIStore((state) => state.taskRefreshTrigger);
+  const { tasks, loading, updateTask, deleteTask, loadTasks } = useTasks();
   const { filteredTasks, filters, updateFilter, activeFilterCount } = useTaskFilters(tasks);
+
+  // Reload tasks when refresh is triggered (e.g., from chat)
+  useEffect(() => {
+    if (taskRefreshTrigger > 0) {
+      console.log('📋 Tasks page: Reloading tasks due to refresh trigger')
+      loadTasks()
+    }
+  }, [taskRefreshTrigger, loadTasks])
 
   // Prepare filter options
   const statusOptions = TASK_STATUSES.map((status) => ({

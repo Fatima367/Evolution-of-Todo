@@ -22,7 +22,7 @@ from chatkit.agents import AgentContext, stream_agent_response, ThreadItemConver
 
 # Import these at module level to avoid circular imports
 # Store imports models, so we delay the import
-from src.todo_chatkit.tools import create_task_tools
+from src.todo_chatkit.tools import create_task_tools, TaskToolContext
 from src.todo_chatkit.store import PostgreSQLStore, ChatContext
 
 
@@ -58,17 +58,18 @@ class TodoChatKitServer(ChatKitServer[ChatContext]):
             api_key=groq_api_key,
         )
 
-    def create_agent(self, context) -> Agent[AgentContext]:
+    def create_agent(self, context, thread_id: str = "") -> Agent[AgentContext]:
         """Create AI agent with tools for the user
 
         Args:
             context: User context with session
+            thread_id: Current conversation thread ID
 
         Returns:
             Configured Agent with task management tools
         """
-        # Create user-specific tools
-        tools = create_task_tools(context.session, context.user_id)
+        # Create user-specific tools with session, user_id, and thread_id
+        tools = create_task_tools(context.session, context.user_id, thread_id)
 
         # Create agent with instructions
         agent = Agent[AgentContext](
@@ -100,7 +101,7 @@ Behavior guidelines:
         self,
         thread: ThreadMetadata,
         input: ThreadItem,
-        context
+        context: ChatContext
     ):
         """Process user input and generate AI response with streaming
 
@@ -114,7 +115,7 @@ Behavior guidelines:
         Args:
             thread: Thread metadata
             input: User's message
-            context: User context
+            context: User context with session and user_id
 
         Yields:
             StreamingResult events
@@ -136,11 +137,22 @@ Behavior guidelines:
         # Convert to agent input format
         agent_input = await self.converter.to_agent_input(all_items)
 
-        # Create agent with tools
-        agent = self.create_agent(context)
+        # Create tool context with session, user_id, and thread_id
+        tool_context = TaskToolContext(
+            session=context.session,
+            user_id=str(context.user_id),
+            thread_id=thread.id
+        )
 
-        # Create agent context
-        agent_context = AgentContext(thread_id=thread.id)
+        # Create agent with tools
+        agent = self.create_agent(context, thread.id)
+
+        # Create agent context with proper request_context for tools
+        agent_context = AgentContext(
+            thread=thread,
+            store=self.store,
+            request_context=tool_context
+        )
 
         # Run agent with streaming
         result = Runner.run_streamed(agent, agent_input, context=agent_context)

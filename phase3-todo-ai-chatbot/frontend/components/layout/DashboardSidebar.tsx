@@ -33,9 +33,24 @@ export function DashboardSidebar() {
     await logout()
   }
 
+  // Determine if we're on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024
+
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Toggle Button - Always visible on mobile when sidebar is closed */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white/90 dark:bg-[#1A1A3A] border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300 shadow-lg"
+      >
+        {isSidebarOpen ? (
+          <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+        ) : (
+          <svg className="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -68,13 +83,6 @@ export function DashboardSidebar() {
               </span>
             </Link>
 
-            {/* Close button (mobile) / Collapse button (desktop) */}
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors lg:hidden"
-            >
-              <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-            </button>
           </div>
 
           {/* Navigation */}

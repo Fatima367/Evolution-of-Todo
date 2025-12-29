@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { useTasks } from '@/hooks/useTasks'
@@ -12,10 +13,20 @@ import {
 import { CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Loading'
+import { useUIStore } from '@/store/uiStore'
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const { tasks, loading } = useTasks()
+  const taskRefreshTrigger = useUIStore((state) => state.taskRefreshTrigger)
+  const { tasks, loading, loadTasks } = useTasks()
+
+  // Reload tasks when refresh is triggered (e.g., from chat)
+  useEffect(() => {
+    if (taskRefreshTrigger > 0) {
+      console.log('📋 Dashboard: Reloading tasks due to refresh trigger')
+      loadTasks()
+    }
+  }, [taskRefreshTrigger, loadTasks])
 
   // Calculate stats directly from tasks to ensure sync
   const totalTasks = tasks.length

@@ -1,7 +1,7 @@
 """Message model for ChatKit messages stored in PostgreSQL"""
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship
 from enum import Enum
 
@@ -20,9 +20,9 @@ class Message(SQLModel, table=True):
     """Message entity representing a single message in a conversation
 
     Attributes:
-        id: Unique identifier (auto-generated integer)
+        id: Unique identifier (auto-generated UUID)
         user_id: Foreign key to owning user (UUID)
-        conversation_id: Foreign key to parent conversation (integer)
+        conversation_id: Foreign key to parent conversation (UUID)
         role: Message role ('user' or 'assistant')
         content: Message content text (max 10000 characters)
         created_at: Timestamp when message was created
@@ -32,9 +32,9 @@ class Message(SQLModel, table=True):
     __tablename__ = "messages"
     __table_args__ = {"extend_existing": True}
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="users.id", nullable=False, index=True)
-    conversation_id: int = Field(foreign_key="conversations.id", nullable=False, index=True)
+    conversation_id: UUID = Field(foreign_key="conversations.id", nullable=False, index=True)
     role: MessageRole = Field(nullable=False)
     content: str = Field(min_length=1, max_length=10000, nullable=False)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
