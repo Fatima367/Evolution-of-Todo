@@ -3,10 +3,11 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 from fastapi import HTTPException, status
-from sqlmodel import Session, select, func
-from src.models.task import Task, TaskStatus
+from sqlmodel import Session, select, func, col, case
+from sqlalchemy import literal_column
+from src.models.task import Task, TaskStatus, TaskPriority
 from src.models.user import User
-from src.schemas.task_schemas import TaskCreate, TaskUpdate
+from src.schemas.task_schemas import TaskCreate, TaskUpdate, SortField, SortOrder
 
 
 class TaskService:
@@ -46,16 +47,20 @@ class TaskService:
         current_user: User,
         status: Optional[TaskStatus] = None,
         priority: Optional[str] = None,
+        sort_by: Optional[SortField] = SortField.CREATED_AT,
+        sort_order: Optional[SortOrder] = SortOrder.DESC,
         limit: int = 50,
         offset: int = 0
     ) -> tuple[List[Task], int]:
-        """Get tasks for the current user with optional filtering
+        """Get tasks for the current user with optional filtering and sorting
 
         Args:
             session: Database session
             current_user: Authenticated user
             status: Optional status filter
             priority: Optional priority filter
+            sort_by: Field to sort by (default: created_at)
+            sort_order: Sort direction (default: desc)
             limit: Maximum number of tasks to return
             offset: Number of tasks to skip
 
@@ -75,8 +80,44 @@ class TaskService:
         count_statement = select(func.count()).select_from(statement.subquery())
         total = session.exec(count_statement).one()
 
-        # Apply pagination and ordering
-        statement = statement.order_by(Task.created_at.desc()).offset(offset).limit(limit)
+        # Apply sorting based on parameters
+        # NULL values handling: tasks without due dates appear last when sorting by due_date
+        if sort_by == SortField.DUE_DATE:
+            # For ascending: NULL values come last (PostgreSQL default)
+            # For descending: NULL values come last (we want tasks with due dates first)
+            if sort_order == SortOrder.ASC:
+                statement = statement.order_by(col(Task.due_date).asc().nulls_last())
+            else:
+                statement = statement.order_by(col(Task.due_date).desc().nulls_last())
+        elif sort_by == SortField.PRIORITY:
+            # Sort by TaskPriority enum order using CASE expression
+            # Priority order: LOW(1) < MEDIUM(2) < HIGH(3) < URGENT(4)
+            priority_case = case(
+                (Task.priority == TaskPriority.LOW, 1),
+                (Task.priority == TaskPriority.MEDIUM, 2),
+                (Task.priority == TaskPriority.HIGH, 3),
+                (Task.priority == TaskPriority.URGENT, 4),
+                else_=0  # Fallback
+            )
+            if sort_order == SortOrder.ASC:
+                statement = statement.order_by(priority_case.asc())
+            else:
+                statement = statement.order_by(priority_case.desc())
+        elif sort_by == SortField.TITLE:
+            # Case-insensitive alphabetical sort
+            if sort_order == SortOrder.ASC:
+                statement = statement.order_by(col(Task.title).asc())
+            else:
+                statement = statement.order_by(col(Task.title).desc())
+        else:
+            # Default: sort by created_at
+            if sort_order == SortOrder.ASC:
+                statement = statement.order_by(Task.created_at.asc())
+            else:
+                statement = statement.order_by(Task.created_at.desc())
+
+        # Apply pagination
+        statement = statement.offset(offset).limit(limit)
 
         tasks = session.exec(statement).all()
         return list(tasks), total

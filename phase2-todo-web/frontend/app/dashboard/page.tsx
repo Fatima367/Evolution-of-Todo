@@ -13,43 +13,109 @@ import { CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Loading'
 
+// Helper to get start and end of current week (Sunday to Saturday)
+const getCurrentWeekRange = () => {
+  const today = new Date()
+  const dayOfWeek = today.getDay() // 0 = Sunday, 6 = Saturday
+  const startOfWeek = new Date(today)
+  startOfWeek.setDate(today.getDate() - dayOfWeek)
+  startOfWeek.setHours(0, 0, 0, 0)
+  const endOfWeek = new Date(today)
+  endOfWeek.setDate(today.getDate() + (6 - dayOfWeek))
+  endOfWeek.setHours(23, 59, 59, 999)
+  return { start: startOfWeek, end: endOfWeek }
+}
+
+// Helper to get start and end of previous week
+const getPreviousWeekRange = () => {
+  const { start, end } = getCurrentWeekRange()
+  const startOfPrevWeek = new Date(start)
+  startOfPrevWeek.setDate(start.getDate() - 7)
+  startOfPrevWeek.setHours(0, 0, 0, 0)
+  const endOfPrevWeek = new Date(end)
+  endOfPrevWeek.setDate(end.getDate() - 7)
+  endOfPrevWeek.setHours(23, 59, 59, 999)
+  return { start: startOfPrevWeek, end: endOfPrevWeek }
+}
+
+// Helper to calculate percentage change
+const calculatePercentageChange = (current: number, previous: number): string => {
+  if (previous === 0) {
+    return current > 0 ? '+100%' : '0%'
+  }
+  const change = ((current - previous) / previous) * 100
+  const formattedChange = Math.round(change)
+  return formattedChange >= 0 ? `+${formattedChange}%` : `${formattedChange}%`
+}
+
+// Helper to filter tasks by date range
+const filterTasksByDateRange = (
+  tasks: any[],
+  startDate: Date,
+  endDate: Date,
+  filterFn?: (task: any) => boolean
+) => {
+  return tasks.filter(task => {
+    const taskDate = new Date(task.created_at)
+    const matchesDate = taskDate >= startDate && taskDate <= endDate
+    const matchesFilter = filterFn ? filterFn(task) : true
+    return matchesDate && matchesFilter
+  })
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const { tasks, loading } = useTasks()
 
-  // Calculate stats directly from tasks to ensure sync
-  const totalTasks = tasks.length
-  const inProgressTasks = tasks.filter(task => task.status === 'in_progress').length
-  const completedTasks = tasks.filter(task => task.status === 'completed').length
-  const highPriorityTasks = tasks.filter(task => task.priority === 'high' || task.priority === 'urgent').length
+  // Calculate week-over-week stats
+  const currentWeek = getCurrentWeekRange()
+  const previousWeek = getPreviousWeekRange()
+
+  // Current week stats
+  const currentTotal = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end).length
+  const currentPending = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end, task => task.status === 'pending').length
+  const currentCompleted = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end, task => task.status === 'completed').length
+  const currentHighPriority = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end, task => task.priority === 'high' || task.priority === 'urgent').length
+
+  // Previous week stats
+  const previousTotal = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end).length
+  const previousPending = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end, task => task.status === 'pending').length
+  const previousCompleted = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end, task => task.status === 'completed').length
+  const previousHighPriority = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end, task => task.priority === 'high' || task.priority === 'urgent').length
+
+  // Calculate percentage changes
+  const totalChange = calculatePercentageChange(currentTotal, previousTotal)
+  const pendingChange = calculatePercentageChange(currentPending, previousPending)
+  const completedChange = calculatePercentageChange(currentCompleted, previousCompleted)
+  const highPriorityChange = calculatePercentageChange(currentHighPriority, previousHighPriority)
 
   // Define stats configuration
   const statConfigs = [
     {
       name: 'Total Tasks',
-      value: totalTasks,
-      change: '+0%',
+      value: currentTotal,
+      change: totalChange,
       icon: CheckCircle,
       color: 'blue',
     },
     {
-      name: 'In Progress',
-      value: inProgressTasks,
-      change: '+0%',
+      name: 'Pending',
+      value: currentPending,
+      change: pendingChange,
       icon: Clock,
       color: 'yellow',
     },
     {
       name: 'Completed',
-      value: completedTasks,
-      change: '+0%',
+      value: currentCompleted,
+      change: completedChange,
       icon: TrendingUp,
       color: 'green',
     },
     {
       name: 'High Priority',
-      value: highPriorityTasks,
-      change: '+0%',
+      value: currentHighPriority,
+      change: highPriorityChange,
       icon: AlertCircle,
       color: 'red',
     },
