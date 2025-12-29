@@ -22,7 +22,7 @@ tests: []
 
 ## Prompt
 
-the chatkit UI is not as dashboard page and tasks page, also dark and light mode not working on it, use mcp server to see chatkit docs, also use fapaperplane icon in send button instead of up arrow
+the chatkit UI is not as dashboard page and tasks page, also dark and light mode not working on it, use mcp server to see chatkit docs.
 
 ## Response snapshot
 
@@ -35,7 +35,7 @@ Fixed the ChatKit UI by:
 
 ## Outcome
 
-- ✅ Impact: ChatKit UI now properly responds to dark/light mode changes and uses paper plane icon for send button
+- ✅ Impact: ChatKit UI now properly responds to dark/light mode changes
 - 🧪 Tests: No tests added
 - 📁 Files: Modified 1 file (FloatingChatButton.tsx)
 - 🔁 Next prompts: None
