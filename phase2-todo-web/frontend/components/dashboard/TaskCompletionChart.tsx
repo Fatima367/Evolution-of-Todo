@@ -70,11 +70,11 @@ export function TaskCompletionChart({ tasks = [] }: TaskCompletionChartProps) {
 
   // Update the data with actual completed tasks
   const completedTasksByDay = tasks
-    .filter(task => task.completed_at) // Only completed tasks
+    .filter(task => task.status === 'completed') // Only completed tasks
     .reduce((acc, task) => {
-      if (!task.completed_at) return acc
-
-      const taskDate = new Date(task.completed_at)
+      // Use completed_at if available, otherwise use updated_at
+      const completionDate = task.completed_at || task.updated_at || task.created_at
+      const taskDate = new Date(completionDate)
       const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][taskDate.getDay()]
 
       const dayEntry = acc.find(entry => entry.date === dayOfWeek)
