@@ -1,14 +1,9 @@
 """User entity model"""
 from datetime import datetime
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import EmailStr
-
-if TYPE_CHECKING:
-    from .task import Task
-    from .conversation import Conversation
-    from .message import Message
 
 
 class User(SQLModel, table=True):
@@ -25,7 +20,6 @@ class User(SQLModel, table=True):
         tasks: Relationship to user's tasks
     """
     __tablename__ = "users"
-    __table_args__ = {"extend_existing": True}
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     email: EmailStr = Field(unique=True, index=True, nullable=False)
@@ -37,5 +31,3 @@ class User(SQLModel, table=True):
 
     # Relationships
     tasks: List["Task"] = Relationship(back_populates="user", cascade_delete=True)
-    conversations: List["Conversation"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    messages: List["Message"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})

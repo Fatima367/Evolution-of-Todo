@@ -1,12 +1,9 @@
 """Task entity model"""
 from datetime import datetime
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship, Column, JSON
 from enum import Enum
-
-if TYPE_CHECKING:
-    from .user import User
 
 
 class TaskStatus(str, Enum):
@@ -42,7 +39,6 @@ class Task(SQLModel, table=True):
         user: Relationship to owning user
     """
     __tablename__ = "tasks"
-    __table_args__ = {"extend_existing": True}
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     title: str = Field(min_length=1, max_length=200, nullable=False)

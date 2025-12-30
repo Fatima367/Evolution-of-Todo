@@ -1,6 +1,26 @@
 export type TaskStatus = "pending" | "in_progress" | "completed";
 export type TaskPriority = "low" | "medium" | "high" | "urgent";
 
+// Sort field options for tasks
+export type SortField = "created_at" | "due_date" | "priority" | "title";
+
+// Sort direction options
+export type SortDirection = "asc" | "desc";
+
+// Sort option configuration
+export interface SortOption {
+  field: SortField;
+  direction: SortDirection;
+}
+
+// Sort configuration for UI dropdown
+export interface SortConfig {
+  label: string;
+  value: SortField;
+  icon?: string;
+  defaultDirection: SortDirection;
+}
+
 export interface User {
   id: string;
   email: string;

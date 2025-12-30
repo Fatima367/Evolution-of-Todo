@@ -138,7 +138,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all;
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-all;
   }
 
   .card {
@@ -153,21 +153,6 @@
     border: 1px solid var(--glass-border);
     box-shadow: 0 8px 32px 0 var(--glass-shadow);
     @apply rounded-xl;
-  }
-
-  /* Consistent input field styling for search bars and dropdowns */
-  input[type="text"].glass-card,
-  input[type="search"].glass-card,
-  input[type="email"].glass-card,
-  input[type="password"].glass-card,
-  textarea.glass-card,
-  select.glass-card {
-    @apply border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] placeholder:text-gray-400 dark:placeholder:text-gray-500;
-  }
-
-  /* Styling for select elements to match the beautiful color palette */
-  select {
-    @apply border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all;
   }
 
   .glass-card-hover {
@@ -341,6 +326,18 @@
 }
 
 /* ===================================
+   Keyframe Animations
+   =================================== */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ===================================
    Accessibility
    =================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -357,78 +354,4 @@
   .glass-card {
     border-width: 2px;
   }
-}
-
-/* ===================================
-   ChatKit Custom Styling
-   =================================== */
-/* Hide all SVG icons within ChatKit send buttons */
-.chatkit-wrapper svg,
-.chatkit-wrapper button svg,
-.chatkit-wrapper button[type="submit"] svg,
-.chatkit-wrapper button[aria-label*="Send"] svg,
-.chatkit-wrapper [data-slot="icon"] svg {
-  display: none !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  visibility: hidden !important;
-}
-
-/* Style the send button to show paper plane icon */
-.chatkit-wrapper button[type="submit"] {
-  position: relative !important;
-}
-
-/* Add paper plane emoji as the send icon */
-.chatkit-wrapper button[type="submit"]::after {
-  content: '✈' !important;
-  font-size: 18px !important;
-  display: inline-block !important;
-  transform: rotate(-45deg) !important;
-  line-height: 1 !important;
-}
-
-/* Light mode welcome text styling to match tasks page */
-.chatkit-wrapper [data-testid="start-screen"] h2,
-.chatkit-wrapper .start-screen h2,
-.chatkit-wrapper [data-testid="start-screen"] p,
-.chatkit-wrapper .start-screen p {
-  color: #0f3460 !important;
-}
-
-.chatkit-wrapper [data-testid="start-screen"] h2 {
-  font-weight: 700 !important;
-  background: linear-gradient(to right, #6EB8E1, #4EB5A9) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-}
-
-/* Dark mode adjustments for ChatKit content */
-.dark .chatkit-wrapper [data-testid="start-screen"] h2,
-.dark .chatkit-wrapper .start-screen h2 {
-  color: #4cc9f0 !important;
-  background: none !important;
-  -webkit-text-fill-color: #4cc9f0 !important;
-}
-
-.dark .chatkit-wrapper [data-testid="start-screen"] p,
-.dark .chatkit-wrapper .start-screen p {
-  color: #94a3b8 !important;
-}
-
-/* Style ChatKit prompt buttons in light mode */
-.chatkit-wrapper [data-testid="start-screen"] button,
-.chatkit-wrapper .start-screen button {
-  background: linear-gradient(to right, #6EB8E1, #4EB5A9) !important;
-  color: white !important;
-  font-weight: 600 !important;
-  border: none !important;
-}
-
-.chatkit-wrapper [data-testid="start-screen"] button:hover,
-.chatkit-wrapper .start-screen button:hover {
-  opacity: 0.9 !important;
-  transform: scale(1.02) !important;
 }

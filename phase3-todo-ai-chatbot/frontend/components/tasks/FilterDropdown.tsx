@@ -76,7 +76,7 @@ export function FilterDropdown({
           flex items-center gap-2 px-4 py-3
           glass-card rounded-xl
           transition-all duration-300
-          ${isOpen ? 'ring-2 ring-purple-500 shadow-lg shadow-purple-500/30' : ''}
+          ${isOpen ? 'ring-2 ring-[#5A7FC8] dark:ring-[#C8ABE6] shadow-lg shadow-[#6EB8E1]/30' : ''}
           ${activeCount > 0 ? 'glow-purple' : ''}
         `}
       >
@@ -88,7 +88,7 @@ export function FilterDropdown({
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full"
+            className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white text-xs font-bold rounded-full"
           >
             {activeCount}
           </motion.span>
@@ -119,7 +119,7 @@ export function FilterDropdown({
                   </span>
                   <button
                     onClick={handleClearAll}
-                    className="text-sm text-purple-500 dark:text-[#C8ABE6] hover:text-purple-600 dark:hover:text-[#C8ABE6] font-medium"
+                    className="text-sm text-[#5A7FC8] dark:text-[#C8ABE6] hover:text-[#6EB8E1] dark:hover:text-[#DBD6F4] font-medium"
                   >
                     Clear all
                   </button>
@@ -134,7 +134,7 @@ export function FilterDropdown({
                   return (
                     <motion.button
                       key={option.value}
-                      whileHover={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}
+                      whileHover={{ backgroundColor: 'rgba(90, 127, 200, 0.1)' }}
                       onClick={() => handleToggle(option.value)}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
                     >
@@ -146,7 +146,7 @@ export function FilterDropdown({
                           transition-all duration-200
                           ${
                             isSelected
-                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500 dark:from-[#C8ABE6] dark:to-[#F8CEC0] dark:border-[#C8ABE6]'
+                              ? 'bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] border-[#5A7FC8] dark:from-[#C8ABE6] dark:to-[#48ADB7] dark:border-[#C8ABE6]'
                               : 'border-gray-300 dark:border-gray-600'
                           }
                         `}

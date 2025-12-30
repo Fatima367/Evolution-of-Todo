@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
-import type { Task, TaskCreate, TaskUpdate } from '@/lib/types';
+import type { Task, TaskCreate, TaskUpdate, SortField, SortDirection } from '@/lib/types';
 
-export function useTasks(statusFilter?: string) {
+export function useTasks(
+  statusFilter?: string,
+  sortBy?: SortField,
+  sortOrder?: SortDirection
+) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -13,7 +17,11 @@ export function useTasks(statusFilter?: string) {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.getTasks({ status: statusFilter });
+      const response = await apiClient.getTasks({
+        status: statusFilter,
+        sort_by: sortBy,
+        sort_order: sortOrder
+      });
       setTasks(response.tasks);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to load tasks'));
@@ -24,7 +32,7 @@ export function useTasks(statusFilter?: string) {
 
   useEffect(() => {
     loadTasks();
-  }, [statusFilter]);
+  }, [statusFilter, sortBy, sortOrder]);
 
   const createTask = async (data: TaskCreate) => {
     const newTask = await apiClient.createTask(data);

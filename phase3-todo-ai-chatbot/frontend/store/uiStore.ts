@@ -11,7 +11,6 @@ interface UIState {
   deletingTaskId: string | null
   deletingTaskTitle: string | null
   theme: 'light' | 'dark'
-  taskRefreshTrigger: number
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
   openSignUpModal: () => void
@@ -26,20 +25,6 @@ interface UIState {
   closeDeleteConfirmModal: () => void
   toggleTheme: () => void
   setTheme: (theme: 'light' | 'dark') => void
-  triggerTaskRefresh: () => void
-}
-
-// BroadcastChannel for cross-tab task refresh notifications
-const taskChannel = typeof window !== 'undefined' ? new BroadcastChannel('task-refresh') : null
-
-// Listen for task refresh events from other tabs
-if (taskChannel) {
-  taskChannel.onmessage = (event) => {
-    if (event.data.type === 'TASK_CREATED' || event.data.type === 'TASK_UPDATED' || event.data.type === 'TASK_DELETED') {
-      // Trigger a UI refresh by updating a trigger value
-      useUIStore.setState((state) => ({ taskRefreshTrigger: (state.taskRefreshTrigger || 0) + 1 }))
-    }
-  }
 }
 
 // Initialize theme from localStorage or system preference
@@ -63,7 +48,6 @@ export const useUIStore = create<UIState>((set) => ({
   deletingTaskId: null,
   deletingTaskTitle: null,
   theme: getInitialTheme(),
-  taskRefreshTrigger: 0,
 
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   setSidebarOpen: (open) => set({ isSidebarOpen: open }),
@@ -106,12 +90,4 @@ export const useUIStore = create<UIState>((set) => ({
     }
     return { theme };
   }),
-  triggerTaskRefresh: () => {
-    // Update local state
-    set((state) => ({ taskRefreshTrigger: (state.taskRefreshTrigger || 0) + 1 }))
-    // Notify other tabs
-    if (taskChannel) {
-      taskChannel.postMessage({ type: 'TASK_CREATED' })
-    }
-  },
 }))
