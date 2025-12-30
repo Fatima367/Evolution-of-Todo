@@ -33,6 +33,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
           <AuthProvider>
             <ThemeProvider>
@@ -44,7 +47,7 @@ export default function RootLayout({
                 <LoginModal />
                 <CreateTaskModal />
 
-                {/* AI Chatbot */}
+                {/* AI Chat Assistant */}
                 <FloatingChatButton />
               </QueryProvider>
             </ThemeProvider>

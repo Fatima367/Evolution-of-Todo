@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     environment: str = "development"
 
+    # AI Provider Configuration (Groq)
+    groq_api_key: str
+    groq_model: str = "llama-3.3-70b-versatile"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

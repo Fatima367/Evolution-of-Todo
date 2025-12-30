@@ -11,7 +11,7 @@ from src.api.chat_router import router as chat_router
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="API for Todo Full-Stack Web Application with user authentication and task management"
+    description="API for Todo Full-Stack Web Application with AI chatbot, user authentication and task management"
 )
 
 # Configure CORS
