@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # AI Provider Configuration (Groq)
     groq_api_key: str
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "llama-3.1-8b-instant"
 
     model_config = SettingsConfigDict(
         env_file=".env",
