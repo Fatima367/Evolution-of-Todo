@@ -5,12 +5,15 @@ allowing natural language task management.
 """
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 from sqlmodel import Session, select
 from agents import function_tool, RunContextWrapper
 
 from src.models.task import Task, TaskStatus, TaskPriority
+from src.models.user import User
+from src.services.task_service import TaskService
+from src.schemas.task_schemas import TaskCreate, TaskUpdate
 
 
 class TaskToolContext:
@@ -28,6 +31,25 @@ class TaskToolContext:
         self.thread_id = thread_id
 
 
+def get_tool_context(ctx: Any) -> tuple[Optional[Session], Optional[str]]:
+    """Extract session and user_id from various possible context structures"""
+    # Get raw context (handle RunContextWrapper or direct object)
+    raw_ctx = ctx.context if hasattr(ctx, 'context') else ctx
+
+    # Try direct attributes (matches TaskToolContext or direct mock)
+    session = getattr(raw_ctx, 'session', None)
+    user_id = getattr(raw_ctx, 'user_id', None)
+
+    # Try request_context (matches ChatKit AgentContext)
+    if session is None and hasattr(raw_ctx, 'request_context'):
+        req_ctx = getattr(raw_ctx, 'request_context', None)
+        if req_ctx:
+            session = getattr(req_ctx, 'session', session)
+            user_id = getattr(req_ctx, 'user_id', user_id)
+
+    return session, user_id
+
+
 def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> list[Any]:
     """Create MCP tools for task management
 
@@ -39,171 +61,175 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
     Returns:
         List of decorated function tools
     """
-    context = TaskToolContext(session=session, user_id=user_id, thread_id=thread_id)
 
     @function_tool(name_override="add_task")
-    def add_task(ctx: RunContextWrapper[TaskToolContext], title: str, description: str | None = None, priority: str = "medium") -> str:
+    def add_task(ctx: RunContextWrapper[Any], title: str, description: str | None = None, priority: str = "medium") -> Dict[str, Any]:
         """Create a new task with a title and optional description and priority"""
-        session = ctx.context.session
-        user_id = ctx.context.user_id
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            # Fallback to closure-captured values if context is missing
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
 
         try:
             priority_enum = TaskPriority(priority.lower())
         except ValueError:
             priority_enum = TaskPriority.MEDIUM
 
-        task = Task(
+        task_data = TaskCreate(
             title=title,
             description=description,
-            priority=priority_enum,
-            user_id=uuid.UUID(user_id),
-            status=TaskStatus.PENDING
+            priority=priority_enum
         )
 
-        session.add(task)
-        session.commit()
-        session.refresh(task)
+        task = TaskService.create_task(session_obj, task_data, mock_user)
 
-        return f"Task created successfully! ID: {task.id}, Title: {task.title}, Priority: {task.priority.value}"
+        return {
+            "status": "created",
+            "task_id": str(task.id),
+            "title": task.title,
+            "priority": task.priority.value
+        }
 
     @function_tool(name_override="list_tasks")
-    def list_tasks(ctx: RunContextWrapper[TaskToolContext], status: str | None = None, limit: int = 20) -> str:
+    def list_tasks(ctx: RunContextWrapper[Any], status: str | None = None, limit: int = 20) -> Dict[str, Any]:
         """List all tasks, optionally filtered by status (pending, in_progress, completed, or omit for all)"""
-        session = ctx.context.session
-        user_id = ctx.context.user_id
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
 
-        statement = select(Task).where(Task.user_id == uuid.UUID(user_id))
+        mock_user = User(id=uuid.UUID(uid))
 
+        status_enum = None
         if status and status.lower() != "all":
             try:
                 status_enum = TaskStatus(status.lower())
-                statement = statement.where(Task.status == status_enum)
             except ValueError:
                 pass
 
-        statement = statement.order_by(Task.created_at.desc()).limit(limit)
-        tasks = session.exec(statement).all()
+        tasks, count = TaskService.get_user_tasks(
+            session=session_obj,
+            current_user=mock_user,
+            status=status_enum,
+            limit=limit
+        )
 
-        if not tasks:
-            return "No tasks found."
-
-        result = f"Found {len(tasks)} task(s):\n\n"
-        for task in tasks:
-            status_icon = "✓" if task.status == TaskStatus.COMPLETED else "○"
-            result += f"{status_icon} [{task.status.value}] *{task.priority.value}* {task.title}"
-            if task.description:
-                result += f"\n   {task.description}"
-            result += f"\n   ID: {task.id}\n\n"
-
-        return result
+        return {
+            "count": len(tasks),
+            "total_count": count,
+            "tasks": [
+                {
+                    "id": str(task.id),
+                    "title": task.title,
+                    "description": task.description,
+                    "status": task.status.value,
+                    "priority": task.priority.value,
+                    "due_date": task.due_date.isoformat() if task.due_date else None,
+                    "created_at": task.created_at.isoformat() if task.created_at else None
+                }
+                for task in tasks
+            ]
+        }
 
     @function_tool(name_override="complete_task")
-    def complete_task(ctx: RunContextWrapper[TaskToolContext], task_id: str) -> str:
+    def complete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
         """Mark a task as completed using its ID"""
-        session = ctx.context.session
-        user_id = ctx.context.user_id
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
 
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return f"Error: Invalid task ID format: {task_id}"
+            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
 
-        statement = select(Task).where(
-            Task.id == task_uuid,
-            Task.user_id == uuid.UUID(user_id)
-        )
-        task = session.exec(statement).first()
-
-        if not task:
-            return f"Error: Task not found with ID: {task_id}"
-
-        task.status = TaskStatus.COMPLETED
-        task.completed_at = datetime.utcnow()
-        task.updated_at = datetime.utcnow()
-
-        session.add(task)
-        session.commit()
-
-        return f"Task completed! Title: {task.title}"
+        try:
+            task_update = TaskUpdate(status=TaskStatus.COMPLETED)
+            task = TaskService.update_task(session_obj, task_uuid, task_update, mock_user)
+            return {
+                "status": "completed",
+                "task_id": str(task.id),
+                "title": task.title
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
 
     @function_tool(name_override="delete_task")
-    def delete_task(ctx: RunContextWrapper[TaskToolContext], task_id: str) -> str:
+    def delete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
         """Delete a task using its ID"""
-        session = ctx.context.session
-        user_id = ctx.context.user_id
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
 
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return f"Error: Invalid task ID format: {task_id}"
+            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
 
-        statement = select(Task).where(
-            Task.id == task_uuid,
-            Task.user_id == uuid.UUID(user_id)
-        )
-        task = session.exec(statement).first()
+        try:
+            # Get task first to have its title for the response
+            statement = select(Task).where(Task.id == task_uuid, Task.user_id == mock_user.id)
+            task = session_obj.exec(statement).first()
+            if not task:
+                return {"status": "error", "error": "Task not found"}
+            title = task.title
 
-        if not task:
-            return f"Error: Task not found with ID: {task_id}"
-
-        title = task.title
-        session.delete(task)
-        session.commit()
-
-        return f"Task deleted! Title: {title}"
+            TaskService.delete_task(session_obj, task_uuid, mock_user)
+            return {
+                "status": "deleted",
+                "task_id": task_id,
+                "title": title
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
 
     @function_tool(name_override="update_task")
-    def update_task(ctx: RunContextWrapper[TaskToolContext], task_id: str, title: str | None = None, description: str | None = None, priority: str | None = None, status: str | None = None) -> str:
+    def update_task(ctx: RunContextWrapper[Any], task_id: str, title: str | None = None, description: str | None = None, priority: str | None = None, status: str | None = None) -> Dict[str, Any]:
         """Update a task's title, description, priority, or status"""
-        session = ctx.context.session
-        user_id = ctx.context.user_id
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
 
         try:
             task_uuid = uuid.UUID(task_id)
         except ValueError:
-            return f"Error: Invalid task ID format: {task_id}"
+            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
 
-        statement = select(Task).where(
-            Task.id == task_uuid,
-            Task.user_id == uuid.UUID(user_id)
-        )
-        task = session.exec(statement).first()
-
-        if not task:
-            return f"Error: Task not found with ID: {task_id}"
-
-        updated = []
-        if title is not None:
-            task.title = title
-            updated.append("title")
-        if description is not None:
-            task.description = description
-            updated.append("description")
+        update_data = {}
+        if title is not None: update_data["title"] = title
+        if description is not None: update_data["description"] = description
         if priority is not None:
             try:
-                task.priority = TaskPriority(priority.lower())
-                updated.append("priority")
+                update_data["priority"] = TaskPriority(priority.lower())
             except ValueError:
                 pass
         if status is not None:
             try:
-                new_status = TaskStatus(status.lower())
-                task.status = new_status
-                updated.append("status")
-                if new_status == TaskStatus.COMPLETED:
-                    task.completed_at = datetime.utcnow()
-                else:
-                    task.completed_at = None
+                update_data["status"] = TaskStatus(status.lower())
             except ValueError:
                 pass
 
-        if not updated:
-            return "No fields to update"
+        if not update_data:
+            return {"status": "no_change", "message": "No fields to update"}
 
-        task.updated_at = datetime.utcnow()
-        session.add(task)
-        session.commit()
-
-        return f"Task updated! Changed fields: {', '.join(updated)}. Title: {task.title}"
+        try:
+            task_update = TaskUpdate(**update_data)
+            task = TaskService.update_task(session_obj, task_uuid, task_update, mock_user)
+            return {
+                "status": "updated",
+                "task_id": str(task.id),
+                "title": task.title,
+                "priority": task.priority.value,
+                "task_status": task.status.value
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
 
     return [add_task, list_tasks, complete_task, delete_task, update_task]

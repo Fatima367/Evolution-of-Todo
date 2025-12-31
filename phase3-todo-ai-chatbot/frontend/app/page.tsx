@@ -1,54 +1,74 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import {
   Target,
   Zap,
   BarChart3,
   CheckCircle2,
   ArrowRight,
-  Calendar,
-  Bell,
-  Users,
-  TrendingUp,
-  Shield,
-  Sparkles,
-  Layers,
   Clock,
+  Shield,
+  Users,
+  Bell,
+  TrendingUp,
+  Layers,
   Pencil,
   CalendarCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUIStore } from "@/store";
-import { Button } from "@/components/ui/Button";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+
+// Premium gradient configurations
+const gradients = {
+  blue: {
+    from: "#6EB8E1",
+    to: "#5A7FC8",
+    accent: "#D6E6F2",
+  },
+  purple: {
+    from: "#C8ABE6",
+    to: "#252E8A",
+    accent: "#DBD6F4",
+  },
+  teal: {
+    from: "#4EB5A9",
+    to: "#48ADB7",
+    accent: "#BAD0CC",
+  },
+  peach: {
+    from: "#F8CEC0",
+    to: "#FBE5E7",
+    accent: "#F8CEC0",
+  },
+};
 
 const features = [
   {
     icon: Target,
     title: "Smart Prioritization",
-    description:
-      "AI-powered task prioritization helps you focus on what matters most.",
+    description: "AI-powered task prioritization helps you focus on what matters most.",
+    gradient: "gradients.blue",
   },
   {
     icon: Zap,
     title: "Lightning Fast",
-    description:
-      "Blazing fast performance with instant updates and real-time sync.",
+    description: "Blazing fast performance with instant updates and real-time sync.",
+    gradient: "gradients.teal",
   },
   {
     icon: BarChart3,
     title: "Insightful Analytics",
-    description:
-      "Track your productivity with beautiful charts and actionable insights.",
+    description: "Track your productivity with beautiful charts and actionable insights.",
+    gradient: "gradients.purple",
   },
   {
     icon: CheckCircle2,
     title: "Never Miss a Beat",
-    description:
-      "Smart reminders and recurring tasks keep you on track effortlessly.",
+    description: "Smart reminders and recurring tasks keep you on track effortlessly.",
+    gradient: "gradients.blue",
   },
 ];
 
@@ -56,30 +76,30 @@ const howItWorks = [
   {
     step: "01",
     title: "Create Your Tasks",
-    description:
-      "Quickly add tasks with priorities, due dates, and tags in seconds.",
+    description: "Quickly add tasks with priorities, due dates, and tags in seconds.",
     icon: Layers,
+    gradient: "gradients.blue",
   },
   {
     step: "02",
     title: "Organize & Prioritize",
-    description:
-      "Let our smart system help you organize and prioritize your workload.",
+    description: "Let our smart system help you organize and prioritize your workload.",
     icon: Target,
+    gradient: "gradients.purple",
   },
   {
     step: "03",
     title: "Track Progress",
-    description:
-      "Monitor your productivity with real-time analytics and insights.",
+    description: "Monitor your productivity with real-time analytics and insights.",
     icon: TrendingUp,
+    gradient: "gradients.teal",
   },
   {
     step: "04",
     title: "Achieve Your Goals",
-    description:
-      "Complete tasks efficiently and celebrate your accomplishments.",
+    description: "Complete tasks efficiently and celebrate your accomplishments.",
     icon: CheckCircle2,
+    gradient: "gradients.purple",
   },
 ];
 
@@ -88,28 +108,74 @@ const benefits = [
     icon: Clock,
     title: "Save Time",
     description: "Reduce planning time by 50% with intelligent automation",
-    color: "blue",
+    gradient: "gradients.blue",
   },
   {
     icon: Shield,
     title: "Stay Secure",
     description: "Enterprise-grade security keeps your data safe and private",
-    color: "purple",
+    gradient: "gradients.purple",
   },
   {
     icon: Users,
     title: "Collaborate",
     description: "Work together seamlessly with your team in real-time",
-    color: "teal",
+    gradient: "gradients.teal",
   },
   {
     icon: Bell,
     title: "Never Forget",
-    description:
-      "Smart notifications ensure you never miss important deadlines",
-    color: "pink",
+    description: "Smart notifications ensure you never miss important deadlines",
+    gradient: "gradients.peach",
   },
 ];
+
+// Modern premium card with gradient border
+function GradientCard({
+  children,
+  gradient,
+  className = "",
+}: {
+  children: React.ReactNode;
+  gradient: { from: string; to: string; accent: string };
+  className?: string;
+}) {
+  return (
+    <motion.div
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className={`relative group ${className}`}
+    >
+      {/* Gradient border layer - always visible */}
+      <div
+        className="absolute inset-0 rounded-2xl transition-opacity duration-500"
+        style={{
+          background: `linear-gradient(135deg, ${gradient.from}40 0%, ${gradient.to}40 100%)`,
+          padding: "1px",
+        }}
+      />
+      {/* Gradient border on hover - brighter */}
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+          padding: "1px",
+        }}
+      />
+      {/* Inner card with shadow */}
+      <div className="relative h-full bg-white dark:bg-[#0E0E34] rounded-2xl shadow-md group-hover:shadow-xl transition-shadow duration-300">
+        {/* Hover glow overlay */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+          style={{
+            background: `radial-gradient(circle at top right, ${gradient.from}10 0%, transparent 50%)`,
+          }}
+        />
+        {children}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -132,24 +198,24 @@ export default function LandingPage() {
         {/* Subtle Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
-            className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+            className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04]"
             style={{
               backgroundImage:
                 "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-              backgroundSize: "50px 50px",
+              backgroundSize: "60px 60px",
             }}
           />
           <motion.div
             animate={{
-              y: [0, -15, 0],
-              opacity: [0.15, 0.25, 0.15],
+              y: [0, -20, 0],
+              scale: [1, 1.05, 1],
             }}
             transition={{
-              duration: 12,
+              duration: 10,
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute top-20 right-[10%] w-96 h-96 rounded-full"
+            className="absolute top-20 right-[10%] w-96 h-96 rounded-full blur-3xl"
             style={{
               background:
                 "radial-gradient(circle, rgba(110,184,225,0.1) 0%, transparent 70%)",
@@ -158,15 +224,15 @@ export default function LandingPage() {
           <motion.div
             animate={{
               y: [0, 20, 0],
-              opacity: [0.1, 0.2, 0.1],
+              scale: [1, 1.1, 1],
             }}
             transition={{
-              duration: 15,
+              duration: 12,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 3,
+              delay: 2,
             }}
-            className="absolute bottom-20 left-[8%] w-80 h-80 rounded-full"
+            className="absolute bottom-20 left-[8%] w-80 h-80 rounded-full blur-3xl"
             style={{
               background:
                 "radial-gradient(circle, rgba(200,171,230,0.1) 0%, transparent 70%)",
@@ -178,41 +244,47 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Column - Content */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="space-y-6 text-center lg:text-left"
             >
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold leading-[1.1] tracking-tight">
                 <span className="text-foreground dark:text-[#F7F6F7]">Organize Your World,</span>
                 <br />
-                <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#6EB8E1] via-[#4EB5A9] to-[#5A7FC8] bg-clip-text text-transparent">
                   Evolve Your Workflow
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-muted-foreground dark:text-[#C8C8D8] leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 From simple lists to intelligent insights, the last todo app
                 you'll ever need. Stay focused, get organized, and achieve more
                 every day.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
-                <button
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                <motion.button
                   onClick={handleCTAClick}
-                  className="btn-primary-gradient group w-full sm:w-auto"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative px-8 py-4 bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto overflow-hidden"
                 >
-                  Create Your First Task
-                  <ArrowRight className="inline-block ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </button>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Create Your First Task
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  {/* Subtle shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out_infinite]" />
+                </motion.button>
               </div>
             </motion.div>
 
             {/* Right Column - Visual Element */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
               className="relative hidden lg:flex lg:items-center lg:justify-center lg:-mb-20 w-full"
             >
               <div className="relative w-full max-w-lg h-[500px]">
@@ -243,18 +315,9 @@ export default function LandingPage() {
                         />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div
-                          className="h-3 rounded w-3/4"
-                          style={{ backgroundColor: "#D6E6F2" }}
-                        ></div>
-                        <div
-                          className="h-2 rounded w-full"
-                          style={{ backgroundColor: "#E6E5E1" }}
-                        ></div>
-                        <div
-                          className="h-2 rounded w-2/3"
-                          style={{ backgroundColor: "#E6E5E1" }}
-                        ></div>
+                        <div className="h-2.5 rounded w-3/4" style={{ background: "#6EB8E130" }}></div>
+                        <div className="h-2 rounded w-full bg-[#E6E5E1] dark:bg-white/10"></div>
+                        <div className="h-2 rounded w-1/2 bg-[#E6E5E1] dark:bg-white/10"></div>
                       </div>
                     </div>
                   </div>
@@ -274,14 +337,8 @@ export default function LandingPage() {
                         />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div
-                          className="h-3 rounded w-2/3"
-                          style={{ backgroundColor: "#DBD6F4" }}
-                        ></div>
-                        <div
-                          className="h-2 rounded w-full"
-                          style={{ backgroundColor: "#E6E5E1" }}
-                        ></div>
+                        <div className="h-2.5 rounded w-2/3" style={{ background: "#C8ABE630" }}></div>
+                        <div className="h-2 rounded w-full bg-[#E6E5E1] dark:bg-white/10"></div>
                       </div>
                     </div>
                   </div>
@@ -298,14 +355,8 @@ export default function LandingPage() {
                         <Zap className="h-6 w-6" style={{ color: "#4EB5A9" }} />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div
-                          className="h-3 rounded w-1/2"
-                          style={{ backgroundColor: "#BAD0CC" }}
-                        ></div>
-                        <div
-                          className="h-2 rounded w-5/6"
-                          style={{ backgroundColor: "#E6E5E1" }}
-                        ></div>
+                        <div className="h-2.5 rounded w-1/2" style={{ background: "#4EB5A930" }}></div>
+                        <div className="h-2 rounded w-4/5 bg-[#E6E5E1] dark:bg-white/10"></div>
                       </div>
                     </div>
                   </div>
@@ -325,14 +376,8 @@ export default function LandingPage() {
                         />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div
-                          className="h-3 rounded w-2/3"
-                          style={{ backgroundColor: "#DBD6F4" }}
-                        ></div>
-                        <div
-                          className="h-2 rounded w-full"
-                          style={{ backgroundColor: "#E6E5E1" }}
-                        ></div>
+                        <div className="h-2.5 rounded w-3/4" style={{ background: "#5A7FC830" }}></div>
+                        <div className="h-2 rounded w-full bg-[#E6E5E1] dark:bg-white/10"></div>
                       </div>
                     </div>
                   </div>
@@ -343,324 +388,252 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Premium Design */}
       <section
         id="features"
-        className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#FBE5E7] dark:from-[#0E0E34] dark:to-[#252E8A]/20"
+        className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#F7F6F7] dark:from-[#0E0E34] dark:to-[#1A1A4A]"
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16 space-y-4"
+            className="text-center mb-4"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-block"
+            <span
+              className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-widest rounded-full bg-white dark:bg-white/5 border border-[#6EB8E1]/30 text-[#6EB8E1] shadow-sm"
             >
-              <span
-                className="text-sm font-bold uppercase tracking-wider"
-                style={{ color: "#5A7FC8" }}
-              >
-                Features
-              </span>
-            </motion.div>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
-              Everything You Need
-            </h2>
-            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
-              Powerful features designed to supercharge your productivity
-            </p>
+              Features
+            </span>
           </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-display font-extrabold text-center text-foreground dark:text-[#F7F6F7] tracking-tight mb-4"
+          >
+            Everything You Need
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-center mb-16"
+          >
+            Powerful features designed to supercharge your productivity
+          </motion.p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <motion.div
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="h-full bg-white dark:bg-[#1A1A3A]/80 p-8 rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300"
-                    style={{ borderColor: "#BAD0CC" }}
-                  >
-                    <div className="relative space-y-4">
-                      <motion.div
-                        whileHover={{ scale: 1.05, rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                        className="inline-flex p-3 rounded-lg border"
-                        style={{
-                          backgroundColor: "rgba(110, 184, 225, 0.1)",
-                          borderColor: "#6EB8E1",
-                        }}
-                      >
-                        <Icon
-                          className="h-6 w-6"
-                          style={{ color: "#6EB8E1" }}
-                        />
-                      </motion.div>
+              const gradient = eval(feature.gradient) as { from: string; to: string; accent: string };
 
-                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] group-hover:text-primary dark:group-hover:text-[#6EB8E1] transition-colors">
+              return (
+                <GradientCard key={index} gradient={gradient} className="h-full">
+                  <div className="relative z-10 p-6 space-y-5">
+                    {/* Icon with gradient background */}
+                    <div
+                      className="inline-flex p-4 rounded-2xl shadow-lg opacity-90 group-hover:opacity-100 transition-opacity"
+                      style={{
+                        background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+                      }}
+                    >
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] tracking-tight">
                         {feature.title}
                       </h3>
 
-                      <p className="text-sm text-muted-foreground dark:text-[#C8C8D8] leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {feature.description}
                       </p>
                     </div>
 
+                    {/* Bottom accent line */}
                     <div
-                      className="absolute bottom-0 left-0 right-0 h-1 rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, #6EB8E1 0%, #4EB5A9 100%)",
-                      }}
+                      className="absolute bottom-0 left-6 right-6 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: `linear-gradient(90deg, ${gradient.from} 0%, ${gradient.to} 100%)` }}
                     />
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </GradientCard>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F6F7] to-[#E6E5E1] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
+      {/* How It Works Section - Premium Design */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0E0E34]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16 space-y-4"
+            className="text-center mb-4"
           >
-            <span
-              className="text-sm font-bold uppercase tracking-wider"
-              style={{ color: "#C8ABE6" }}
-            >
+            <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-widest rounded-full bg-white dark:bg-white/5 border border-[#C8ABE6]/30 text-[#C8ABE6] shadow-sm">
               How It Works
             </span>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
-              Get Started in Minutes
-            </h2>
-            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
-              Four simple steps to transform your productivity
-            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-display font-extrabold text-center text-foreground dark:text-[#F7F6F7] tracking-tight mb-4"
+          >
+            Get Started in Minutes
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-center mb-16"
+          >
+            Four simple steps to transform your productivity
+          </motion.p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {howItWorks.map((item, index) => {
               const Icon = item.icon;
-              const colors = [
-                {
-                  gradient: "linear-gradient(135deg, #6EB8E1 0%, #5A7FC8 100%)",
-                  shadow: "rgba(110, 184, 225, 0.25)",
-                  border: "#6EB8E1",
-                },
-                {
-                  gradient: "linear-gradient(135deg, #C8ABE6 0%, #DBD6F4 100%)",
-                  shadow: "rgba(200, 171, 230, 0.25)",
-                  border: "#C8ABE6",
-                },
-                {
-                  gradient: "linear-gradient(135deg, #4EB5A9 0%, #48ADB7 100%)",
-                  shadow: "rgba(78, 181, 169, 0.25)",
-                  border: "#4EB5A9",
-                },
-                {
-                  gradient: "linear-gradient(135deg, #5A7FC8 0%, #252E8A 100%)",
-                  shadow: "rgba(90, 127, 200, 0.25)",
-                  border: "#5A7FC8",
-                },
-              ];
-              const colorSet = colors[index];
+              const gradient = eval(item.gradient) as { from: string; to: string; accent: string };
 
               return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <motion.div
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative bg-white dark:bg-[#1A1A3A]/80 p-8 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300"
-                    style={{ borderColor: colorSet.border }}
-                  >
-                    {/* Step Number Badge */}
-                    <div
-                      className="absolute -top-4 -left-4 w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg"
-                      style={{ background: colorSet.gradient }}
-                    >
-                      {item.step}
+                <div key={index} className="relative">
+                  <GradientCard gradient={gradient} className="h-full">
+                    <div className="relative z-10 p-6 space-y-4">
+                      {/* Step number badge */}
+                      <div
+                        className="absolute -top-3 -left-3 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white shadow-lg"
+                        style={{
+                          background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+                        }}
+                      >
+                        {item.step}
+                      </div>
+
+                      {/* Icon */}
+                      <motion.div
+                        whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                        transition={{ duration: 0.5 }}
+                        className="inline-flex p-4 rounded-2xl shadow-lg ml-8"
+                        style={{
+                          background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+                        }}
+                      >
+                        <Icon className="h-6 w-6 text-white" />
+                      </motion.div>
+
+                      <div className="space-y-3 ml-8">
+                        <h3 className="text-base font-display font-bold text-foreground dark:text-[#F7F6F7] tracking-tight">
+                          {item.title}
+                        </h3>
+
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      {/* Bottom accent line */}
+                      <div
+                        className="absolute bottom-0 left-6 right-6 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{ background: `linear-gradient(90deg, ${gradient.from} 0%, ${gradient.to} 100%)` }}
+                      />
                     </div>
+                  </GradientCard>
 
-                    {/* Icon Container */}
-                    <motion.div
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.6 }}
-                      className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"
-                      style={{
-                        background: colorSet.gradient,
-                        boxShadow: `0 10px 40px ${colorSet.shadow}`,
-                      }}
-                    >
-                      <Icon className="h-8 w-8 text-white" />
-                    </motion.div>
-
-                    {/* Content */}
-                    <div className="space-y-3 text-center">
-                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] group-hover:text-primary dark:group-hover:text-[#6EB8E1] transition-colors">
-                        {item.title}
-                      </h3>
-
-                      <p className="text-sm text-muted-foreground dark:text-[#C8C8D8] leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-
-                    {/* Animated Bottom Border */}
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: colorSet.gradient }}
-                    />
-                  </motion.div>
-
-                  {/* Connection Line */}
+                  {/* Connection line */}
                   {index < howItWorks.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-current to-transparent opacity-20" />
+                    <div className="hidden lg:flex absolute top-1/2 -right-4 w-8 h-px opacity-30" style={{ background: `linear-gradient(to right, ${gradient.from} 0%, transparent 100%)` }} />
                   )}
-                </motion.div>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#E6E5E1] via-[#F7F6F7] to-white dark:from-[#0E0E34] dark:to-[#252E8A]/20">
+      {/* Benefits Section - Premium Design */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#F7F6F7] to-white dark:from-[#1A1A4A] dark:to-[#0E0E34]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16 space-y-4"
+            className="text-center mb-4"
           >
-            <span
-              className="text-sm font-bold uppercase tracking-wider"
-              style={{ color: "#48ADB7" }}
-            >
+            <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-widest rounded-full bg-white dark:bg-white/5 border border-[#4EB5A9]/30 text-[#4EB5A9] shadow-sm">
               Benefits
             </span>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-foreground dark:text-[#F7F6F7] tracking-tight">
-              Why Choose TodoEvo
-            </h2>
-            <p className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto">
-              Experience the difference with our powerful platform
-            </p>
           </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-display font-extrabold text-center text-foreground dark:text-[#F7F6F7] tracking-tight mb-4"
+          >
+            Why Choose TodoEvo
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-center mb-16"
+          >
+            Experience the difference with our powerful platform
+          </motion.p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
-              const colors = {
-                blue: {
-                  gradient: "linear-gradient(135deg, #D6E6F2 0%, #6EB8E1 100%)",
-                  border: "#6EB8E1",
-                  icon: "#5A7FC8",
-                  shadow: "rgba(110, 184, 225, 0.2)",
-                },
-                purple: {
-                  gradient: "linear-gradient(135deg, #DBD6F4 0%, #C8ABE6 100%)",
-                  border: "#C8ABE6",
-                  icon: "#252E8A",
-                  shadow: "rgba(200, 171, 230, 0.2)",
-                },
-                teal: {
-                  gradient: "linear-gradient(135deg, #BAD0CC 0%, #4EB5A9 100%)",
-                  border: "#4EB5A9",
-                  icon: "#48ADB7",
-                  shadow: "rgba(78, 181, 169, 0.2)",
-                },
-                pink: {
-                  gradient: "linear-gradient(135deg, #FBE5E7 0%, #F8CEC0 100%)",
-                  border: "#F8CEC0",
-                  icon: "#C8ABE6",
-                  shadow: "rgba(248, 206, 192, 0.2)",
-                },
-              };
-              const colorSet = colors[benefit.color as keyof typeof colors];
+              const gradient = eval(benefit.gradient) as { from: string; to: string; accent: string };
 
               return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group"
-                >
-                  <motion.div
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative h-full p-8 bg-white dark:bg-[#1A1A3A]/80 rounded-2xl border-2 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-                    style={{
-                      borderColor: colorSet.border,
-                    }}
-                  >
-                    {/* Gradient Overlay on Hover */}
+                <GradientCard key={index} gradient={gradient} className="h-full">
+                  <div className="relative z-10 p-6 space-y-4">
+                    {/* Icon with gradient background */}
                     <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: colorSet.gradient }}
-                    />
+                      className="inline-flex p-4 rounded-2xl shadow-lg opacity-90 group-hover:opacity-100 transition-opacity"
+                      style={{
+                        background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+                      }}
+                    >
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
 
-                    {/* Content */}
-                    <div className="relative z-10">
-                      {/* Icon with Gradient Background */}
-                      <motion.div
-                        whileHover={{
-                          rotate: [0, -10, 10, -10, 0],
-                          scale: 1.1,
-                        }}
-                        transition={{ duration: 0.5 }}
-                        className="w-14 h-14 rounded-xl mb-6 mx-auto flex items-center justify-center shadow-lg group-hover:shadow-xl"
-                        style={{
-                          background: colorSet.gradient,
-                          boxShadow: `0 8px 32px ${colorSet.shadow}`,
-                        }}
-                      >
-                        <Icon className="h-7 w-7 text-white" />
-                      </motion.div>
-
-                      <h3 className="text-lg font-display font-bold text-center mb-3 text-[#201761] dark:text-[#F7F6F7] group-hover:text-white transition-colors duration-300">
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-display font-bold text-foreground dark:text-[#F7F6F7] tracking-tight">
                         {benefit.title}
                       </h3>
 
-                      <p className="text-sm text-center leading-relaxed text-[#201761]/80 dark:text-[#F7F6F7]/80 group-hover:text-white transition-colors duration-300">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {benefit.description}
                       </p>
                     </div>
 
-                    {/* Decorative Corner Element */}
+                    {/* Bottom accent line */}
                     <div
-                      className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full opacity-10 group-hover:opacity-20 transition-opacity"
-                      style={{ background: colorSet.gradient }}
+                      className="absolute bottom-0 left-6 right-6 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: `linear-gradient(90deg, ${gradient.from} 0%, ${gradient.to} 100%)` }}
                     />
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </GradientCard>
               );
             })}
           </div>
@@ -668,14 +641,14 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-white to-[#D6E6F2] dark:from-[#252E8A]/20 dark:to-[#0E0E34]">
+      <section className="py-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-b from-white to-[#D6E6F2] dark:from-[#0E0E34] dark:to-[#1A1A4A]">
+        {/* Subtle pattern */}
         <div className="absolute inset-0 pointer-events-none">
           <div
-            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            className="absolute inset-0 opacity-20"
             style={{
-              backgroundImage:
-                "radial-gradient(circle, currentColor 2px, transparent 2px)",
-              backgroundSize: "40px 40px",
+              background:
+                "radial-gradient(circle at 50% 0%, #6EB8E1 0%, transparent 50%)",
             }}
           />
         </div>
@@ -687,78 +660,64 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto text-center relative"
         >
-          <div
-            className="bg-white/80 dark:bg-[#1A1A3A]/80 backdrop-blur-xl p-12 lg:p-16 rounded-2xl border shadow-xl"
-            style={{ borderColor: "#6EB8E1" }}
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="space-y-6"
-            >
+          <div className="relative">
+            {/* Ambient glow behind */}
+            <div
+              className="absolute -inset-8 -z-10 rounded-[2rem] blur-xl"
+              style={{
+                background:
+                  "linear-gradient(135deg, #6EB8E1 0%, #C8ABE6 100%)",
+              }}
+            />
+
+            {/* Glass card */}
+            <div className="relative bg-white/90 dark:bg-[#0E0E34]/90 backdrop-blur-xl p-12 lg:p-16 rounded-3xl border border-white/20 dark:border-white/10 shadow-2xl">
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ scale: 0.98 }}
+                whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="space-y-6"
               >
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight">
                   <span className="text-foreground dark:text-[#F7F6F7]">Ready to Get </span>
-                  <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#6EB8E1] via-[#4EB5A9] to-[#5A7FC8] bg-clip-text text-transparent">
                     Started?
                   </span>
                 </h2>
+
+                <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                  Join thousands of productive people who transformed their
+                  workflow. Start organizing today.
+                </p>
+
+                <motion.div className="pt-4">
+                  <motion.button
+                    onClick={openSignUpModal}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group relative px-8 py-4 bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      Start For Free
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out_infinite]" />
+                  </motion.button>
+                </motion.div>
+
+                <div className="flex items-center justify-center gap-8 text-sm font-medium text-gray-600 dark:text-gray-400 flex-wrap">
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: "#4EB5A9" }} />
+                    No credit card required
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" style={{ color: "#4EB5A9" }} />
+                    Free forever
+                  </span>
+                </div>
               </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="text-base text-muted-foreground dark:text-[#C8C8D8] max-w-2xl mx-auto"
-              >
-                Join thousands of productive people who transformed their
-                workflow. Start organizing today.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="pt-4"
-              >
-                <button
-                  onClick={openSignUpModal}
-                  className="btn-primary-gradient group"
-                >
-                  Start For Free
-                  <ArrowRight className="inline-block ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="text-sm font-medium text-muted-foreground dark:text-[#C8C8D8] flex items-center justify-center gap-2 flex-wrap"
-              >
-                <CheckCircle2
-                  className="h-4 w-4"
-                  style={{ color: "#4EB5A9" }}
-                />
-                No credit card required
-                <span className="text-gray-400 dark:text-[#5A7FC8]">•</span>
-                <CheckCircle2
-                  className="h-4 w-4"
-                  style={{ color: "#4EB5A9" }}
-                />
-                Free forever
-              </motion.p>
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       </section>

@@ -44,7 +44,7 @@ export function ActivityFeed({ tasks = [] }: ActivityFeedProps) {
       let type: 'created' | 'completed' | 'updated' | 'deleted' = 'created'
 
       // Determine activity type based on task properties
-      if (task.completed_at) {
+      if (task.status === 'completed') {
         type = 'completed'
       } else if (task.updated_at && new Date(task.updated_at).getTime() > new Date(task.created_at).getTime()) {
         type = 'updated'

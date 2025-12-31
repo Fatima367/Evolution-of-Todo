@@ -35,7 +35,7 @@ export function ProgressOverview({ tasks = [] }: ProgressOverviewProps) {
     const categoryTasks = tasks.filter(task =>
       task.tags && task.tags.includes(category) || (category === 'Uncategorized' && (!task.tags || task.tags.length === 0))
     )
-    const completed = categoryTasks.filter(task => task.completed_at).length
+    const completed = categoryTasks.filter(task => task.status === 'completed').length
 
     return {
       category,

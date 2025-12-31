@@ -1,29 +1,22 @@
 'use client';
 
-import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Filter, ListChecks } from 'lucide-react';
+import { Plus, Filter, ListChecks, ArrowUpDown } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useTaskFilters } from '@/lib/hooks/useTaskFilters';
+import { useTaskSort } from '@/lib/hooks/useTaskSort';
 import { useUIStore } from '@/store/uiStore';
 import { TaskList } from '@/components/tasks/TaskList';
 import { SearchBar } from '@/components/tasks/SearchBar';
 import { FilterDropdown } from '@/components/tasks/FilterDropdown';
+import { SortDropdown } from '@/components/tasks/SortDropdown';
 import { TASK_STATUSES, TASK_PRIORITIES } from '@/lib/constants/taskOptions';
 
 export default function TasksPage() {
   const openCreateTaskModal = useUIStore((state) => state.openCreateTaskModal);
-  const taskRefreshTrigger = useUIStore((state) => state.taskRefreshTrigger);
-  const { tasks, loading, updateTask, deleteTask, loadTasks } = useTasks();
+  const { sort, onChange, toggleDirection } = useTaskSort();
+  const { tasks, loading, updateTask, deleteTask } = useTasks(undefined, sort.field, sort.direction);
   const { filteredTasks, filters, updateFilter, activeFilterCount } = useTaskFilters(tasks);
-
-  // Reload tasks when refresh is triggered (e.g., from chat)
-  useEffect(() => {
-    if (taskRefreshTrigger > 0) {
-      console.log('📋 Tasks page: Reloading tasks due to refresh trigger')
-      loadTasks()
-    }
-  }, [taskRefreshTrigger, loadTasks])
 
   // Prepare filter options
   const statusOptions = TASK_STATUSES.map((status) => ({
@@ -100,7 +93,7 @@ export default function TasksPage() {
             placeholder="Search tasks by title or description..."
           />
 
-          {/* Filter Dropdowns */}
+          {/* Filter and Sort Dropdowns */}
           <div className="flex flex-wrap gap-3">
             {/* Status Filter */}
             <FilterDropdown
@@ -130,6 +123,13 @@ export default function TasksPage() {
                 icon={<Filter size={18} />}
               />
             )}
+
+            {/* Sort Dropdown */}
+            <SortDropdown
+              currentSort={sort}
+              onChange={onChange}
+              onToggleDirection={toggleDirection}
+            />
           </div>
         </div>
 
@@ -169,7 +169,7 @@ export default function TasksPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          className="grid grid-cols-2 md:grid-cols-3 gap-4"
         >
           <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
             <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Total</p>
@@ -183,12 +183,12 @@ export default function TasksPage() {
               {tasks.filter((t) => t.status === 'pending').length}
             </p>
           </div>
-          <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
+          {/* <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
             <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">In Progress</p>
             <p className="text-2xl font-bold text-blue-500 dark:text-blue-400 mt-1">
               {tasks.filter((t) => t.status === 'in_progress').length}
             </p>
-          </div>
+          </div> */}
           <div className="glass-card p-4 rounded-xl bg-white/50 dark:bg-[#201761]/50">
             <p className="text-sm text-gray-500 dark:text-[#C8C8D8]">Completed</p>
             <p className="text-2xl font-bold text-green-500 dark:text-green-400 mt-1">

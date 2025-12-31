@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
+from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 from src.models.task import TaskStatus, TaskPriority
 
@@ -78,3 +79,19 @@ class TaskListResponse(BaseModel):
     """Schema for task list response with pagination"""
     tasks: List[TaskRead]
     total: int
+
+
+# Sort field options for task sorting
+class SortField(str, Enum):
+    """Valid fields to sort tasks by"""
+    CREATED_AT = "created_at"
+    DUE_DATE = "due_date"
+    PRIORITY = "priority"
+    TITLE = "title"
+
+
+# Sort direction options
+class SortOrder(str, Enum):
+    """Sort direction options"""
+    ASC = "asc"
+    DESC = "desc"
