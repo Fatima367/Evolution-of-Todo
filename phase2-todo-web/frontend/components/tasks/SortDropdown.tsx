@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ArrowUp, ArrowDown, Calendar, AlertCircle, Type } from 'lucide-react';
+import { ChevronDown, ArrowUp, ArrowDown, Calendar, AlertCircle, Type, ArrowUpDown } from 'lucide-react';
 import { SortOption, SortField, SortDirection, SortConfig } from '../../lib/types';
 
 interface SortDropdownProps {
