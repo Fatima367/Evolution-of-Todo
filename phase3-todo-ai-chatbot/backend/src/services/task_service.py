@@ -156,6 +156,57 @@ class TaskService:
         return task
 
     @staticmethod
+    def find_tasks_by_query(
+        session: Session,
+        query: str,
+        current_user: User
+    ) -> List[Task]:
+        """Find tasks by ID, exact title, or partial title (fuzzy match)
+
+        Args:
+            session: Database session
+            query: Search query (ID or title)
+            current_user: Authenticated user
+
+        Returns:
+            List of matching tasks
+        """
+        if not query or not query.strip():
+            return []
+
+        clean_query = query.strip()
+
+        # 1. Try to parse as UUID
+        try:
+            task_uuid = UUID(clean_query)
+            # If it's a valid UUID, look it up directly
+            statement = select(Task).where(
+                Task.id == task_uuid,
+                Task.user_id == current_user.id
+            )
+            task = session.exec(statement).first()
+            return [task] if task else []
+        except (ValueError, TypeError):
+            pass
+
+        # 2. Exact title match (case-insensitive)
+        statement = select(Task).where(
+            func.lower(Task.title) == clean_query.lower(),
+            Task.user_id == current_user.id
+        )
+        exact_matches = session.exec(statement).all()
+        if exact_matches:
+            return list(exact_matches)
+
+        # 3. Partial title match (case-insensitive)
+        statement = select(Task).where(
+            Task.title.ilike(f"%{clean_query}%"),
+            Task.user_id == current_user.id
+        ).order_by(Task.created_at.desc())
+
+        return list(session.exec(statement).all())
+
+    @staticmethod
     def update_task(
         session: Session,
         task_id: UUID,

@@ -5,7 +5,10 @@ allowing natural language task management.
 """
 import uuid
 from datetime import datetime
-from typing import Any, Optional, Dict
+from typing import Any, Optional, Dict, List, Annotated
+
+from dateutil import parser
+from pydantic import Field
 
 from sqlmodel import Session, select
 from agents import function_tool, RunContextWrapper
@@ -63,8 +66,15 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
     """
 
     @function_tool(name_override="add_task")
-    def add_task(ctx: RunContextWrapper[Any], title: str, description: str | None = None, priority: str = "medium") -> Dict[str, Any]:
-        """Create a new task with a title and optional description and priority"""
+    def add_task(
+        ctx: RunContextWrapper[Any],
+        title: Annotated[str, Field(description="The title of the task")],
+        description: Annotated[Optional[str], Field(default=None, description="The description of the task. If not provided by the user, use None.")] = None,
+        priority: Annotated[Optional[str], Field(default=None, description="The priority of the task. Can be 'low', 'medium', 'high', or 'urgent'. If not provided by the user, use None.")] = None,
+        due_date: Annotated[Optional[str], Field(default=None, description="The due date of the task. Accepts ISO format (e.g., '2024-12-31', '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday', 'in 3 days'). If not provided by the user, use None.")] = None,
+        tags: Annotated[Optional[List[str]], Field(default=None, description="A list of tags for the task (max 10 tags, each max 50 characters).")] = None
+    ) -> Dict[str, Any]:
+        """Create a new task with a title and optional description, priority, due date, and tags."""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
             # Fallback to closure-captured values if context is missing
@@ -72,15 +82,29 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
 
         mock_user = User(id=uuid.UUID(uid))
 
+        prio = priority or "medium"
         try:
-            priority_enum = TaskPriority(priority.lower())
+            priority_enum = TaskPriority(prio.lower())
         except ValueError:
             priority_enum = TaskPriority.MEDIUM
+        
+        due_date_obj = None
+        if due_date:
+            try:
+                due_date_obj = parser.parse(due_date)
+            except (ValueError, TypeError) as e:
+                # Return error for invalid date format
+                return {
+                    "status": "error",
+                    "error": f"Invalid date format: {str(e)}. Please use ISO format (e.g., '2024-12-31' or '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday')."
+                }
 
         task_data = TaskCreate(
             title=title,
             description=description,
-            priority=priority_enum
+            priority=priority_enum,
+            due_date=due_date_obj,
+            tags=tags
         )
 
         task = TaskService.create_task(session_obj, task_data, mock_user)
@@ -89,11 +113,17 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
             "status": "created",
             "task_id": str(task.id),
             "title": task.title,
-            "priority": task.priority.value
+            "priority": task.priority.value,
+            "due_date": task.due_date.isoformat() if task.due_date else None,
+            "tags": task.tags
         }
 
     @function_tool(name_override="list_tasks")
-    def list_tasks(ctx: RunContextWrapper[Any], status: str | None = None, limit: int = 20) -> Dict[str, Any]:
+    def list_tasks(
+        ctx: RunContextWrapper[Any],
+        status: Annotated[Optional[str], Field(default=None, description="Filter by status: 'pending', 'in_progress', 'completed', or omit for all tasks")] = None,
+        limit: Annotated[int, Field(default=20, description="Maximum number of tasks to return (default: 20)")] = 20
+    ) -> Dict[str, Any]:
         """List all tasks, optionally filtered by status (pending, in_progress, completed, or omit for all)"""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
@@ -134,7 +164,7 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
 
     @function_tool(name_override="complete_task")
     def complete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
-        """Mark a task as completed using its ID"""
+        """Mark a task as completed using its ID or title"""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
             session_obj, uid = session, user_id
@@ -142,24 +172,36 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
         mock_user = User(id=uuid.UUID(uid))
 
         try:
-            task_uuid = uuid.UUID(task_id)
-        except ValueError:
-            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
+            tasks = TaskService.find_tasks_by_query(session_obj, task_id, mock_user)
 
-        try:
+            if not tasks:
+                return {"status": "error", "error": f"Task not found matching: {task_id}"}
+
+            if len(tasks) > 1:
+                return {
+                    "status": "ambiguous",
+                    "message": f"Multiple tasks found matching '{task_id}'. Please be more specific.",
+                    "matches": [
+                        {"id": str(t.id), "title": t.title, "status": t.status.value}
+                        for t in tasks
+                    ]
+                }
+
+            task = tasks[0]
             task_update = TaskUpdate(status=TaskStatus.COMPLETED)
-            task = TaskService.update_task(session_obj, task_uuid, task_update, mock_user)
+            updated_task = TaskService.update_task(session_obj, task.id, task_update, mock_user)
+
             return {
                 "status": "completed",
-                "task_id": str(task.id),
-                "title": task.title
+                "task_id": str(updated_task.id),
+                "title": updated_task.title
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
     @function_tool(name_override="delete_task")
     def delete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
-        """Delete a task using its ID"""
+        """Delete a task using its ID or title"""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
             session_obj, uid = session, user_id
@@ -167,30 +209,46 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
         mock_user = User(id=uuid.UUID(uid))
 
         try:
-            task_uuid = uuid.UUID(task_id)
-        except ValueError:
-            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
+            tasks = TaskService.find_tasks_by_query(session_obj, task_id, mock_user)
 
-        try:
-            # Get task first to have its title for the response
-            statement = select(Task).where(Task.id == task_uuid, Task.user_id == mock_user.id)
-            task = session_obj.exec(statement).first()
-            if not task:
-                return {"status": "error", "error": "Task not found"}
+            if not tasks:
+                return {"status": "error", "error": f"Task not found matching: {task_id}"}
+
+            if len(tasks) > 1:
+                return {
+                    "status": "ambiguous",
+                    "message": f"Multiple tasks found matching '{task_id}'. Please be more specific.",
+                    "matches": [
+                        {"id": str(t.id), "title": t.title, "status": t.status.value}
+                        for t in tasks
+                    ]
+                }
+
+            task = tasks[0]
+            task_id_val = task.id
             title = task.title
 
-            TaskService.delete_task(session_obj, task_uuid, mock_user)
+            TaskService.delete_task(session_obj, task_id_val, mock_user)
             return {
                 "status": "deleted",
-                "task_id": task_id,
+                "task_id": str(task_id_val),
                 "title": title
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
     @function_tool(name_override="update_task")
-    def update_task(ctx: RunContextWrapper[Any], task_id: str, title: str | None = None, description: str | None = None, priority: str | None = None, status: str | None = None) -> Dict[str, Any]:
-        """Update a task's title, description, priority, or status"""
+    def update_task(
+        ctx: RunContextWrapper[Any],
+        task_id: Annotated[str, Field(description="The task ID (UUID) or title to identify the task")],
+        title: Annotated[Optional[str], Field(default=None, description="New title for the task (optional)")] = None,
+        description: Annotated[Optional[str], Field(default=None, description="New description for the task (optional)")] = None,
+        priority: Annotated[Optional[str], Field(default=None, description="New priority - 'low', 'medium', 'high', or 'urgent' (optional)")] = None,
+        status: Annotated[Optional[str], Field(default=None, description="New status - 'pending', 'in_progress', or 'completed' (optional)")] = None,
+        due_date: Annotated[Optional[str], Field(default=None, description="New due date. Accepts ISO format (e.g., '2024-12-31', '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday', 'in 3 days') (optional)")] = None,
+        tags: Annotated[Optional[List[str]], Field(default=None, description="New list of tags (replaces existing tags) (optional)")] = None
+    ) -> Dict[str, Any]:
+        """Update a task's title, description, priority, status, due date, or tags using its ID or title"""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
             session_obj, uid = session, user_id
@@ -198,38 +256,158 @@ def create_task_tools(session: Session, user_id: str, thread_id: str = "") -> li
         mock_user = User(id=uuid.UUID(uid))
 
         try:
-            task_uuid = uuid.UUID(task_id)
-        except ValueError:
-            return {"status": "error", "error": f"Invalid task ID format: {task_id}"}
+            tasks = TaskService.find_tasks_by_query(session_obj, task_id, mock_user)
 
-        update_data = {}
-        if title is not None: update_data["title"] = title
-        if description is not None: update_data["description"] = description
-        if priority is not None:
-            try:
-                update_data["priority"] = TaskPriority(priority.lower())
-            except ValueError:
-                pass
-        if status is not None:
-            try:
-                update_data["status"] = TaskStatus(status.lower())
-            except ValueError:
-                pass
+            if not tasks:
+                return {"status": "error", "error": f"Task not found matching: {task_id}"}
 
-        if not update_data:
-            return {"status": "no_change", "message": "No fields to update"}
+            if len(tasks) > 1:
+                return {
+                    "status": "ambiguous",
+                    "message": f"Multiple tasks found matching '{task_id}'. Please be more specific.",
+                    "matches": [
+                        {"id": str(t.id), "title": t.title, "status": t.status.value}
+                        for t in tasks
+                    ]
+                }
 
-        try:
+            task = tasks[0]
+
+            update_data = {}
+            if title is not None: update_data["title"] = title
+            if description is not None: update_data["description"] = description
+            if priority is not None:
+                try:
+                    update_data["priority"] = TaskPriority(priority.lower())
+                except ValueError:
+                    pass
+            if status is not None:
+                try:
+                    update_data["status"] = TaskStatus(status.lower())
+                except ValueError:
+                    pass
+            if due_date:
+                try:
+                    update_data["due_date"] = parser.parse(due_date)
+                except (ValueError, TypeError) as e:
+                    # Return error for invalid date format
+                    return {
+                        "status": "error",
+                        "error": f"Invalid date format: {str(e)}. Please use ISO format (e.g., '2024-12-31' or '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday')."
+                    }
+            if tags is not None:
+                update_data["tags"] = tags
+
+            if not update_data:
+                return {"status": "no_change", "message": "No fields to update"}
+
             task_update = TaskUpdate(**update_data)
-            task = TaskService.update_task(session_obj, task_uuid, task_update, mock_user)
+            updated_task = TaskService.update_task(session_obj, task.id, task_update, mock_user)
+
             return {
                 "status": "updated",
-                "task_id": str(task.id),
-                "title": task.title,
-                "priority": task.priority.value,
-                "task_status": task.status.value
+                "task_id": str(updated_task.id),
+                "title": updated_task.title,
+                "priority": updated_task.priority.value,
+                "task_status": updated_task.status.value,
+                "due_date": updated_task.due_date.isoformat() if updated_task.due_date else None,
+                "tags": updated_task.tags
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
-    return [add_task, list_tasks, complete_task, delete_task, update_task]
+    @function_tool(name_override="bulk_complete")
+    def bulk_complete(
+        ctx: RunContextWrapper[Any],
+        confirm: Annotated[bool, Field(default=True, description="Confirmation flag (always true)")] = True
+    ) -> Dict[str, Any]:
+        """Mark all your pending or in-progress tasks as completed"""
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
+
+        try:
+            # Find all non-completed tasks for this user
+            statement = select(Task).where(
+                Task.user_id == mock_user.id,
+                Task.status != TaskStatus.COMPLETED
+            )
+            tasks = session_obj.exec(statement).all()
+            count = len(tasks)
+
+            for task in tasks:
+                task_update = TaskUpdate(status=TaskStatus.COMPLETED)
+                TaskService.update_task(session_obj, task.id, task_update, mock_user)
+
+            return {
+                "status": "success",
+                "message": f"Successfully completed {count} tasks.",
+                "count": count
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
+
+    @function_tool(name_override="bulk_delete")
+    def bulk_delete(
+        ctx: RunContextWrapper[Any],
+        confirm: Annotated[bool, Field(default=True, description="Confirmation flag (always true)")] = True
+    ) -> Dict[str, Any]:
+        """Delete all your completed tasks"""
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
+
+        try:
+            # Find all completed tasks for this user
+            statement = select(Task).where(
+                Task.user_id == mock_user.id,
+                Task.status == TaskStatus.COMPLETED
+            )
+            tasks = session_obj.exec(statement).all()
+            count = len(tasks)
+
+            for task in tasks:
+                TaskService.delete_task(session_obj, task.id, mock_user)
+
+            return {
+                "status": "success",
+                "message": f"Successfully deleted {count} completed tasks.",
+                "deleted_count": count
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
+
+    @function_tool(name_override="clear_all")
+    def clear_all(
+        ctx: RunContextWrapper[Any],
+        confirm: Annotated[bool, Field(default=True, description="Confirmation flag (always true)")] = True
+    ) -> Dict[str, Any]:
+        """Delete ALL your tasks (irreversible)"""
+        session_obj, uid = get_tool_context(ctx)
+        if not session_obj or not uid:
+            session_obj, uid = session, user_id
+
+        mock_user = User(id=uuid.UUID(uid))
+
+        try:
+            # Find all tasks for this user
+            statement = select(Task).where(Task.user_id == mock_user.id)
+            tasks = session_obj.exec(statement).all()
+            count = len(tasks)
+
+            for task in tasks:
+                TaskService.delete_task(session_obj, task.id, mock_user)
+
+            return {
+                "status": "success",
+                "message": f"Successfully deleted all {count} tasks.",
+                "deleted_count": count
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
+
+    return [add_task, list_tasks, complete_task, delete_task, update_task, bulk_complete, bulk_delete, clear_all]

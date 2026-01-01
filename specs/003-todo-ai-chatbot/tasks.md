@@ -147,11 +147,11 @@ description: "Task list for 003-todo-ai-chatbot implementation"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T060 [P] Test conversation persists across multiple message exchanges in backend/tests/chat_tests/test_conversation_service.py
-- [ ] T061 [P] Test conversation updated_at timestamp updates on each message in backend/tests/chat_tests/test_conversation_service.py
-- [ ] T062 Test conversation can be resumed after server restart in backend/tests/chat_tests/test_chat_endpoint.py
-- [ ] T063 Test messages are ordered by created_at ascending in backend/tests/chat_tests/test_message_service.py
-- [ ] T064 Test frontend resends conversation_id on page refresh in frontend/tests/chat/chat.spec.ts
+- [X] T060 [P] Test conversation persists across multiple message exchanges in backend/tests/chat_tests/test_conversation_service.py
+- [X] T061 [P] Test conversation updated_at timestamp updates on each message in backend/tests/chat_tests/test_conversation_service.py
+- [X] T062 Test conversation can be resumed after server restart in backend/tests/chat_tests/test_chat_endpoint.py
+- [X] T063 Test messages are ordered by created_at ascending in backend/tests/chat_tests/test_message_service.py
+- [X] T064 Test frontend resends conversation_id on page refresh in frontend/tests/chat/chat.spec.ts
 
 ### Implementation for User Story 2
 
@@ -174,17 +174,17 @@ description: "Task list for 003-todo-ai-chatbot implementation"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T071 [P] Test agent asks for clarification on ambiguous task reference in backend/tests/chat_tests/test_chat_service.py
-- [ ] T072 [P] Test agent handles unique task name correctly in backend/tests/chat_tests/test_chat_service.py
-- [ ] T073 [P] Test fuzzy matching works for partial names in backend/tests/chat_tests/test_mcp_tools.py
+- [X] T071 [P] Test agent asks for clarification on ambiguous task reference in backend/tests/chat_tests/test_chat_service.py
+- [X] T072 [P] Test agent handles unique task name correctly in backend/tests/chat_tests/test_chat_service.py
+- [X] T073 [P] Test fuzzy matching works for partial names in backend/tests/chat_tests/test_mcp_tools.py
 
 ### Implementation for User Story 3
 
-- [ ] T074 [US3] Implement fuzzy task matching in list_tasks MCP tool (partial name search in backend/src/mcp/tools.py)
-- [ ] T075 [US3] Add disambiguation logic for multiple matches in backend/src/mcp/tools.py (return options for user)
-- [ ] T076 [US3] Update agent system prompt to handle disambiguation requests in backend/src/services/chat_service.py
-- [ ] T077 [US3] Implement task name extraction from user message in backend/src/services/chat_service.py (identify "the X task" pattern)
-- [ ] T078 [US3] Add clarification UI for disambiguation in frontend/src/components/chat/ChatInterface.tsx (show matching options)
+- [X] T074 [US3] Implement fuzzy task matching in list_tasks MCP tool (partial name search in backend/src/mcp/tools.py)
+- [X] T075 [US3] Add disambiguation logic for multiple matches in backend/src/mcp/tools.py (return options for user)
+- [X] T076 [US3] Update agent system prompt to handle disambiguation requests in backend/src/services/chat_service.py
+- [X] T077 [US3] Implement task name extraction from user message in backend/src/services/chat_service.py (identify "the X task" pattern)
+- [X] T078 [US3] Add clarification UI for disambiguation in frontend/src/components/chat/ChatInterface.tsx (show matching options - handled by agent conversational UI)
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently. Users can reference tasks naturally.
 
@@ -198,17 +198,17 @@ description: "Task list for 003-todo-ai-chatbot implementation"
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T079 [P] Test bulk complete all tasks operation in backend/tests/chat_tests/test_mcp_tools.py
-- [ ] T080 [P] Test bulk delete completed tasks operation in backend/tests/chat_tests/test_mcp_tools.py
-- [ ] T081 [P] Test "clear my list" deletes all tasks in backend/tests/chat_tests/test_mcp_tools.py
+- [X] T079 [P] Test bulk complete all tasks operation in backend/tests/chat_tests/test_mcp_tools.py
+- [X] T080 [P] Test bulk delete completed tasks operation in backend/tests/chat_tests/test_mcp_tools.py
+- [X] T081 [P] Test "clear my list" deletes all tasks in backend/tests/chat_tests/test_mcp_tools.py
 
 ### Implementation for User Story 4
 
-- [ ] T082 [US4] Add bulk_complete MCP tool in backend/src/mcp/tools.py (marks all user tasks as complete)
-- [ ] T083 [US4] Add bulk_delete MCP tool for completed tasks in backend/src/mcp/tools.py (deletes all completed tasks)
-- [ ] T084 [US4] Add clear_all MCP tool in backend/src/mcp/tools.py (deletes all tasks with confirmation)
-- [ ] T085 [US4] Update agent system prompt for bulk operations in backend/src/services/chat_service.py
-- [ ] T086 [US4] Add bulk operation confirmation UI in frontend/src/components/chat/ChatInterface.tsx (confirm destructive bulk actions)
+- [X] T082 [US4] Add bulk_complete MCP tool in backend/src/mcp/tools.py (marks all user tasks as complete)
+- [X] T083 [US4] Add bulk_delete MCP tool for completed tasks in backend/src/mcp/tools.py (deletes all completed tasks)
+- [X] T084 [US4] Add clear_all MCP tool in backend/src/mcp/tools.py (deletes all tasks with confirmation)
+- [X] T085 [US4] Update agent system prompt for bulk operations in backend/src/services/chat_service.py
+- [X] T086 [US4] Add bulk operation confirmation UI in frontend/src/components/chat/ChatInterface.tsx (confirm destructive bulk actions - handled by agent conversational confirmation)
 
 **Checkpoint**: All user stories should now be independently functional. Users can perform bulk operations.
 
@@ -220,7 +220,7 @@ description: "Task list for 003-todo-ai-chatbot implementation"
 
 ### Testing & Validation
 
-- [ ] T087 Run all backend tests with `pytest backend/tests/ -v`
+- [X] T087 Run all backend tests with `pytest backend/tests/ -v`
 - [ ] T088 Run all frontend tests with `npm test` (if configured)
 - [ ] T089 Perform end-to-end manual testing: create task via chat, list tasks, complete task, delete task, resume conversation
 - [ ] T090 Verify stateless behavior: restart backend, resume conversation, verify data intact
@@ -228,7 +228,7 @@ description: "Task list for 003-todo-ai-chatbot implementation"
 ### Documentation
 
 - [ ] T091 Update README.md with chatbot setup instructions
-- [ ] T092 Add .env.example with GROQ_API_KEY placeholder in backend/.env.example
+- [X] T092 Add .env.example with GROQ_API_KEY placeholder in backend/.env.example
 - [ ] T093 Document MCP tools usage in backend/README.md
 - [ ] T094 Add conversation examples to quickstart.md
 

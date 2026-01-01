@@ -7,7 +7,7 @@ from src.database import get_session
 from src.auth.dependencies import get_current_user
 from src.models.user import User
 from src.models.task import TaskStatus, TaskPriority
-from src.schemas.task_schemas import TaskCreate, TaskRead, TaskUpdate, TaskListResponse
+from src.schemas.task_schemas import TaskCreate, TaskRead, TaskUpdate, TaskListResponse, SortField, SortOrder
 from src.services.task_service import TaskService
 
 
@@ -20,10 +20,12 @@ async def get_tasks(
     current_user: Annotated[User, Depends(get_current_user)],
     status_filter: Optional[TaskStatus] = Query(None, alias="status", description="Filter by status"),
     priority: Optional[TaskPriority] = Query(None, description="Filter by priority"),
+    sort_by: Optional[SortField] = Query(SortField.CREATED_AT, description="Field to sort by"),
+    sort_order: Optional[SortOrder] = Query(SortOrder.DESC, description="Sort direction"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of tasks"),
     offset: int = Query(0, ge=0, description="Number of tasks to skip")
 ):
-    """Get all tasks for the authenticated user with optional filtering
+    """Get all tasks for the authenticated user with optional filtering and sorting
 
     Enforces user isolation by filtering tasks by current_user.id
     """
@@ -32,6 +34,8 @@ async def get_tasks(
         current_user=current_user,
         status=status_filter,
         priority=priority,
+        sort_by=sort_by,
+        sort_order=sort_order,
         limit=limit,
         offset=offset
     )

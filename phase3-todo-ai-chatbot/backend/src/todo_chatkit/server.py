@@ -78,15 +78,20 @@ class TodoChatKitServer(ChatKitServer[ChatContext]):
 
 Available tools:
 - add_task: Create a new task (requires title, optionally description and priority)
-- list_tasks: Show tasks with optional status filter (pending/in_progress/completed/all)
-- complete_task: Mark a task as completed using its ID
-- delete_task: Remove a task using its ID
-- update_task: Change task title, description, priority, or status
+- list_tasks: Show tasks with optional status filter (pending/in_progress/completed/all). Supports searching by title.
+- complete_task: Mark a task as completed using its ID or Title.
+- delete_task: Remove a task using its ID or Title.
+- update_task: Change task title, description, priority, or status using ID or Title.
+- bulk_complete: Mark ALL your pending or in-progress tasks as completed.
+- bulk_delete: Delete ALL your completed tasks.
+- clear_all: Delete ALL your tasks (irreversible).
 
 Behavior guidelines:
 - Always confirm actions with a friendly response
-- When listing tasks, present them in a clear, organized format
-- If a user refers to a task by name instead of ID, list matching tasks and ask for clarification
+- When listing tasks, present them in a clear, organized format (Markdown tables or lists)
+- If a user refers to a task by name instead of ID and there are multiple matches, list the options clearly (e.g., "I found multiple tasks with that name, which one did you mean?") and provide the titles and IDs.
+- For destructive bulk actions like 'clear_all', ALWAYS ask the user for confirmation first (e.g., "Are you sure you want to delete ALL your tasks? This cannot be undone.") before calling the tool.
+- If a tool returns an 'ambiguous' status with matches, present those matches to the user and ask them to specify.
 - Handle errors gracefully with helpful suggestions
 - Be concise but helpful
 - Use natural, conversational language
@@ -170,17 +175,18 @@ Behavior guidelines:
                         # Generate unique ID using store's ID generator
                         new_id = self.store.generate_item_id("message", thread, context)
                         id_mapping[old_id] = new_id
-                    # Replace with mapped ID
-                    event.item.id = id_mapping[old_id]
+                    # Replace with mapped ID using model_copy (fields may be frozen)
+                    event.item = event.item.model_copy(update={"id": id_mapping[old_id]})
 
             elif event.type == "thread.item.done":
                 if isinstance(event.item, AssistantMessageItem):
                     old_id = event.item.id
                     if old_id in id_mapping:
-                        event.item.id = id_mapping[old_id]
+                        event.item = event.item.model_copy(update={"id": id_mapping[old_id]})
 
             elif event.type == "thread.item.updated":
                 if event.item_id in id_mapping:
-                    event.item_id = id_mapping[event.item_id]
+                    # Replace event with updated item_id (event may be frozen)
+                    event = event.model_copy(update={"item_id": id_mapping[event.item_id]})
 
             yield event

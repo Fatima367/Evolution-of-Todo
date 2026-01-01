@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 import { AuthProvider } from '@/contexts/auth'
@@ -8,18 +7,6 @@ import { SignUpModal } from '@/components/auth/SignUpModal'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { CreateTaskModal } from '@/components/tasks/CreateTaskModal'
 import { FloatingChatButton } from '@/components/chat/FloatingChatButton'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space-grotesk',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'TodoEvo - Evolve Your Workflow',
@@ -34,9 +21,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap"
+          rel="stylesheet"
+        />
         <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
+      <body className="font-sans"
+        style={{
+          fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }}>
           <AuthProvider>
             <ThemeProvider>
               <QueryProvider>
