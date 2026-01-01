@@ -30,9 +30,17 @@ class TaskCreate(BaseModel):
     @field_validator('due_date')
     @classmethod
     def validate_due_date(cls, v: Optional[datetime]) -> Optional[datetime]:
-        """Validate due date is in the future"""
-        if v is not None and v < datetime.utcnow():
-            raise ValueError('Due date must be in the future')
+        """Validate due date is reasonable (not too far in the past)
+
+        Allow dates from yesterday onwards to be flexible with time zones and user intent.
+        Users might set a due date for "today" which could be in the past due to time zones.
+        """
+        if v is not None:
+            # Only reject dates more than 24 hours in the past
+            from datetime import timedelta
+            yesterday = datetime.utcnow() - timedelta(days=1)
+            if v < yesterday:
+                raise ValueError('Due date cannot be more than 24 hours in the past')
         return v
 
 

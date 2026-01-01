@@ -24,7 +24,8 @@ from chatkit.types import (
     ThreadMetadata,
     UserMessageItem,
     AssistantMessageItem,
-    UserMessageTextContent
+    UserMessageTextContent,
+    AssistantMessageContent
 )
 
 
@@ -236,7 +237,7 @@ async def test_add_thread_item_user_and_assistant(store: PostgreSQLStore, chat_c
     assistant_msg = AssistantMessageItem(
         id="msg_2",
         thread_id=thread_id,
-        content=[UserMessageTextContent(type="input_text", text="Assistant message")],
+        content=[AssistantMessageContent(type="output_text", text="Assistant message")],
         created_at=datetime.now(timezone.utc)
     )
     await store.add_thread_item(thread_id, assistant_msg, chat_context)
@@ -402,8 +403,10 @@ async def test_save_and_load_item(store: PostgreSQLStore, chat_context: ChatCont
 @pytest.mark.asyncio
 async def test_load_item_not_found(store: PostgreSQLStore, chat_context: ChatContext):
     """Test loading non-existent message raises error"""
+    # Use a valid UUID format but one that doesn't exist to trigger lookup failure
+    non_existent_id = f"msg_{uuid4()}"
     with pytest.raises(ValueError, match="Message not found"):
-        await store.load_item("1", "msg_99999", chat_context)
+        await store.load_item("1", non_existent_id, chat_context)
 
 
 @pytest.mark.asyncio

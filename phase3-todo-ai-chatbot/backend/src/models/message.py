@@ -17,6 +17,7 @@ class MessageRole(str, Enum):
 
 
 class Message(SQLModel, table=True):
+    model_config = {"validate_assignment": True}
     """Message entity representing a single message in a conversation
 
     Attributes:

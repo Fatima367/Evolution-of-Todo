@@ -111,10 +111,13 @@ Frontend will be available at: http://localhost:3000
 The AI agent has access to these tools for task management:
 
 1. **add_task** - Create new task with title, description, and priority
-2. **list_tasks** - List tasks with optional status filter
-3. **complete_task** - Mark task as completed
-4. **delete_task** - Remove task permanently
-5. **update_task** - Modify task details
+2. **list_tasks** - List tasks with optional status filter (pending, in_progress, completed)
+3. **complete_task** - Mark a specific task as completed by title or ID
+4. **delete_task** - Remove a specific task permanently by title or ID
+5. **update_task** - Modify task details (title, description, priority, status)
+6. **bulk_complete** - Mark ALL pending or in-progress tasks as completed
+7. **bulk_delete** - Delete ALL completed tasks
+8. **clear_all** - Delete ALL tasks for the user (irreversible)
 
 ## Example Conversations
 
