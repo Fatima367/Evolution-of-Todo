@@ -17,27 +17,16 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For debugging production connectivity issues
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers with /api prefix as per spec
-# We also include them without /api as a fallback for the current HF configuration
-app.include_router(auth_router, prefix="/api")
-app.include_router(task_router, prefix="/api")
-app.include_router(chat_router, prefix="/api")
-
-# Fallback for direct calls if HF proxy is not handling /api
+# Include routers
 app.include_router(auth_router)
 app.include_router(task_router)
 app.include_router(chat_router)
-
-@app.get("/routes")
-async def list_routes():
-    """Diagnostic endpoint to see all registered routes"""
-    return [{"path": route.path, "name": route.name} for route in app.routes]
 
 
 @app.on_event("startup")
