@@ -117,6 +117,33 @@ The chat components are designed to work with the backend test suite:
 - [MCP Tools Documentation](../../../specs/003-todo-ai-chatbot/contracts/mcp-tools.yaml)
 - [Chat API Specification](../../../specs/003-todo-ai-chatbot/contracts/chat-api.yaml)
 
+## Production Deployment Notes
+
+### Fix for Blank Screen Issue
+
+The ChatKit component was showing a blank screen in production due to SSR/hydration mismatches. The issue was resolved by:
+
+1. Adding proper checks for `window` and `document` objects before accessing them
+2. Implementing a Next.js API route proxy at `/api/chatkit` to handle requests in production
+3. Using conditional logic to switch between direct backend calls (development) and API routes (production)
+
+### Environment Configuration
+
+For production deployment, ensure the following environment variables are set:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-domain.com
+NEXT_PUBLIC_BASE_URL=https://your-frontend-domain.com
+```
+
+### API Route Proxy
+
+The `/api/chatkit` route acts as a proxy between the frontend and backend services, handling:
+- Authentication token forwarding
+- Request/response transformation
+- CORS handling
+- Streaming response management
+
 ## Future Enhancements
 
 - Multi-layout support (fullpage, sidebar, popup-left)

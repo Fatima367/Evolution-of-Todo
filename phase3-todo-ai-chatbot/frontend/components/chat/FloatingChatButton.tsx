@@ -32,10 +32,12 @@ export function FloatingChatButton() {
 
   // Listen for task creation messages from ChatKit and trigger refresh
   useEffect(() => {
-    if (!isChatOpen) return
+    if (!isChatOpen || typeof window === 'undefined') return
 
     // Check for task-related messages in the chat
     const checkForTaskCreation = () => {
+      if (typeof document === 'undefined') return;
+
       const messages = document.querySelectorAll('.chatkit-wrapper [data-content-type="output_text"]')
       const currentCount = messages.length
 
@@ -70,13 +72,15 @@ export function FloatingChatButton() {
     const interval = setInterval(checkForTaskCreation, 500)
 
     // Also observe for DOM changes
-    const wrapper = document.querySelector('.chatkit-wrapper')
-    if (wrapper) {
-      const observer = new MutationObserver(checkForTaskCreation)
-      observer.observe(wrapper, { childList: true, subtree: true })
-      return () => {
-        observer.disconnect()
-        clearInterval(interval)
+    if (typeof document !== 'undefined') {
+      const wrapper = document.querySelector('.chatkit-wrapper')
+      if (wrapper) {
+        const observer = new MutationObserver(checkForTaskCreation)
+        observer.observe(wrapper, { childList: true, subtree: true })
+        return () => {
+          observer.disconnect()
+          clearInterval(interval)
+        }
       }
     }
 
@@ -86,7 +90,7 @@ export function FloatingChatButton() {
   // Handle SSR mounting
   useEffect(() => {
     setMounted(true)
-    if (user) {
+    if (user && typeof window !== 'undefined') {
       const savedThread = localStorage.getItem(`chatkit-thread-${user.id}`)
       setInitialThread(savedThread)
     }
@@ -95,11 +99,30 @@ export function FloatingChatButton() {
 
   const { control } = useChatKit({
     api: {
-      url: process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
-        : 'http://127.0.0.1:8000/chatkit',
+      url: typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+        ? '/api/chatkit'  // Use the Next.js API route in production
+        : (process.env.NEXT_PUBLIC_API_URL
+          ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
+          : 'http://127.0.0.1:8000/chatkit'),
       domainKey: 'localhost',
       fetch: async (input, init) => {
+        if (typeof window === 'undefined') {
+          // If running on server, return a basic fetch without auth
+          return fetch(input, init);
+        }
+
+        // For production, use the API route which handles auth internally
+        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+          const token = localStorage.getItem('auth_token')
+          const headers = {
+            ...init?.headers,
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          }
+          return fetch(input, { ...init, headers })
+        }
+
+        // For development, use the direct backend URL
         const token = localStorage.getItem('auth_token')
         const headers = {
           ...init?.headers,
@@ -122,7 +145,7 @@ export function FloatingChatButton() {
       placeholder: 'Ask me to manage your tasks...',
     },
     onThreadChange: ({ threadId }) => {
-      if (threadId && user) {
+      if (threadId && user && typeof window !== 'undefined') {
         localStorage.setItem(`chatkit-thread-${user.id}`, threadId)
       }
     },
@@ -141,9 +164,11 @@ export function FloatingChatButton() {
 
   // Apply custom send icon using DOM manipulation
   useEffect(() => {
-    if (!isChatOpen) return
+    if (!isChatOpen || typeof window === 'undefined') return
 
     const applyCustomIcon = () => {
+      if (typeof document === 'undefined') return;
+
       const wrapper = document.querySelector('.chatkit-wrapper')
       if (!wrapper) return
 
@@ -166,7 +191,7 @@ export function FloatingChatButton() {
             iconSpan.className = 'custom-send-icon';
             iconSpan.innerHTML = '<svg viewBox="0 0 576 512" style="display:block !important; width:18px !important; height:18px !important;"><path fill="currentColor" d="M482.3 192c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2L128 65.7c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l37.8 0c3.4 0 6.1 2.7 6.1 6.1c0 1.3-.4 2.5-1.1 3.4l-14.6 21.8c-1.4 2.1-1.4 4.7 0 6.8l14.6 21.8c.7.9 1.1 2.1 1.1 3.4c0 3.4-2.7 6.1-6.1 6.1l-37.8 0c-3.4 0-6.1-2.7-6.1-6.1c0-32.7-26.4-59.2-64-59.2L64 134c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l290.3 0c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2zM256 352c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96zm224 64H160c-17.7 0-32 14.3-32 32v48h64V448h128v48h64v-48c0-17.7-14.3-32-32-32z"/></svg>';
             iconSpan.style.cssText = 'display:flex !important; align-items:center !important; justify-content:center !important; width:100% !important; height:100% !important;';
-            
+
             button.style.cssText = 'position:relative !important; display:flex !important; align-items:center !important; justify-content:center !important;';
             button.appendChild(iconSpan);
           }
@@ -180,13 +205,15 @@ export function FloatingChatButton() {
     )
 
     // Watch for DOM changes
-    const observer = new MutationObserver(applyCustomIcon)
-    const wrapper = document.querySelector('.chatkit-wrapper')
-    if (wrapper) {
-      observer.observe(wrapper, {
-        childList: true,
-        subtree: true,
-      })
+    if (typeof document !== 'undefined') {
+      const observer = new MutationObserver(applyCustomIcon)
+      const wrapper = document.querySelector('.chatkit-wrapper')
+      if (wrapper) {
+        observer.observe(wrapper, {
+          childList: true,
+          subtree: true,
+        })
+      }
     }
 
     return () => {
@@ -196,7 +223,7 @@ export function FloatingChatButton() {
   }, [isChatOpen])
 
   // Check if user is logged in (has valid token) - only after mount
-  const hasToken = mounted && !!localStorage.getItem('auth_token')
+  const hasToken = mounted && typeof window !== 'undefined' && !!localStorage.getItem('auth_token')
 
   // Only show chat button for authenticated users (after mount to prevent hydration mismatch)
   if (!mounted || !user || !isReady || !hasToken) {
