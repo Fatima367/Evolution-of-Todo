@@ -1,7 +1,6 @@
 import { Task, TaskCreate, TaskUpdate, TasksResponse, User, UserCreate, UserLogin, TokenResponse, SortField, SortDirection } from './types';
 
-// Ensure no trailing slash in base URL
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 class ApiClient {
   private baseUrl: string;
@@ -22,31 +21,21 @@ class ApiClient {
       ...options.headers,
     };
 
-    // Ensure endpoint starts with /
-    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${this.baseUrl}${normalizedEndpoint}`;
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
-
-      if (!response.ok) {
-        console.error(`API Error: ${options.method || 'GET'} ${url} returned ${response.status}`);
-        const error = await response.json().catch(() => ({ detail: 'Request failed' }));
-        throw new Error(error.detail || `HTTP ${response.status}`);
-      }
-
-      if (response.status === 204) {
-        return null as T;
-      }
-
-      return response.json();
-    } catch (error) {
-      console.error(`Request Failed: ${options.method || 'GET'} ${url}`, error);
-      throw error;
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Request failed' }));
+      throw new Error(error.detail || `HTTP ${response.status}`);
     }
+
+    if (response.status === 204) {
+      return null as T;
+    }
+
+    return response.json();
   }
 
   // Auth endpoints
