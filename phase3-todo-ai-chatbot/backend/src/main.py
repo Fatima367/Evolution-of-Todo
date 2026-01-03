@@ -17,16 +17,16 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],  # For debugging production connectivity issues
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(auth_router)
-app.include_router(task_router)
-app.include_router(chat_router)
+# Include routers with /api prefix as per spec
+app.include_router(auth_router, prefix="/api")
+app.include_router(task_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
 
 
 @app.on_event("startup")

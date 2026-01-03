@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 60  # 1 hour as per spec (plan.md operational parameters)
 
     # CORS
-    cors_origins: List[str] = ["http://localhost:3000"]
+    cors_origins: List[str] = ["*"]
 
     # Application
     app_name: str = "Todo Web Application"
