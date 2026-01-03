@@ -83,6 +83,7 @@ export function FloatingChatButton() {
     return () => clearInterval(interval)
   }, [isChatOpen, lastMessageCount, triggerTaskRefresh])
 
+  // Handle SSR mounting
   useEffect(() => {
     setMounted(true)
     if (user) {
@@ -95,24 +96,16 @@ export function FloatingChatButton() {
   const { control } = useChatKit({
     api: {
       url: process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/chatkit`
+        ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
         : 'http://127.0.0.1:8000/chatkit',
-      domainKey: typeof window !== 'undefined' ? window.location.hostname : 'localhost',
+      domainKey: 'localhost',
       fetch: async (input, init) => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-        
-        // Merge headers properly
-        const headers = new Headers(init?.headers);
-        if (token) {
-          headers.set('Authorization', `Bearer ${token}`);
+        const token = localStorage.getItem('auth_token')
+        const headers = {
+          ...init?.headers,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
-                
-        try {
-          const response = await fetch(input, { ...init, headers });
-          return response;
-        } catch (err) {
-          throw err;
-        }
+        return fetch(input, { ...init, headers })
       },
     },
     initialThread: initialThread || undefined,
@@ -130,19 +123,13 @@ export function FloatingChatButton() {
     },
     onThreadChange: ({ threadId }) => {
       if (threadId && user) {
-        localStorage.setItem(`chatkit-thread-${user.id}`, threadId);
+        localStorage.setItem(`chatkit-thread-${user.id}`, threadId)
       }
     },
     onError: ({ error }) => {
-      console.error('❌ ChatKit Error State:', error);
+      console.error('ChatKit error:', error)
     },
   })
-
-  useEffect(() => {
-    if (isChatOpen) {
-      console.log('🟢 Chat Window Opened');
-    }
-  }, [isChatOpen, control])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
