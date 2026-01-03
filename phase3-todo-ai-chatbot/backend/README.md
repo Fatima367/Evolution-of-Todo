@@ -1,3 +1,13 @@
+---
+title: Todo AI Chatbot Backend
+emoji: 📝
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # Todo Web Application - Backend
 
 FastAPI backend for the Todo Full-Stack Web Application with user authentication and task management.
