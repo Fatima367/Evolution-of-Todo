@@ -96,8 +96,8 @@ export function FloatingChatButton() {
   const { control } = useChatKit({
     api: {
       url: process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/chatkit`
-        : 'http://127.0.0.1:8000/api/chatkit',
+        ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
+        : 'http://127.0.0.1:8000/chatkit',
       domainKey: 'localhost',
       fetch: async (input, init) => {
         const token = localStorage.getItem('auth_token')

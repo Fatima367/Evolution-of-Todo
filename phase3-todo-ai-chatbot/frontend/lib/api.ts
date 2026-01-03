@@ -40,25 +40,25 @@ class ApiClient {
 
   // Auth endpoints
   async register(data: UserCreate): Promise<TokenResponse> {
-    return this.request<TokenResponse>('/api/auth/register', {
+    return this.request<TokenResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   async login(credentials: UserLogin): Promise<TokenResponse> {
-    return this.request<TokenResponse>('/api/auth/login', {
+    return this.request<TokenResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
   }
 
   async logout(): Promise<void> {
-    return this.request<void>('/api/auth/logout', { method: 'POST' });
+    return this.request<void>('/auth/logout', { method: 'POST' });
   }
 
   async getCurrentUser(): Promise<User> {
-    return this.request<User>('/api/auth/me');
+    return this.request<User>('/auth/me');
   }
 
   // Task endpoints
@@ -78,29 +78,29 @@ class ApiClient {
     if (params?.limit) query.append('limit', params.limit.toString());
     if (params?.offset) query.append('offset', params.offset.toString());
 
-    return this.request<TasksResponse>(`/api/tasks/?${query}`);
+    return this.request<TasksResponse>(`/tasks/?${query}`);
   }
 
   async getTask(id: string): Promise<Task> {
-    return this.request<Task>(`/api/tasks/${id}`);
+    return this.request<Task>(`/tasks/${id}`);
   }
 
   async createTask(data: TaskCreate): Promise<Task> {
-    return this.request<Task>('/api/tasks/', {
+    return this.request<Task>('/tasks/', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   async updateTask(id: string, data: TaskUpdate): Promise<Task> {
-    return this.request<Task>(`/api/tasks/${id}`, {
+    return this.request<Task>(`/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
   async deleteTask(id: string): Promise<void> {
-    return this.request<void>(`/api/tasks/${id}`, { method: 'DELETE' });
+    return this.request<void>(`/tasks/${id}`, { method: 'DELETE' });
   }
 }
 
