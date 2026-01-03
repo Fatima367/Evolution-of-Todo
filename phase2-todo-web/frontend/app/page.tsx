@@ -586,7 +586,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl sm:text-5xl font-display font-extrabold text-center text-foreground dark:text-[#F7F6F7] tracking-tight mb-4"
           >
-            Why Choose TodoEvo
+            Why Choose TodoBoard
           </motion.h2>
 
           <motion.p

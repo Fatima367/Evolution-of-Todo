@@ -26,7 +26,7 @@ export function Navbar() {
               <div className="absolute inset-0 glow-primary blur-xl opacity-0 group-hover:opacity-100 transition-opacity dark:glow-[#5A7FC8]" />
             </div>
             <span className="text-xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent dark:from-[#6EB8E1] dark:via-[#48ADB7] dark:to-[#6EB8E1]">
-              TodoEvo
+              TodoBoard
             </span>
           </Link>
 

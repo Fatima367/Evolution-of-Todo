@@ -79,7 +79,7 @@ export function DashboardSidebar() {
             <Link href="/dashboard" className="flex items-center space-x-2">
               <CheckSquare className="h-8 w-8 text-[#6EB8E1]" />
               <span className="text-xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] bg-clip-text text-transparent">
-                TodoEvo
+                TodoBoard
               </span>
             </Link>
 

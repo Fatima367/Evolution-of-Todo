@@ -16,7 +16,7 @@ export function Footer() {
             <div className="flex items-center space-x-2">
               <CheckSquare className="h-8 w-8 text-primary dark:text-[#6EB8E1]" />
               <span className="text-xl font-display font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent dark:from-[#6EB8E1] dark:via-[#48ADB7] dark:to-[#6EB8E1]">
-                TodoEvo
+                TodoBoard
               </span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -189,7 +189,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            © {currentYear} TodoEvo. All rights reserved. Built with ❤️ for productivity.
+            © {currentYear} TodoBoard. All rights reserved. Built with ❤️ for productivity.
           </p>
         </div>
       </div>

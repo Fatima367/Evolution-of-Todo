@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Authentication - TodoEvo',
+  title: 'Authentication - TodoBoard',
   description: 'Login or create an account to manage your tasks',
 }
 

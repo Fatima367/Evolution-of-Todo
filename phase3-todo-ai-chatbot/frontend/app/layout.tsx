@@ -22,7 +22,7 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'TodoEvo - Evolve Your Workflow',
+  title: 'TodoBoard - Evolve Your Workflow',
   description: 'From simple lists to intelligent insights, the last todo app you\'ll ever need.',
 }
 

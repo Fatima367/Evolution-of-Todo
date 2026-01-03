@@ -574,6 +574,26 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-display font-extrabold text-center text-foreground dark:text-[#F7F6F7] tracking-tight mb-4"
+          >
+            Why Choose TodoBoard
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-center mb-16"
+          >
+            Experience the difference with our powerful platform
+          </motion.p>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
