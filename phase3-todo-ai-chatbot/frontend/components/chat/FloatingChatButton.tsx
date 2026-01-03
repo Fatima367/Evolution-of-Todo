@@ -72,19 +72,21 @@ export function FloatingChatButton() {
     const interval = setInterval(checkForTaskCreation, 500)
 
     // Also observe for DOM changes
+    let observer: MutationObserver | null = null;
     if (typeof document !== 'undefined') {
       const wrapper = document.querySelector('.chatkit-wrapper')
       if (wrapper) {
-        const observer = new MutationObserver(checkForTaskCreation)
+        observer = new MutationObserver(checkForTaskCreation)
         observer.observe(wrapper, { childList: true, subtree: true })
-        return () => {
-          observer.disconnect()
-          clearInterval(interval)
-        }
       }
     }
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      if (observer) {
+        observer.disconnect()
+      }
+    }
   }, [isChatOpen, lastMessageCount, triggerTaskRefresh])
 
   // Handle SSR mounting
@@ -205,10 +207,11 @@ export function FloatingChatButton() {
     )
 
     // Watch for DOM changes
+    let observer: MutationObserver | null = null;
     if (typeof document !== 'undefined') {
-      const observer = new MutationObserver(applyCustomIcon)
       const wrapper = document.querySelector('.chatkit-wrapper')
       if (wrapper) {
+        observer = new MutationObserver(applyCustomIcon)
         observer.observe(wrapper, {
           childList: true,
           subtree: true,
@@ -218,7 +221,9 @@ export function FloatingChatButton() {
 
     return () => {
       timeouts.forEach(clearTimeout)
-      observer.disconnect()
+      if (observer) {
+        observer.disconnect()
+      }
     }
   }, [isChatOpen])
 
