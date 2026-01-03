@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
+from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 from src.models.task import TaskStatus, TaskPriority
 
@@ -29,9 +30,17 @@ class TaskCreate(BaseModel):
     @field_validator('due_date')
     @classmethod
     def validate_due_date(cls, v: Optional[datetime]) -> Optional[datetime]:
-        """Validate due date is in the future"""
-        if v is not None and v < datetime.utcnow():
-            raise ValueError('Due date must be in the future')
+        """Validate due date is reasonable (not too far in the past)
+
+        Allow dates from yesterday onwards to be flexible with time zones and user intent.
+        Users might set a due date for "today" which could be in the past due to time zones.
+        """
+        if v is not None:
+            # Only reject dates more than 24 hours in the past
+            from datetime import timedelta
+            yesterday = datetime.utcnow() - timedelta(days=1)
+            if v < yesterday:
+                raise ValueError('Due date cannot be more than 24 hours in the past')
         return v
 
 
@@ -78,3 +87,19 @@ class TaskListResponse(BaseModel):
     """Schema for task list response with pagination"""
     tasks: List[TaskRead]
     total: int
+
+
+# Sort field options for task sorting
+class SortField(str, Enum):
+    """Valid fields to sort tasks by"""
+    CREATED_AT = "created_at"
+    DUE_DATE = "due_date"
+    PRIORITY = "priority"
+    TITLE = "title"
+
+
+# Sort direction options
+class SortOrder(str, Enum):
+    """Sort direction options"""
+    ASC = "asc"
+    DESC = "desc"

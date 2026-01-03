@@ -141,6 +141,18 @@ export function DashboardSidebar() {
           <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         )}
       </button>
+
+      {/* Mobile Toggle Button - appears when sidebar is closed on small screens */}
+      {!isSidebarOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white/90 dark:bg-[#1A1A3A] border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      )}
     </>
   )
 }

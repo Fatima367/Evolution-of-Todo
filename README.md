@@ -1,3 +1,13 @@
+---
+title: Evolution of Todo
+emoji: 🚀
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # The Evolution of Todo Project
 
 This project, "The Evolution of Todo," is designed to foster mastery in Spec-Driven Development and Cloud-Native AI by iteratively building a Todo application. Starting from a simple in-memory console application, the project evolves into a sophisticated, cloud-native AI chatbot deployed on Kubernetes.

@@ -50,25 +50,25 @@ const features = [
     icon: Target,
     title: "Smart Prioritization",
     description: "AI-powered task prioritization helps you focus on what matters most.",
-    gradient: "gradients.blue",
+    gradient: gradients.blue,
   },
   {
     icon: Zap,
     title: "Lightning Fast",
     description: "Blazing fast performance with instant updates and real-time sync.",
-    gradient: "gradients.teal",
+    gradient: gradients.teal,
   },
   {
     icon: BarChart3,
     title: "Insightful Analytics",
     description: "Track your productivity with beautiful charts and actionable insights.",
-    gradient: "gradients.purple",
+    gradient: gradients.purple,
   },
   {
     icon: CheckCircle2,
     title: "Never Miss a Beat",
     description: "Smart reminders and recurring tasks keep you on track effortlessly.",
-    gradient: "gradients.blue",
+    gradient: gradients.blue,
   },
 ];
 
@@ -78,28 +78,28 @@ const howItWorks = [
     title: "Create Your Tasks",
     description: "Quickly add tasks with priorities, due dates, and tags in seconds.",
     icon: Layers,
-    gradient: "gradients.blue",
+    gradient: gradients.blue,
   },
   {
     step: "02",
     title: "Organize & Prioritize",
     description: "Let our smart system help you organize and prioritize your workload.",
     icon: Target,
-    gradient: "gradients.purple",
+    gradient: gradients.purple,
   },
   {
     step: "03",
     title: "Track Progress",
     description: "Monitor your productivity with real-time analytics and insights.",
     icon: TrendingUp,
-    gradient: "gradients.teal",
+    gradient: gradients.teal,
   },
   {
     step: "04",
     title: "Achieve Your Goals",
     description: "Complete tasks efficiently and celebrate your accomplishments.",
     icon: CheckCircle2,
-    gradient: "gradients.purple",
+    gradient: gradients.purple,
   },
 ];
 
@@ -108,25 +108,25 @@ const benefits = [
     icon: Clock,
     title: "Save Time",
     description: "Reduce planning time by 50% with intelligent automation",
-    gradient: "gradients.blue",
+    gradient: gradients.blue,
   },
   {
     icon: Shield,
     title: "Stay Secure",
     description: "Enterprise-grade security keeps your data safe and private",
-    gradient: "gradients.purple",
+    gradient: gradients.purple,
   },
   {
     icon: Users,
     title: "Collaborate",
     description: "Work together seamlessly with your team in real-time",
-    gradient: "gradients.teal",
+    gradient: gradients.teal,
   },
   {
     icon: Bell,
     title: "Never Forget",
     description: "Smart notifications ensure you never miss important deadlines",
-    gradient: "gradients.peach",
+    gradient: gradients.peach,
   },
 ];
 
@@ -431,7 +431,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
-              const gradient = eval(feature.gradient) as { from: string; to: string; accent: string };
+              const gradient = feature.gradient;
 
               return (
                 <GradientCard key={index} gradient={gradient} className="h-full">
@@ -507,7 +507,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {howItWorks.map((item, index) => {
               const Icon = item.icon;
-              const gradient = eval(item.gradient) as { from: string; to: string; accent: string };
+              const gradient = item.gradient;
 
               return (
                 <div key={index} className="relative">
@@ -602,7 +602,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
-              const gradient = eval(benefit.gradient) as { from: string; to: string; accent: string };
+              const gradient = benefit.gradient;
 
               return (
                 <GradientCard key={index} gradient={gradient} className="h-full">

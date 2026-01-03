@@ -1,3 +1,13 @@
+---
+title: Todo AI Chatbot Backend
+emoji: 📝
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # Todo Web Application - Backend
 
 FastAPI backend for the Todo Full-Stack Web Application with user authentication and task management.
@@ -112,6 +122,25 @@ Note: Ensure all Python packages and tools (like uvicorn, pytest, etc.) are inst
 - `DELETE /tasks/{id}` - Delete task
 
 All task endpoints require JWT authentication.
+
+### ChatKit AI (Protected)
+- `POST /chatkit` - Chat Interface Endpoint (supports streaming)
+- `GET /chatkit/health` - Health check for ChatKit server
+
+The AI Assistant can manage your tasks through natural language, including creating, listing, updating, completing, and deleting tasks. It also supports bulk operations and referring to tasks by name.
+
+## MCP Tools (AI Assistant)
+
+The AI Assistant uses Model Context Protocol (MCP) tools to interact with the task database:
+
+- `add_task(title, description, priority)`: Create a new task.
+- `list_tasks(status)`: List tasks with optional status filter. Supports searching by title.
+- `complete_task(task_id)`: Mark a task as completed (accepts UUIDs or Titles).
+- `delete_task(task_id)`: Delete a task (accepts UUIDs or Titles).
+- `update_task(task_id, ...)`: Update task properties (accepts UUIDs or Titles).
+- `bulk_complete()`: Mark all tasks as completed.
+- `bulk_delete()`: Delete all completed tasks.
+- `clear_all()`: Delete all tasks (requires confirmation).
 
 ## Testing
 

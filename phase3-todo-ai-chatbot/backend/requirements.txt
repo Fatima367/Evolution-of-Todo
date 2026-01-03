@@ -9,7 +9,8 @@ alembic==1.13.3
 
 # Authentication
 python-jose[cryptography]==3.3.0
-bcrypt==4.2.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 python-multipart==0.0.17
 
 # Validation and Data Handling
@@ -19,6 +20,7 @@ email-validator==2.2.0
 
 # Environment
 python-dotenv==1.0.1
+python-dateutil==2.9.0 # Added for natural language date parsing
 
 # Testing
 pytest==8.3.4
