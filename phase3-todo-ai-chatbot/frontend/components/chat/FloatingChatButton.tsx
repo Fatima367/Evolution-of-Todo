@@ -83,7 +83,6 @@ export function FloatingChatButton() {
     return () => clearInterval(interval)
   }, [isChatOpen, lastMessageCount, triggerTaskRefresh])
 
-  // Handle SSR mounting
   useEffect(() => {
     setMounted(true)
     if (user) {
@@ -96,16 +95,24 @@ export function FloatingChatButton() {
   const { control } = useChatKit({
     api: {
       url: process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
+        ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/chatkit`
         : 'http://127.0.0.1:8000/chatkit',
-      domainKey: 'localhost',
+      domainKey: typeof window !== 'undefined' ? window.location.hostname : 'localhost',
       fetch: async (input, init) => {
-        const token = localStorage.getItem('auth_token')
-        const headers = {
-          ...init?.headers,
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+        
+        // Merge headers properly
+        const headers = new Headers(init?.headers);
+        if (token) {
+          headers.set('Authorization', `Bearer ${token}`);
         }
-        return fetch(input, { ...init, headers })
+                
+        try {
+          const response = await fetch(input, { ...init, headers });
+          return response;
+        } catch (err) {
+          throw err;
+        }
       },
     },
     initialThread: initialThread || undefined,
@@ -123,13 +130,19 @@ export function FloatingChatButton() {
     },
     onThreadChange: ({ threadId }) => {
       if (threadId && user) {
-        localStorage.setItem(`chatkit-thread-${user.id}`, threadId)
+        localStorage.setItem(`chatkit-thread-${user.id}`, threadId);
       }
     },
     onError: ({ error }) => {
-      console.error('ChatKit error:', error)
+      console.error('❌ ChatKit Error State:', error);
     },
   })
+
+  useEffect(() => {
+    if (isChatOpen) {
+      console.log('🟢 Chat Window Opened');
+    }
+  }, [isChatOpen, control])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -200,11 +213,9 @@ export function FloatingChatButton() {
 
   // Only show chat button for authenticated users (after mount to prevent hydration mismatch)
   if (!mounted || !user || !isReady || !hasToken) {
-    console.log('🔒 Chat hidden - mounted:', mounted, 'user:', !!user, 'isReady:', isReady, 'hasToken:', hasToken)
     return null
   }
 
-  console.log('✅ Chat visible - user logged in')
 
   return (
     <>
