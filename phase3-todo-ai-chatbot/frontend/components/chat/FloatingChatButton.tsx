@@ -21,9 +21,8 @@ export function FloatingChatButton() {
   const theme = useUIStore((state) => state.theme)
   const triggerTaskRefresh = useUIStore((state) => state.triggerTaskRefresh)
   const [isChatOpen, setIsChatOpen] = useState(false)
-  const [initialThread, setInitialThread] = useState<string | null>(null)
-  const [isReady, setIsReady] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [threadId, setThreadId] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   const [lastMessageCount, setLastMessageCount] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -89,14 +88,15 @@ export function FloatingChatButton() {
     }
   }, [isChatOpen, lastMessageCount, triggerTaskRefresh])
 
-  // Handle SSR mounting
+  // Handle SSR mounting and load initial thread
   useEffect(() => {
-    setMounted(true)
+    setIsMounted(true)
     if (user && typeof window !== 'undefined') {
       const savedThread = localStorage.getItem(`chatkit-thread-${user.id}`)
-      setInitialThread(savedThread)
+      if (savedThread) {
+        setThreadId(savedThread)
+      }
     }
-    setIsReady(true)
   }, [user])
 
   const { control } = useChatKit({
@@ -127,7 +127,7 @@ export function FloatingChatButton() {
         return fetch(input, { ...init, headers })
       },
     },
-    initialThread: initialThread || undefined,
+    initialThread: threadId || undefined,
     theme: getChatKitTheme(isDark),
     startScreen: {
       greeting: 'Welcome! I can help you manage your tasks.',
@@ -140,9 +140,10 @@ export function FloatingChatButton() {
     composer: {
       placeholder: 'Ask me to manage your tasks...',
     },
-    onThreadChange: ({ threadId }) => {
-      if (threadId && user && typeof window !== 'undefined') {
-        localStorage.setItem(`chatkit-thread-${user.id}`, threadId)
+    onThreadChange: ({ threadId: newThreadId }) => {
+      setThreadId(newThreadId)
+      if (newThreadId && user && typeof window !== 'undefined') {
+        localStorage.setItem(`chatkit-thread-${user.id}`, newThreadId)
       }
     },
     onError: ({ error }) => {
@@ -222,11 +223,11 @@ export function FloatingChatButton() {
   }, [isChatOpen])
 
   // Check if user is logged in (has valid token) - only after mount
-  const hasToken = mounted && typeof window !== 'undefined' && !!localStorage.getItem('auth_token')
+  const hasToken = isMounted && typeof window !== 'undefined' && !!localStorage.getItem('auth_token')
 
   // Only show chat button for authenticated users (after mount to prevent hydration mismatch)
-  // We check 'mounted' first to ensure it only renders on client
-  if (!mounted || !user || !isReady || !hasToken) {
+  // We check 'isMounted' first to ensure it only renders on client
+  if (!isMounted || !user || !hasToken) {
     return null
   }
 
