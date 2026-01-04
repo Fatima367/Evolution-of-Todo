@@ -7,6 +7,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useUIStore();
 
   useEffect(() => {
+    // Only run on client
+    if (typeof window === 'undefined') return;
+
     // Get saved theme from localStorage or use system preference
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -24,8 +27,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [setTheme]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     // Update HTML class and localStorage when theme changes
     const root = document.documentElement;
+    if (!root) return;
 
     if (theme === 'dark') {
       root.classList.add('dark');

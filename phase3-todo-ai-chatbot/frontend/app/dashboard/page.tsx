@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { useTasks } from '@/hooks/useTasks'
@@ -66,12 +67,23 @@ const filterTasksByDateRange = (
 export default function DashboardPage() {
   const { user } = useAuth()
   const { tasks, loading } = useTasks()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Calculate week-over-week stats
   const currentWeek = getCurrentWeekRange()
   const previousWeek = getPreviousWeekRange()
 
-  // Current week stats
+  // All-time stats (Main values)
+  const allTimeTotal = tasks.length
+  const allTimePending = tasks.filter(task => task.status === 'pending').length
+  const allTimeCompleted = tasks.filter(task => task.status === 'completed').length
+  const allTimeHighPriority = tasks.filter(task => task.priority === 'high' || task.priority === 'urgent').length
+
+  // Current week stats (for percentage calculation)
   const currentTotal = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end).length
   const currentPending = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end, task => task.status === 'pending').length
   const currentCompleted = filterTasksByDateRange(tasks, currentWeek.start, currentWeek.end, task => task.status === 'completed').length
@@ -83,7 +95,7 @@ export default function DashboardPage() {
   const previousCompleted = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end, task => task.status === 'completed').length
   const previousHighPriority = filterTasksByDateRange(tasks, previousWeek.start, previousWeek.end, task => task.priority === 'high' || task.priority === 'urgent').length
 
-  // Calculate percentage changes
+  // Calculate percentage changes (Current vs Previous)
   const totalChange = calculatePercentageChange(currentTotal, previousTotal)
   const pendingChange = calculatePercentageChange(currentPending, previousPending)
   const completedChange = calculatePercentageChange(currentCompleted, previousCompleted)
@@ -93,35 +105,35 @@ export default function DashboardPage() {
   const statConfigs = [
     {
       name: 'Total Tasks',
-      value: currentTotal,
+      value: allTimeTotal,
       change: totalChange,
       icon: CheckCircle,
       color: 'blue',
     },
     {
       name: 'Pending',
-      value: currentPending,
+      value: allTimePending,
       change: pendingChange,
       icon: Clock,
       color: 'yellow',
     },
     {
       name: 'Completed',
-      value: currentCompleted,
+      value: allTimeCompleted,
       change: completedChange,
       icon: TrendingUp,
       color: 'green',
     },
     {
       name: 'High Priority',
-      value: currentHighPriority,
+      value: allTimeHighPriority,
       change: highPriorityChange,
       icon: AlertCircle,
       color: 'red',
     },
   ]
 
-  if (loading) {
+  if (!isMounted || loading) {
     return (
       <div className="space-y-8">
         {/* Welcome Section */}

@@ -62,7 +62,7 @@ export const useUIStore = create<UIState>((set) => ({
   isDeleteConfirmModalOpen: false,
   deletingTaskId: null,
   deletingTaskTitle: null,
-  theme: getInitialTheme(),
+  theme: 'light', // Default to light for SSR
   taskRefreshTrigger: 0,
 
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),

@@ -101,7 +101,8 @@ export function FloatingChatButton() {
 
   const { control } = useChatKit({
     api: {
-      url: typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+      url: typeof window !== 'undefined' &&
+           (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
         ? '/api/chatkit'  // Use the Next.js API route in production
         : (process.env.NEXT_PUBLIC_API_URL
           ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
@@ -109,27 +110,20 @@ export function FloatingChatButton() {
       domainKey: 'localhost',
       fetch: async (input, init) => {
         if (typeof window === 'undefined') {
-          // If running on server, return a basic fetch without auth
           return fetch(input, init);
         }
 
-        // For production, use the API route which handles auth internally
-        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-          const token = localStorage.getItem('auth_token')
-          const headers = {
-            ...init?.headers,
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          }
-          return fetch(input, { ...init, headers })
-        }
-
-        // For development, use the direct backend URL
         const token = localStorage.getItem('auth_token')
-        const headers = {
-          ...init?.headers,
+        const headers: Record<string, string> = {
+          ...(init?.headers as Record<string, string>),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
+
+        // Logic for setting Content-Type
+        if (!headers['Content-Type'] && !(init?.body instanceof FormData)) {
+          headers['Content-Type'] = 'application/json';
+        }
+
         return fetch(input, { ...init, headers })
       },
     },
@@ -231,6 +225,7 @@ export function FloatingChatButton() {
   const hasToken = mounted && typeof window !== 'undefined' && !!localStorage.getItem('auth_token')
 
   // Only show chat button for authenticated users (after mount to prevent hydration mismatch)
+  // We check 'mounted' first to ensure it only renders on client
   if (!mounted || !user || !isReady || !hasToken) {
     return null
   }
