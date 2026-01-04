@@ -107,7 +107,7 @@ export function FloatingChatButton() {
         : (process.env.NEXT_PUBLIC_API_URL
           ? `${process.env.NEXT_PUBLIC_API_URL}/chatkit`
           : 'http://127.0.0.1:8000/chatkit'),
-      domainKey: 'localhost',
+      domainKey: process.env.NEXT_PUBLIC_CHATKIT_DOMAIN_KEY || 'localhost',
       fetch: async (input, init) => {
         if (typeof window === 'undefined') {
           return fetch(input, init);
