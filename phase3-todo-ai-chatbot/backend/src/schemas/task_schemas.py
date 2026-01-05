@@ -4,7 +4,7 @@ from typing import Optional, List
 from uuid import UUID
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
-from src.models.task import TaskStatus, TaskPriority
+from src.models.task import TaskStatus, TaskPriority, RecurringType
 
 
 class TaskCreate(BaseModel):
@@ -14,6 +14,8 @@ class TaskCreate(BaseModel):
     priority: TaskPriority = Field(TaskPriority.MEDIUM, description="Task priority level")
     due_date: Optional[datetime] = Field(None, description="Optional deadline")
     tags: Optional[List[str]] = Field(None, max_length=10, description="Array of tags")
+    is_favorite: bool = Field(False, description="Whether task is favorited")
+    recurring_type: RecurringType = Field(RecurringType.NONE, description="Recurring frequency")
 
     @field_validator('tags')
     @classmethod
@@ -52,6 +54,8 @@ class TaskUpdate(BaseModel):
     priority: Optional[TaskPriority] = None
     due_date: Optional[datetime] = None
     tags: Optional[List[str]] = Field(None, max_length=10)
+    is_favorite: Optional[bool] = None
+    recurring_type: Optional[RecurringType] = None
 
     @field_validator('tags')
     @classmethod
@@ -75,6 +79,8 @@ class TaskRead(BaseModel):
     priority: TaskPriority
     due_date: Optional[datetime]
     tags: Optional[List[str]]
+    is_favorite: bool
+    recurring_type: RecurringType
     user_id: UUID
     created_at: datetime
     updated_at: datetime
