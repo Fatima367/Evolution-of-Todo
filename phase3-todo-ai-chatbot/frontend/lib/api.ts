@@ -65,6 +65,7 @@ class ApiClient {
   async getTasks(params?: {
     status?: string;
     priority?: string;
+    is_favorite?: boolean;
     sort_by?: SortField;
     sort_order?: SortDirection;
     limit?: number;
@@ -73,6 +74,7 @@ class ApiClient {
     const query = new URLSearchParams();
     if (params?.status) query.append('status', params.status);
     if (params?.priority) query.append('priority', params.priority);
+    if (params?.is_favorite !== undefined) query.append('is_favorite', params.is_favorite.toString());
     if (params?.sort_by) query.append('sort_by', params.sort_by);
     if (params?.sort_order) query.append('sort_order', params.sort_order);
     if (params?.limit) query.append('limit', params.limit.toString());
@@ -96,6 +98,12 @@ class ApiClient {
     return this.request<Task>(`/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    });
+  }
+
+  async toggleFavorite(id: string): Promise<Task> {
+    return this.request<Task>(`/tasks/${id}/favorite`, {
+      method: 'PATCH',
     });
   }
 

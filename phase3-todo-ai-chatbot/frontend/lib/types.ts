@@ -1,5 +1,6 @@
 export type TaskStatus = "pending" | "in_progress" | "completed";
 export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type RecurringType = "none" | "daily" | "weekly" | "monthly" | "yearly";
 
 // Sort field options for tasks
 export type SortField = "created_at" | "due_date" | "priority" | "title";
@@ -38,6 +39,8 @@ export interface Task {
   priority: TaskPriority;
   due_date: string | null;
   tags: string[] | null;
+  is_favorite: boolean;
+  recurring_type: RecurringType;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -50,6 +53,8 @@ export interface TaskCreate {
   priority?: TaskPriority;
   due_date?: string;
   tags?: string[];
+  is_favorite?: boolean;
+  recurring_type?: RecurringType;
 }
 
 export interface TaskUpdate {
@@ -59,6 +64,8 @@ export interface TaskUpdate {
   priority?: TaskPriority;
   due_date?: string;
   tags?: string[];
+  is_favorite?: boolean;
+  recurring_type?: RecurringType;
 }
 
 export interface UserCreate {

@@ -35,5 +35,5 @@ ruff==0.8.4
 mypy==1.13.0
 
 # OpenAI SDKs
-openai-chatkit==1.4.0
-openai-agents[litellm]==0.6.2
+openai-chatkit<=1.4.0
+openai-agents[litellm]<=0.6.2

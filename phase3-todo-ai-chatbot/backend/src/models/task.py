@@ -24,6 +24,15 @@ class TaskPriority(str, Enum):
     URGENT = "urgent"
 
 
+class RecurringType(str, Enum):
+    """Recurring task type enumeration"""
+    NONE = "none"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
+
 class Task(SQLModel, table=True):
     """Task entity representing a user's todo item
 
@@ -35,6 +44,8 @@ class Task(SQLModel, table=True):
         priority: Task priority (low, medium, high, urgent)
         due_date: Optional deadline for the task
         tags: Array of tags (max 10 tags, each max 50 characters)
+        is_favorite: Whether the task is starred/favorited
+        recurring_type: How often the task repeats (none, daily, weekly, monthly, yearly)
         user_id: Foreign key to owning user
         created_at: Timestamp when task was created
         updated_at: Timestamp when task was last updated
@@ -51,6 +62,8 @@ class Task(SQLModel, table=True):
     priority: TaskPriority = Field(default=TaskPriority.MEDIUM, nullable=False, index=True)
     due_date: Optional[datetime] = Field(default=None, index=True)
     tags: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
+    is_favorite: bool = Field(default=False, nullable=False, index=True)
+    recurring_type: RecurringType = Field(default=RecurringType.NONE, nullable=False, index=True)
     user_id: UUID = Field(foreign_key="users.id", nullable=False, index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
