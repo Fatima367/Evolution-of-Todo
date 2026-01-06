@@ -27,8 +27,51 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Request failed' }));
-      throw new Error(error.detail || `HTTP ${response.status}`);
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        // Handle different possible error response formats
+        if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        } else if (errorData?.detail) {
+          if (Array.isArray(errorData.detail)) {
+            errorMessage = errorData.detail.map(err => {
+              const field = err.loc && err.loc.length > 1 ? String(err.loc[1]).replace(/_/g, ' ') : 'field';
+              return `${field.charAt(0).toUpperCase() + field.slice(1)}: ${err.msg}`;
+            }).join('; ');
+          } else {
+            errorMessage = String(errorData.detail);
+          }
+        } else if (errorData?.message) {
+          errorMessage = String(errorData.message);
+        } else if (errorData?.error) {
+          errorMessage = String(errorData.error);
+        } else if (typeof errorData === 'object') {
+          // Extract the most relevant field from the error object
+          const possibleFields = ['detail', 'message', 'error', 'msg', 'reason'];
+          for (const field of possibleFields) {
+            if (errorData[field]) {
+              errorMessage = String(errorData[field]);
+              break;
+            }
+          }
+          // If no known field found, try to create a readable string
+          if (errorMessage === `HTTP ${response.status}`) {
+            errorMessage = Object.entries(errorData)
+              .filter(([_, value]) => value != null && typeof value !== 'object' && typeof value !== 'function')
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(', ');
+
+            if (!errorMessage) {
+              errorMessage = JSON.stringify(errorData, null, 2);
+            }
+          }
+        }
+      } catch (jsonError) {
+        // If parsing JSON fails, use status text or default message
+        errorMessage = response.statusText || 'Request failed';
+      }
+      throw new Error(errorMessage);
     }
 
     if (response.status === 204) {
@@ -59,6 +102,37 @@ class ApiClient {
 
   async getCurrentUser(): Promise<User> {
     return this.request<User>('/auth/me');
+  }
+
+  async updateCurrentUser(data: {
+    name?: string;
+    email_notifications?: boolean;
+    task_reminders?: boolean;
+    weekly_summary?: boolean;
+  }): Promise<User> {
+    return this.request<User>('/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    return this.request<void>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword
+      }),
+    });
+  }
+
+  async deleteAccount(password: string): Promise<void> {
+    return this.request<void>('/auth/me', {
+      method: 'DELETE',
+      body: JSON.stringify({
+        password: password
+      }),
+    });
   }
 
   // Task endpoints

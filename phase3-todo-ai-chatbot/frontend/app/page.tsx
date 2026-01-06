@@ -117,9 +117,9 @@ const benefits = [
     gradient: gradients.purple,
   },
   {
-    icon: Users,
-    title: "Collaborate",
-    description: "Work together seamlessly with your team in real-time",
+    icon: Zap,
+    title: "Boost Productivity",
+    description: "AI-powered insights help you accomplish more in less time",
     gradient: gradients.teal,
   },
   {
@@ -523,17 +523,27 @@ export default function LandingPage() {
                         {item.step}
                       </div>
 
-                      {/* Icon */}
-                      <motion.div
-                        whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                        transition={{ duration: 0.5 }}
-                        className="inline-flex p-4 rounded-2xl shadow-lg ml-8"
-                        style={{
-                          background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
-                        }}
-                      >
-                        <Icon className="h-6 w-6 text-white" />
-                      </motion.div>
+                      {/* Modern icon with refined styling */}
+                      <div className="relative ml-8">
+                        <div
+                          className="inline-flex items-center justify-center p-4 rounded-2xl bg-white dark:bg-[#0E0E34] relative z-10"
+                          style={{
+                            boxShadow: `0 4px 6px -1px ${gradient.from}20, 0 2px 4px -1px ${gradient.to}10`,
+                          }}
+                        >
+                          <Icon
+                            className="h-6 w-6 relative z-10"
+                            style={{ color: gradient.from }}
+                          />
+                        </div>
+                        {/* Subtle gradient background */}
+                        <div
+                          className="absolute inset-0 rounded-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-300 -z-10"
+                          style={{
+                            background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`,
+                          }}
+                        />
+                      </div>
 
                       <div className="space-y-3 ml-8">
                         <h3 className="text-base font-display font-bold text-foreground dark:text-[#F7F6F7] tracking-tight">
