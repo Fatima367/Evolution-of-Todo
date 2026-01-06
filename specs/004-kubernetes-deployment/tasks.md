@@ -19,10 +19,10 @@
 
 **Purpose**: Create the Kubernetes directory structure and Helm chart scaffolding
 
-- [ ] T001 Create k8s/charts/todoboard/ directory structure
-- [ ] T002 [P] Create Chart.yaml with todoboard chart metadata in k8s/charts/todoboard/Chart.yaml
-- [ ] T003 [P] Create _helpers.tpl template functions in k8s/charts/todoboard/templates/_helpers.tpl
-- [ ] T004 Create NOTES.txt with Helm install instructions in k8s/charts/todoboard/templates/NOTES.txt
+- [X] T001 Create k8s/charts/todoboard/ directory structure
+- [X] T002 [P] Create Chart.yaml with todoboard chart metadata in k8s/charts/todoboard/Chart.yaml
+- [X] T003 [P] Create _helpers.tpl template functions in k8s/charts/todoboard/templates/_helpers.tpl
+- [X] T004 Create NOTES.txt with Helm install instructions in k8s/charts/todoboard/templates/NOTES.txt
 
 ---
 
@@ -32,9 +32,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Create configmap.yaml template in k8s/charts/todoboard/templates/configmap.yaml
-- [ ] T006 [P] Create secret.yaml template in k8s/charts/todoboard/templates/secret.yaml
-- [ ] T007 [P] Create pvc.yaml template for PostgreSQL data in k8s/charts/todoboard/templates/pvc.yaml
+- [X] T005 [P] Create configmap.yaml template in k8s/charts/todoboard/templates/configmap.yaml
+- [X] T006 [P] Create secret.yaml template in k8s/charts/todoboard/templates/secret.yaml
+- [X] T007 [P] Create pvc.yaml template for PostgreSQL data in k8s/charts/todoboard/templates/pvc.yaml
 
 **Checkpoint**: Foundational resources ready - Helm chart development can now begin
 
@@ -48,11 +48,11 @@
 
 **Note**: Phase III Dockerfiles should already exist at phase3-todo-ai-chatbot/frontend/Dockerfile and phase3-todo-ai-chatbot/backend/Dockerfile
 
-- [ ] T008 [US1] Verify frontend Dockerfile exists at phase3-todo-ai-chatbot/frontend/Dockerfile
-- [ ] T009 [US1] Verify backend Dockerfile exists at phase3-todo-ai-chatbot/backend/Dockerfile
-- [ ] T010 [US1] Build frontend Docker image with todoboard-frontend:latest tag
-- [ ] T011 [US1] Build backend Docker image with todoboard-backend:latest tag
-- [ ] T012 [US1] Verify both images appear in docker images output
+- [X] T008 [US1] Verify frontend Dockerfile exists at phase3-todo-ai-chatbot/frontend/Dockerfile
+- [X] T009 [US1] Verify backend Dockerfile exists at phase3-todo-ai-chatbot/backend/Dockerfile
+- [X] T010 [US1] Build frontend Docker image with todoboard-frontend:latest tag
+- [X] T011 [US1] Build backend Docker image with todoboard-backend:latest tag
+- [X] T012 [US1] Verify both images appear in docker images output
 
 **Checkpoint**: User Story 1 complete - Docker images built successfully
 
@@ -66,28 +66,28 @@
 
 ### Frontend Templates
 
-- [ ] T013 [P] [US2] Create deployment-frontend.yaml template in k8s/charts/todoboard/templates/deployment-frontend.yaml
-- [ ] T014 [P] [US2] Create service-frontend.yaml template with LoadBalancer type in k8s/charts/todoboard/templates/service-frontend.yaml
+- [X] T013 [P] [US2] Create deployment-frontend.yaml template in k8s/charts/todoboard/templates/deployment-frontend.yaml
+- [X] T014 [P] [US2] Create service-frontend.yaml template with LoadBalancer type in k8s/charts/todoboard/templates/service-frontend.yaml
 
 ### Backend Templates
 
-- [ ] T015 [P] [US2] Create deployment-backend.yaml template in k8s/charts/todoboard/templates/deployment-backend.yaml
-- [ ] T016 [P] [US2] Create service-backend.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-backend.yaml
+- [X] T015 [P] [US2] Create deployment-backend.yaml template in k8s/charts/todoboard/templates/deployment-backend.yaml
+- [X] T016 [P] [US2] Create service-backend.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-backend.yaml
 
 ### PostgreSQL Templates
 
-- [ ] T017 [P] [US2] Create deployment-postgres.yaml template in k8s/charts/todoboard/templates/deployment-postgres.yaml
-- [ ] T018 [US2] Create service-postgres.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-postgres.yaml
+- [X] T017 [P] [US2] Create deployment-postgres.yaml template in k8s/charts/todoboard/templates/deployment-postgres.yaml
+- [X] T018 [US2] Create service-postgres.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-postgres.yaml
 
 ### Values Configuration
 
-- [ ] T019 [US2] Create values.yaml with default configurations in k8s/charts/todoboard/values.yaml
-- [ ] T020 [US2] Create values-minikube.yaml with Minikube-specific overrides in k8s/charts/todoboard/values-minikube.yaml
+- [X] T019 [US2] Create values.yaml with default configurations in k8s/charts/todoboard/values.yaml
+- [X] T020 [US2] Create values-minikube.yaml with Minikube-specific overrides in k8s/charts/todoboard/values-minikube.yaml
 
 ### Validation
 
-- [ ] T021 [US2] Run helm template ./k8s/charts/todoboard and verify valid output
-- [ ] T022 [US2] Run helm lint ./k8s/charts/todoboard and fix any errors
+- [X] T021 [US2] Run helm template ./k8s/charts/todoboard and verify valid output
+- [X] T022 [US2] Run helm lint ./k8s/charts/todoboard and fix any errors
 
 **Checkpoint**: User Story 2 complete - Helm charts render and pass lint
 
@@ -129,11 +129,11 @@
 
 **Independent Test**: kubectl-ai commands execute successfully for common operations
 
-- [ ] T034 [US4] Install kubectl-ai CLI tool
-- [ ] T035 [US4] Test kubectl-ai "scale the frontend to 3 replicas" command
-- [ ] T036 [US4] Test kubectl-ai "check why pods are not starting" command
-- [ ] T037 [US4] Test kubectl-ai "show me recent errors in logs" command
-- [ ] T038 [US4] Create kubectl-ai examples documentation in k8s/charts/todoboard/KUBECTL_AI.md
+- [X] T034 [US4] Install kubectl-ai CLI tool
+- [X] T035 [US4] Test kubectl-ai "scale the frontend to 3 replicas" command
+- [X] T036 [US4] Test kubectl-ai "check why pods are not starting" command
+- [X] T037 [US4] Test kubectl-ai "show me recent errors in logs" command
+- [X] T038 [US4] Create kubectl-ai examples documentation in k8s/charts/todoboard/KUBECTL_AI.md
 
 **Checkpoint**: User Story 4 complete - kubectl-ai commands work for 3+ operations
 
@@ -145,11 +145,11 @@
 
 **Independent Test**: Kagent commands return health reports and optimization suggestions
 
-- [ ] T039 [US5] Install Kagent CLI tool
-- [ ] T040 [US5] Test Kagent "analyze cluster health" command
-- [ ] T041 [US5] Test Kagent "optimize resource allocation" command
-- [ ] T042 [US5] Test Kagent "what's my current capacity" command
-- [ ] T043 [US5] Create Kagent examples documentation in k8s/charts/todoboard/KAGENT.md
+- [X] T039 [US5] Install Kagent CLI tool
+- [X] T040 [US5] Test Kagent "analyze cluster health" command
+- [X] T041 [US5] Test Kagent "optimize resource allocation" command
+- [X] T042 [US5] Test Kagent "what's my current capacity" command
+- [X] T043 [US5] Create Kagent examples documentation in k8s/charts/todoboard/KAGENT.md
 
 **Checkpoint**: User Story 5 complete - Kagent provides health analysis
 
@@ -163,12 +163,12 @@
 
 ### End-to-End Verification
 
-- [ ] T044 [US6] Access frontend URL and verify UI loads
-- [ ] T045 [US6] Create a new task through the web interface
-- [ ] T046 [US6] Verify task appears in the task list
-- [ ] T047 [US6] Send a message to the chatbot and receive AI response
-- [ ] T048 [US6] Refresh page and verify tasks persist (database connectivity)
-- [ ] T049 [US6] Test update and delete operations on tasks
+- [X] T044 [US6] Access frontend URL and verify UI loads
+- [X] T045 [US6] Create a new task through the web interface
+- [X] T046 [US6] Verify task appears in the task list
+- [X] T047 [US6] Send a message to the chatbot and receive AI response
+- [X] T048 [US6] Refresh page and verify tasks persist (database connectivity)
+- [X] T049 [US6] Test update and delete operations on tasks
 
 **Checkpoint**: User Story 6 complete - Full stack functionality verified
 
@@ -178,11 +178,11 @@
 
 **Purpose**: Documentation, optimization, and final validation
 
-- [ ] T050 [P] Update QUICK_SETUP.md with Kubernetes deployment instructions
-- [ ] T051 [P] Create KUBERNETES.md with architecture overview and troubleshooting
-- [ ] T052 Test Helm rollback capability with helm rollback command
-- [ ] T053 Verify all quickstart.md commands work as documented
-- [ ] T054 [P] Document resource usage metrics in k8s/charts/todoboard/RESOURCES.md
+- [X] T050 [P] Update QUICK_SETUP.md with Kubernetes deployment instructions
+- [X] T051 [P] Create KUBERNETES.md with architecture overview and troubleshooting
+- [X] T052 Test Helm rollback capability with helm rollback command
+- [X] T053 Verify all quickstart.md commands work as documented
+- [X] T054 [P] Document resource usage metrics in k8s/charts/todoboard/RESOURCES.md
 
 ---
 

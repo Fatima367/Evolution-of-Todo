@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todoboard.fullname" . }}-postgres
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app: todoboard-postgres
+spec:
+  type: {{ .Values.postgres.service.type }}
+  ports:
+    - port: {{ .Values.postgres.service.port }}
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+  selector:
+    {{- include "todoboard.selectorLabels" . | nindent 4 }}
+    app: todoboard-postgres

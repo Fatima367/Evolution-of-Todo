@@ -1,0 +1,121 @@
+# Global settings
+global:
+  imagePullPolicy: "IfNotPresent"
+  imageRegistry: ""
+  namespace: "todoboard"
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "todoboard-frontend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: "LoadBalancer"
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  autoscaling:
+    enabled: false
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  env:
+    NEXT_PUBLIC_API_URL: ""
+
+# Backend configuration
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "todoboard-backend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  autoscaling:
+    enabled: false
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  openaiApiKey: "your-openai-key-here"
+  postgresPassword: "your-postgres-password-here"
+
+# PostgreSQL configuration
+postgres:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "postgres"
+    tag: "16"
+    pullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: "ClusterIP"
+    port: 5432
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: "1Gi"
+  env:
+    POSTGRES_DB: "todoboard"
+    POSTGRES_USER: "todoboard"
+    POSTGRES_PASSWORD: "your-postgres-password-here"
+
+# Ingress configuration (optional)
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: "todoboard.local"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+
+# Service Account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
