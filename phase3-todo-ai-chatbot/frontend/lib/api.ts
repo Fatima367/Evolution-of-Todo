@@ -35,7 +35,7 @@ class ApiClient {
           errorMessage = errorData;
         } else if (errorData?.detail) {
           if (Array.isArray(errorData.detail)) {
-            errorMessage = errorData.detail.map(err => {
+            errorMessage = errorData.detail.map((err: { loc: (string | number)[], msg: string }) => {
               const field = err.loc && err.loc.length > 1 ? String(err.loc[1]).replace(/_/g, ' ') : 'field';
               return `${field.charAt(0).toUpperCase() + field.slice(1)}: ${err.msg}`;
             }).join('; ');
