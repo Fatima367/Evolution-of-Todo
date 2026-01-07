@@ -2,11 +2,11 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from src.database import get_session
 from src.models.user import User
-from src.schemas.user_schemas import UserCreate, UserLogin, UserRead, TokenResponse
+from src.schemas.user_schemas import UserCreate, UserLogin, UserRead, UserUpdate, TokenResponse
 from src.auth.security import hash_password, verify_password, create_access_token
 from src.auth.dependencies import get_current_user
 
@@ -116,3 +116,95 @@ async def get_current_user_info(
 ):
     """Get current authenticated user's information"""
     return UserRead.model_validate(current_user)
+
+
+@router.put("/me", response_model=UserRead)
+async def update_current_user_info(
+    user_update: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
+):
+    """Update current authenticated user's information"""
+    # Update user fields if provided
+    if user_update.name is not None:
+        current_user.name = user_update.name
+    if user_update.email_notifications is not None:
+        current_user.email_notifications = user_update.email_notifications
+    if user_update.task_reminders is not None:
+        current_user.task_reminders = user_update.task_reminders
+    if user_update.weekly_summary is not None:
+        current_user.weekly_summary = user_update.weekly_summary
+
+    current_user.updated_at = datetime.utcnow()
+
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+
+    return UserRead.model_validate(current_user)
+
+
+from src.schemas.user_schemas import UserCreate, UserLogin, UserRead, UserUpdate, TokenResponse, PasswordChange, PasswordConfirmation
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    passwords: PasswordChange,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
+):
+    """Change current user's password"""
+    # Verify current password
+    if not verify_password(passwords.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+
+    # Validate new password
+    if len(passwords.new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 8 characters long"
+        )
+
+    # Check for bcrypt password length limitation (72 bytes)
+    if len(passwords.new_password.encode('utf-8')) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be 72 bytes or less when encoded in UTF-8"
+        )
+
+    # Update password
+    current_user.password_hash = hash_password(passwords.new_password)
+    current_user.updated_at = datetime.utcnow()
+
+    session.add(current_user)
+    session.commit()
+
+    return None
+
+
+@router.delete("/me", status_code=status.HTTP_202_ACCEPTED)
+async def delete_account(
+    payload: PasswordConfirmation,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[Session, Depends(get_session)]
+):
+    """Schedule current user's account for deletion"""
+    # Verify password
+    if not verify_password(payload.password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password is incorrect"
+        )
+
+    # Soft delete the user
+    current_user.is_active = False
+    current_user.deletion_scheduled = True
+    current_user.scheduled_for_deletion_at = datetime.utcnow() + timedelta(days=90)
+    current_user.updated_at = datetime.utcnow()
+
+    session.add(current_user)
+    session.commit()
+
+    return {"message": "Account scheduled for deletion in 90 days."}

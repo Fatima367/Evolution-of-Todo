@@ -29,6 +29,9 @@ export interface User {
   created_at: string;
   updated_at: string;
   is_active: boolean;
+  email_notifications: boolean;
+  task_reminders: boolean;
+  weekly_summary: boolean;
 }
 
 export interface Task {
