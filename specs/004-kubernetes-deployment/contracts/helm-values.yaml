@@ -1,0 +1,355 @@
+# Helm Values Schema: todoboard Chart
+
+## Overview
+
+This document defines the configuration contract for the `todoboard` Helm chart. All values must conform to this schema.
+
+## Schema
+
+### Global Configuration
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "description": "Global settings applied to all resources",
+      "properties": {
+        "imagePullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "default": "IfNotPresent"
+        },
+        "imageRegistry": {
+          "type": "string",
+          "description": "Docker registry prefix (empty for local images)",
+          "default": ""
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Target namespace",
+          "default": "todoboard"
+        }
+      }
+    }
+  }
+}
+```
+
+### Frontend Configuration
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "frontend": {
+      "type": "object",
+      "description": "Frontend deployment configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable frontend deployment",
+          "default": true
+        },
+        "replicaCount": {
+          "type": "integer",
+          "description": "Number of replicas",
+          "minimum": 1,
+          "default": 2
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string", "default": "todoboard-frontend" },
+            "tag": { "type": "string", "default": "latest" },
+            "pullPolicy": {
+              "type": "string",
+              "enum": ["Always", "IfNotPresent", "Never"],
+              "default": "IfNotPresent"
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+              "description": "Service type for frontend",
+              "default": "LoadBalancer"
+            },
+            "port": {
+              "type": "integer",
+              "description": "Service port",
+              "default": 3000
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests and limits",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            }
+          }
+        },
+        "env": {
+          "type": "array",
+          "description": "Environment variables",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "properties": {
+                  "name": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              },
+              {
+                "properties": {
+                  "name": { "type": "string" },
+                  "valueFrom": {
+                    "type": "object",
+                    "properties": {
+                      "secretKeyRef": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "key": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Backend Configuration
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "backend": {
+      "type": "object",
+      "description": "Backend deployment configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "replicaCount": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string", "default": "todoboard-backend" },
+            "tag": { "type": "string", "default": "latest" },
+            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+              "default": "ClusterIP"
+            },
+            "port": { "type": "integer", "default": 8000 }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### PostgreSQL Configuration
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "postgres": {
+      "type": "object",
+      "description": "PostgreSQL deployment configuration",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "replicaCount": { "type": "integer", "minimum": 1, "maximum": 1, "default": 1 },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string", "default": "postgres" },
+            "tag": { "type": "string", "default": "16" },
+            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "enum": ["ClusterIP"], "default": "ClusterIP" },
+            "port": { "type": "integer", "default": 5432 }
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "storageClass": { "type": "string", "default": "standard" },
+            "size": { "type": "string", "pattern": "^[0-9]+(Gi|Ti)$", "default": "1Gi" }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
+                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Default Values (values.yaml)
+
+```yaml
+global:
+  imagePullPolicy: "IfNotPresent"
+  imageRegistry: ""
+  namespace: "todoboard"
+
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: "todoboard-frontend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "LoadBalancer"
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: []
+
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: "todoboard-backend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "ClusterIP"
+    port: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  env: []
+
+postgres:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "postgres"
+    tag: "16"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "ClusterIP"
+    port: 5432
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: "1Gi"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: []
+
+ingress:
+  enabled: false
+```
+
+## Minikube Overrides (values-minikube.yaml)
+
+```yaml
+# Use LoadBalancer with Minikube tunnel
+frontend:
+  service:
+    type: "LoadBalancer"
+
+# Use standard storage class for Minikube
+postgres:
+  persistence:
+    storageClass: "standard"
+```

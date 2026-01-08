@@ -1,0 +1,18 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todoboard.fullname" . }}-postgres
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.postgres.service.type }}
+  ports:
+    - port: {{ .Values.postgres.service.port }}
+      targetPort: 5432
+      protocol: TCP
+      name: postgres
+  selector:
+    {{- include "todoboard.selectorLabels" . | nindent 4 }}
+    app: {{ include "todoboard.fullname" . }}-postgres
+{{- end }}

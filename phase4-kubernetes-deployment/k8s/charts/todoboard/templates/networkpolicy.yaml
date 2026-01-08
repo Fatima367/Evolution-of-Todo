@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "todoboard.fullname" . }}-network-policy
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "todoboard.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow inbound traffic from within the namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 3000  # frontend
+        - protocol: TCP
+          port: 8000  # backend
+        - protocol: TCP
+          port: 5432  # postgres
+  egress:
+    # Allow outbound traffic to within the namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 3000  # frontend
+        - protocol: TCP
+          port: 8000  # backend
+        - protocol: TCP
+          port: 5432  # postgres
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

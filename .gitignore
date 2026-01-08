@@ -116,3 +116,7 @@ coverage/
 
 # Alembic
 alembic.ini.bak
+
+# Kubernetes binaries
+kubectl
+minikube*
