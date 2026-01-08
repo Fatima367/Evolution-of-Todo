@@ -1,0 +1,84 @@
+# Default values for todoboard chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  imagePullPolicy: "IfNotPresent"
+  imageRegistry: ""
+  namespace: "todoboard"
+
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: "todoboard-frontend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "LoadBalancer"
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: []
+
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: "todoboard-backend"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "ClusterIP"
+    port: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  env: []
+
+postgres:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "postgres"
+    tag: "16"
+    pullPolicy: "IfNotPresent"
+  service:
+    type: "ClusterIP"
+    port: 5432
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: "1Gi"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: []
+
+ingress:
+  enabled: false
+
+# Additional configuration
+config:
+  name: "todoboard-config"
+
+# Security context
+securityContext:
+  enabled: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001

@@ -1,0 +1,39 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+{{- if eq .Values.frontend.service.type "LoadBalancer" }}
+To access the frontend service:
+
+{{- if contains "NodePort" .Values.frontend.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "todoboard.fullname" . }}-frontend)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  Watch the status with: 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ include "todoboard.fullname" . }}-frontend'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "todoboard.fullname" . }}-frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo "Visit http://${SERVICE_IP}:{{ .Values.frontend.service.port }} to use your application"
+
+{{- else if contains "ClusterIP" .Values.frontend.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ include "todoboard.fullname" . }}-frontend" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.frontend.service.port }}
+
+{{- end }}
+{{- end }}
+
+Don't forget to set your secrets for database and API keys:
+
+  kubectl create secret generic {{ include "todoboard.fullname" . }}-secrets \
+    --from-literal=postgres-password=YOUR_PASSWORD \
+    --from-literal=openai-api-key=YOUR_OPENAI_KEY \
+    --from-literal=better-auth-secret=YOUR_AUTH_SECRET \
+    --namespace {{ .Release.Namespace }}

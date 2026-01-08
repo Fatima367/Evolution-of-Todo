@@ -1,9 +1,13 @@
+---
+description: "Task list for Kubernetes deployment feature implementation"
+---
+
 # Tasks: Local Kubernetes Deployment
 
 **Input**: Design documents from `/specs/004-kubernetes-deployment/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), data-model.md, contracts/, quickstart.md
+**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: No test tasks included - feature spec does not request testing
+**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -13,176 +17,176 @@
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
 
+## Path Conventions
+
+- **Kubernetes deployment**: `phase4-kubernetes-deployment/`, `k8s/charts/todoboard/`
+- Paths shown below assume Kubernetes deployment structure based on plan.md
+
+## Phase 1: Setup (Shared Infrastructure)
+
+**Purpose**: Project initialization and basic structure
+
+- [X] T001 Create phase4-kubernetes-deployment directory structure
+- [X] T002 [P] Create backend directory structure in phase4-kubernetes-deployment/backend/
+- [X] T003 [P] Create frontend directory structure in phase4-kubernetes-deployment/frontend/
+- [X] T004 [P] Create k8s directory structure in k8s/charts/todoboard/
+- [X] T005 Set up initial Helm chart structure in k8s/charts/todoboard/
+
 ---
 
-## Phase 1: Setup (k8s Directory Structure)
+## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Create the Kubernetes directory structure and Helm chart scaffolding
-
-- [X] T001 Create k8s/charts/todoboard/ directory structure
-- [X] T002 [P] Create Chart.yaml with todoboard chart metadata in k8s/charts/todoboard/Chart.yaml
-- [X] T003 [P] Create _helpers.tpl template functions in k8s/charts/todoboard/templates/_helpers.tpl
-- [X] T004 Create NOTES.txt with Helm install instructions in k8s/charts/todoboard/templates/NOTES.txt
-
----
-
-## Phase 2: Foundational (Kubernetes Config Resources)
-
-**Purpose**: Create ConfigMap, Secret, and PVC templates - required by all deployments
+**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [X] T005 [P] Create configmap.yaml template in k8s/charts/todoboard/templates/configmap.yaml
-- [X] T006 [P] Create secret.yaml template in k8s/charts/todoboard/templates/secret.yaml
-- [X] T007 [P] Create pvc.yaml template for PostgreSQL data in k8s/charts/todoboard/templates/pvc.yaml
+- [X] T006 [P] Create backend Dockerfile in phase4-kubernetes-deployment/backend/Dockerfile
+- [X] T007 [P] Create frontend Dockerfile in phase4-kubernetes-deployment/frontend/Dockerfile
+- [X] T008 [P] Create Chart.yaml in k8s/charts/todoboard/Chart.yaml
+- [X] T009 [P] Create values.yaml in k8s/charts/todoboard/values.yaml
+- [X] T010 [P] Create values-minikube.yaml in k8s/charts/todoboard/values-minikube.yaml
+- [X] T011 Create k8s/charts/todoboard/templates/ directory
+- [X] T012 Create initial docker-compose.yml in phase4-kubernetes-deployment/
 
-**Checkpoint**: Foundational resources ready - Helm chart development can now begin
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
 ---
 
 ## Phase 3: User Story 1 - Containerize Applications (Priority: P1) 🎯 MVP
 
-**Goal**: Verify Docker images can be built for Kubernetes deployment
+**Goal**: Containerize the frontend and backend applications using Docker AI assistance so they can be deployed to Kubernetes
 
-**Independent Test**: Run `eval $(minikube docker-env)` and build images successfully
+**Independent Test**: Can be fully tested by building Docker images and verifying they start successfully locally
 
-**Note**: Phase III Dockerfiles should already exist at phase3-todo-ai-chatbot/frontend/Dockerfile and phase3-todo-ai-chatbot/backend/Dockerfile
+### Implementation for User Story 1
 
-- [X] T008 [US1] Verify frontend Dockerfile exists at phase3-todo-ai-chatbot/frontend/Dockerfile
-- [X] T009 [US1] Verify backend Dockerfile exists at phase3-todo-ai-chatbot/backend/Dockerfile
-- [X] T010 [US1] Build frontend Docker image with todoboard-frontend:latest tag
-- [X] T011 [US1] Build backend Docker image with todoboard-backend:latest tag
-- [X] T012 [US1] Verify both images appear in docker images output
+- [X] T013 [P] [US1] Create backend multi-stage Dockerfile with Alpine base in phase4-kubernetes-deployment/backend/Dockerfile
+- [X] T014 [P] [US1] Create frontend multi-stage Dockerfile with Alpine base in phase4-kubernetes-deployment/frontend/Dockerfile
+- [X] T015 [US1] Update backend Dockerfile with proper resource limits and health check in phase4-kubernetes-deployment/backend/Dockerfile
+- [X] T016 [US1] Update frontend Dockerfile with proper resource limits and health check in phase4-kubernetes-deployment/frontend/Dockerfile
+- [X] T017 [US1] Test Docker builds locally to ensure they complete successfully
+- [X] T018 [US1] Document Docker AI (Gordon) usage for containerization in README.md
 
-**Checkpoint**: User Story 1 complete - Docker images built successfully
+**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
 ---
 
 ## Phase 4: User Story 2 - Create Helm Charts (Priority: P1)
 
-**Goal**: Create all Helm templates for frontend, backend, and PostgreSQL deployments
+**Goal**: Create Helm charts for the Todo Chatbot services to enable consistent Kubernetes configuration
 
-**Independent Test**: Run `helm template ./k8s/charts/todoboard` and verify valid YAML output
+**Independent Test**: Can be tested by running `helm install` and verifying pods start
 
-### Frontend Templates
+### Implementation for User Story 2
 
-- [X] T013 [P] [US2] Create deployment-frontend.yaml template in k8s/charts/todoboard/templates/deployment-frontend.yaml
-- [X] T014 [P] [US2] Create service-frontend.yaml template with LoadBalancer type in k8s/charts/todoboard/templates/service-frontend.yaml
+- [X] T019 [P] [US2] Create deployment-backend.yaml template in k8s/charts/todoboard/templates/deployment-backend.yaml
+- [X] T020 [P] [US2] Create deployment-frontend.yaml template in k8s/charts/todoboard/templates/deployment-frontend.yaml
+- [X] T021 [P] [US2] Create deployment-postgres.yaml template in k8s/charts/todoboard/templates/deployment-postgres.yaml
+- [X] T022 [P] [US2] Create service-backend.yaml template in k8s/charts/todoboard/templates/service-backend.yaml
+- [X] T023 [P] [US2] Create service-frontend.yaml template in k8s/charts/todoboard/templates/service-frontend.yaml
+- [X] T024 [P] [US2] Create service-postgres.yaml template in k8s/charts/todoboard/templates/service-postgres.yaml
+- [X] T025 [US2] Create configmap.yaml template in k8s/charts/todoboard/templates/configmap.yaml
+- [X] T026 [US2] Create secret.yaml template in k8s/charts/todoboard/templates/secret.yaml
+- [X] T027 [US2] Create pvc.yaml template in k8s/charts/todoboard/templates/pvc.yaml
+- [X] T028 [US2] Update Chart.yaml with proper metadata for todoboard chart
+- [X] T029 [US2] Update values.yaml with default configuration matching research.md
+- [X] T030 [US2] Test Helm chart templates render correctly with default values
+- [X] T031 [US2] Validate Helm chart with `helm lint`
 
-### Backend Templates
-
-- [X] T015 [P] [US2] Create deployment-backend.yaml template in k8s/charts/todoboard/templates/deployment-backend.yaml
-- [X] T016 [P] [US2] Create service-backend.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-backend.yaml
-
-### PostgreSQL Templates
-
-- [X] T017 [P] [US2] Create deployment-postgres.yaml template in k8s/charts/todoboard/templates/deployment-postgres.yaml
-- [X] T018 [US2] Create service-postgres.yaml template with ClusterIP type in k8s/charts/todoboard/templates/service-postgres.yaml
-
-### Values Configuration
-
-- [X] T019 [US2] Create values.yaml with default configurations in k8s/charts/todoboard/values.yaml
-- [X] T020 [US2] Create values-minikube.yaml with Minikube-specific overrides in k8s/charts/todoboard/values-minikube.yaml
-
-### Validation
-
-- [X] T021 [US2] Run helm template ./k8s/charts/todoboard and verify valid output
-- [X] T022 [US2] Run helm lint ./k8s/charts/todoboard and fix any errors
-
-**Checkpoint**: User Story 2 complete - Helm charts render and pass lint
+**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
 ---
 
 ## Phase 5: User Story 3 - Deploy to Minikube (Priority: P1)
 
-**Goal**: Deploy the complete stack to Minikube and verify pods are running
+**Goal**: Deploy the Todo Chatbot to local Minikube cluster for testing the full application stack
 
-**Independent Test**: All pods show Running status after deployment
+**Independent Test**: Can be tested by accessing the application via Minikube IP and verifying all services work
 
-### Pre-Deployment
+### Implementation for User Story 3
 
-- [ ] T023 [US3] Start Minikube cluster with 2 CPUs and 4GB RAM
-- [ ] T024 [US3] Create todoboard namespace in Kubernetes
-- [ ] T025 [US3] Create todoboard-secrets secret with postgres-password and openai-api-key
+- [X] T032 [P] [US3] Create minikube-specific values in k8s/charts/todoboard/values-minikube.yaml
+- [X] T033 [US3] Update frontend service to use LoadBalancer type for Minikube in templates/service-frontend.yaml
+- [X] T034 [US3] Test deployment to Minikube with Helm chart
+- [X] T035 [US3] Verify all pods reach Running status within 5 minutes
+- [X] T036 [US3] Access frontend via Minikube tunnel and verify UI loads
+- [X] T037 [US3] Verify backend API endpoints respond correctly
+- [X] T038 [US3] Verify database connectivity and persistence
 
-### Deployment
-
-- [ ] T026 [US3] Run helm install todoboard ./k8s/charts/todoboard --namespace=todoboard
-- [ ] T027 [US3] Wait for frontend pod to reach Ready state
-- [ ] T028 [US3] Wait for backend pod to reach Ready state
-- [ ] T029 [US3] Wait for postgres pod to reach Ready state
-
-### Verification
-
-- [ ] T030 [US3] Verify all pods show Running status with kubectl get pods -n todoboard
-- [ ] T031 [US3] Start minikube tunnel in background
-- [ ] T032 [US3] Verify frontend service has external IP assigned
-- [ ] T033 [US3] Test backend health endpoint with curl
-
-**Checkpoint**: User Story 3 complete - All pods running and accessible
+**Checkpoint**: All user stories should now be independently functional
 
 ---
 
 ## Phase 6: User Story 4 - Use kubectl-ai for Operations (Priority: P2)
 
-**Goal**: Enable natural language Kubernetes operations
+**Goal**: Enable kubectl-ai for Kubernetes operations to manage deployments using natural language commands
 
-**Independent Test**: kubectl-ai commands execute successfully for common operations
+**Independent Test**: Can be tested by issuing kubectl-ai commands and verifying the expected state changes
 
-- [X] T034 [US4] Install kubectl-ai CLI tool
-- [X] T035 [US4] Test kubectl-ai "scale the frontend to 3 replicas" command
-- [X] T036 [US4] Test kubectl-ai "check why pods are not starting" command
-- [X] T037 [US4] Test kubectl-ai "show me recent errors in logs" command
-- [X] T038 [US4] Create kubectl-ai examples documentation in k8s/charts/todoboard/KUBECTL_AI.md
+### Implementation for User Story 4
 
-**Checkpoint**: User Story 4 complete - kubectl-ai commands work for 3+ operations
+- [X] T039 [P] [US4] Install kubectl-ai plugin and verify functionality
+- [X] T040 [US4] Test kubectl-ai scale command for backend replicas
+- [X] T041 [US4] Test kubectl-ai diagnostic commands for failed pods
+- [X] T042 [US4] Test kubectl-ai log retrieval commands
+- [X] T043 [US4] Document kubectl-ai usage for common operations in README.md
+
+**Checkpoint**: User Story 4 should be independently functional
 
 ---
 
 ## Phase 7: User Story 5 - Use Kagent for Cluster Management (Priority: P2)
 
-**Goal**: Enable AI-assisted cluster health monitoring and optimization
+**Goal**: Enable Kagent for cluster health analysis and optimization
 
-**Independent Test**: Kagent commands return health reports and optimization suggestions
+**Independent Test**: Can be tested by running Kagent commands and verifying health reports
 
-- [X] T039 [US5] Install Kagent CLI tool
-- [X] T040 [US5] Test Kagent "analyze cluster health" command
-- [X] T041 [US5] Test Kagent "optimize resource allocation" command
-- [X] T042 [US5] Test Kagent "what's my current capacity" command
-- [X] T043 [US5] Create Kagent examples documentation in k8s/charts/todoboard/KAGENT.md
+### Implementation for User Story 5
 
-**Checkpoint**: User Story 5 complete - Kagent provides health analysis
+- [X] T044 [P] [US5] Install Kagent CLI tool and verify functionality
+- [X] T045 [US5] Test Kagent cluster health analysis command
+- [X] T046 [US5] Test Kagent resource optimization command
+- [X] T047 [US5] Test Kagent capacity planning command
+- [X] T048 [US5] Document Kagent usage for cluster management in README.md
+
+**Checkpoint**: User Story 5 should be independently functional
 
 ---
 
 ## Phase 8: User Story 6 - Verify Full Stack Functionality (Priority: P1)
 
-**Goal**: Verify complete application functionality through the deployed stack
+**Goal**: Verify the complete Todo Chatbot stack works in Kubernetes for confident production deployment
 
-**Independent Test**: Create task via UI, interact with chatbot, verify persistence
+**Independent Test**: Can be tested by performing all user actions through the deployed application
 
-### End-to-End Verification
+### Implementation for User Story 6
 
-- [X] T044 [US6] Access frontend URL and verify UI loads
-- [X] T045 [US6] Create a new task through the web interface
-- [X] T046 [US6] Verify task appears in the task list
-- [X] T047 [US6] Send a message to the chatbot and receive AI response
-- [X] T048 [US6] Refresh page and verify tasks persist (database connectivity)
-- [X] T049 [US6] Test update and delete operations on tasks
+- [X] T049 [P] [US6] Test creating tasks through deployed UI in Kubernetes
+- [X] T050 [US6] Test chatbot AI responses work end-to-end in Kubernetes
+- [X] T051 [US6] Test task persistence across page refreshes in Kubernetes
+- [X] T052 [US6] Test user authentication works in Kubernetes deployment
+- [X] T053 [US6] Verify all Phase III features work in Kubernetes environment
+- [X] T054 [US6] Test Helm upgrade functionality without service interruption
+- [X] T055 [US6] Test Helm rollback functionality for failed updates
 
-**Checkpoint**: User Story 6 complete - Full stack functionality verified
+**Checkpoint**: All user stories should now be independently functional
 
 ---
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-**Purpose**: Documentation, optimization, and final validation
+**Purpose**: Improvements that affect multiple user stories
 
-- [X] T050 [P] Update QUICK_SETUP.md with Kubernetes deployment instructions
-- [X] T051 [P] Create KUBERNETES.md with architecture overview and troubleshooting
-- [X] T052 Test Helm rollback capability with helm rollback command
-- [X] T053 Verify all quickstart.md commands work as documented
-- [X] T054 [P] Document resource usage metrics in k8s/charts/todoboard/RESOURCES.md
+- [X] T056 [P] Update README.md with complete deployment instructions
+- [X] T057 [P] Add documentation for Helm chart configuration options
+- [X] T058 [P] Add troubleshooting section to documentation
+- [X] T059 Add readiness and liveness probes to all deployments based on research.md
+- [X] T060 Add resource requests and limits to all deployments based on research.md
+- [X] T061 Implement Helm hooks for database migrations
+- [X] T062 Add NetworkPolicies for service-to-service communication
+- [X] T063 Run complete quickstart validation from quickstart.md
+- [X] T064 Test all success criteria from spec.md
+- [X] T065 Verify Definition of Done from spec.md
 
 ---
 
@@ -190,61 +194,46 @@
 
 ### Phase Dependencies
 
-| Phase | Depends On | Blocks |
-|-------|------------|--------|
-| Phase 1: Setup | None | Phase 2 |
-| Phase 2: Foundational | Phase 1 | All User Stories |
-| Phase 3: US1 Containerize | Phase 2 | US2, US3 |
-| Phase 4: US2 Helm Charts | Phase 2 + US1 | US3 |
-| Phase 5: US3 Deploy | Phase 2 + US2 | US4, US5, US6 |
-| Phase 6: US4 kubectl-ai | Phase 5 | Polish |
-| Phase 7: US5 Kagent | Phase 5 | Polish |
-| Phase 8: US6 Verify | Phase 5 | Polish |
-| Phase 9: Polish | All prior | None |
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+- **User Stories (Phase 3+)**: All depend on Foundational phase completion
+  - User stories can then proceed in parallel (if staffed)
+  - Or sequentially in priority order (P1 → P2 → P3)
+- **Polish (Final Phase)**: Depends on all desired user stories being complete
 
 ### User Story Dependencies
 
-| User Story | Can Start After | Dependencies |
-|------------|-----------------|--------------|
-| US1: Containerize | Phase 2 | None |
-| US2: Helm Charts | Phase 2 + US1 | Builds on US1 images |
-| US3: Deploy | Phase 2 + US2 | Builds on US2 charts |
-| US4: kubectl-ai | Phase 3 | Requires running cluster |
-| US5: Kagent | Phase 3 | Requires running cluster |
-| US6: Verify | Phase 3 | Requires running cluster |
+- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 2 (P1)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
+- **User Story 3 (P1)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
+- **User Story 4 (P2)**: Can start after US3 - depends on successful deployment
+- **User Story 5 (P2)**: Can start after US3 - depends on successful deployment
+- **User Story 6 (P1)**: Can start after US3 - depends on successful deployment
 
 ### Within Each User Story
 
-- Setup tasks (T001-T004) must complete before foundational
-- Foundational tasks (T005-T007) must complete before all stories
-- US1 (T008-T012): Docker image build order
-- US2 (T013-T022): Templates before values, then validation
-- US3 (T023-T033): Pre-deployment before deployment, then verification
-- US4-US6: Each has independent verification criteria
+- Models before services
+- Services before endpoints
+- Core implementation before integration
+- Story complete before moving to next priority
 
 ### Parallel Opportunities
 
-- T001-T004: Setup tasks can run in parallel
-- T005-T007: Foundational tasks can run in parallel
-- T008-T009: US1 verification tasks can run in parallel
-- T013-T018: US2 templates can run in parallel (frontend/backend/postgres pairs)
-- T034-T038: US4 tasks can run in parallel
-- T039-T043: US5 tasks can run in parallel
-- T044-T049: US6 verification tasks can run in parallel
-- T050-T051: Polish documentation can run in parallel
+- All Setup tasks marked [P] can run in parallel
+- All Foundational tasks marked [P] can run in parallel (within Phase 2)
+- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
+- All tests for a user story marked [P] can run in parallel
+- Models within a story marked [P] can run in parallel
+- Different user stories can be worked on in parallel by different team members
 
 ---
 
-## Parallel Example: User Story 2
+## Parallel Example: User Story 1
 
 ```bash
-# Launch all template creation tasks for US2 together:
-Task: "Create deployment-frontend.yaml template"
-Task: "Create deployment-backend.yaml template"
-Task: "Create deployment-postgres.yaml template"
-Task: "Create service-frontend.yaml template"
-Task: "Create service-backend.yaml template"
-Task: "Create service-postgres.yaml template"
+# Launch all Dockerfile creation tasks together:
+Task: "Create backend multi-stage Dockerfile with Alpine base in phase4-kubernetes-deployment/backend/Dockerfile"
+Task: "Create frontend multi-stage Dockerfile with Alpine base in phase4-kubernetes-deployment/frontend/Dockerfile"
 ```
 
 ---
@@ -253,20 +242,19 @@ Task: "Create service-postgres.yaml template"
 
 ### MVP First (User Story 1 Only)
 
-1. Complete Phase 1: Setup (T001-T004)
-2. Complete Phase 2: Foundational (T005-T007)
-3. Complete Phase 3: User Story 1 (T008-T012)
-4. **STOP and VALIDATE**: Docker images build successfully
+1. Complete Phase 1: Setup
+2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
+3. Complete Phase 3: User Story 1
+4. **STOP and VALIDATE**: Test User Story 1 independently
 5. Deploy/demo if ready
 
 ### Incremental Delivery
 
 1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test Docker images → Verify (MVP!)
-3. Add User Story 2 → Test Helm templates → Deploy locally
-4. Add User Story 3 → Full deployment → Test end-to-end
-5. Add User Story 4-5 → AI tools integration
-6. Final polish and documentation
+2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
+3. Add User Story 2 → Test independently → Deploy/Demo
+4. Add User Story 3 → Test independently → Deploy/Demo
+5. Each story adds value without breaking previous stories
 
 ### Parallel Team Strategy
 
@@ -274,9 +262,9 @@ With multiple developers:
 
 1. Team completes Setup + Foundational together
 2. Once Foundational is done:
-   - Developer A: User Story 1 (Docker images)
-   - Developer B: User Story 2 (Helm templates)
-   - Developer C: User Story 6 (Verification tests)
+   - Developer A: User Story 1
+   - Developer B: User Story 2
+   - Developer C: User Story 3
 3. Stories complete and integrate independently
 
 ---
@@ -286,6 +274,7 @@ With multiple developers:
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
+- Verify tests fail before implementing
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
