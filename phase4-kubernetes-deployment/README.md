@@ -105,7 +105,7 @@ Before deploying the application, you need to set up your environment variables.
     You will need to provide values for the following:
     - `DATABASE_URL`: Your PostgreSQL connection string.
     - `BETTER_AUTH_SECRET`: A secret key for authentication, which you can generate with `openssl rand -base64 32`.
-    - `OPENAI_API_KEY`: Your API key for the language model. You can replace this with another LLM provider key (GEMINI_API_KEY/GROQ_API_KEY)
+    - `OPENAI_API_KEY`: Your API key for the language model. You can replace this with another LLM provider key (`GEMINI_API_KEY`/`GROQ_API_KEY`)
 
 
 ## Quick Start
