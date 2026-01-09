@@ -129,7 +129,7 @@ minikube service todoboard-frontend -n todoboard --url
 *Note: You may need to run `minikube tunnel` in a separate terminal to expose the LoadBalancer service.*
 
 ### Alternative: Automated Setup Script (Step-by-Step)
-If you prefer to deploy manually, you can also use the following scripts to automate the setup:
+If you prefer to deploy manually, you can use the following scripts to automate the setup:
 
 ```bash
 #!/bin/bash
