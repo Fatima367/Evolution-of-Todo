@@ -4,18 +4,18 @@ This repository contains the Kubernetes deployment configuration for the fullsta
 
 ## Overview
 
+#### Architecture
 A full-stack Todo web application that combines:
-- Frontend: Next.js UI with chatbot interface
-- Backend: FastAPI server with AI integration
-- Database: PostgreSQL for persistent storage
-- AI Integration: External OpenAI/Groq API
+- **Frontend**: Next.js UI with chatbot interface, served via a NodePort service, making it accessible from outside the cluster.
+- **Backend**: A FastAPI server with AI integration, running as a ClusterIP service, only accessible from within the cluster.
+- **Database**: An external PostgreSQL database hosted on Neon.
+- **LLM (AI Integration)**: An external API for AI-powered features. (OpenAI/Groq API)
 
-***Phase 4 packages the application for local Kubernetes deployment using:***
-- **Minikube** - Local Kubernetes cluster
-- **Helm 3** - Kubernetes package manager
-- **Docker** - Container runtime
-- **kubectl** - Kubernetes CLI
-
+**Phase 4 packages the application for local Kubernetes deployment using. The key technologies used in this deployment are:**
+- **Minikube** - For running a local Kubernetes cluster.
+- **Helm 3** - For managing the application's Kubernetes packages. (Kubernetes package manager)
+- **Docker** - For containerizing the frontend and backend services.
+- **kubectl** - For interacting with the Kubernetes cluster. (Kubernetes CLI)
 
 ## Required Environment Variables for Kubernetes Deployment
 
@@ -48,101 +48,111 @@ Before starting, ensure you have the following tools installed:
 
 ### 1. **Minikube** - Local Kubernetes cluster
 ```bash
-# macOS
+# For macOS
 brew install minikube
 
-# Linux
+# For Linux
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-# Windows (WSL2)
+# For Windows (with WSL2)
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
 ```
 
 ### 2. **Helm 3** - Kubernetes package manager
 ```bash
-# macOS
+# For macOS
 brew install helm
 
-# Linux/WSL2
+# For Linux/WSL2
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
 ### 3. **Docker** - Container runtime
 ```bash
-# macOS
+# For macOS
 brew install --cask docker
 
-# Linux/WSL2
-# Follow: https://docs.docker.com/engine/install/
+# For Linux/WSL2
+# Follow the official installation guide: https://docs.docker.com/engine/install/
 ```
 
 ### 4. **kubectl** - Kubernetes CLI
 ```bash
-# macOS
+# For macOS
 brew install kubectl
 
-# Linux/WSL2
+# For Linux/WSL2
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 
+## Environment Setup
+
+Before deploying the application, you need to set up your environment variables.
+
+1.  **Create an environment file**: Copy the example file to create your own local environment configuration.
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Edit the file**: Open the `.env` file and add your credentials .
+    ```bash
+    nano .env # Or use any other text editor to edit .env with your DATABASE_URL, OPENAI_API_KEY (or use GEMINI_API_KEY/GROQ_API_KEY), and BETTER_AUTH_SECRET
+    ```
+
+    You will need to provide values for the following:
+    - `DATABASE_URL`: Your PostgreSQL connection string.
+    - `BETTER_AUTH_SECRET`: A secret key for authentication, which you can generate with `openssl rand -base64 32`.
+    - `OPENAI_API_KEY`: Your API key for the language model. You can replace this with another LLM provider key (GEMINI_API_KEY/GROQ_API_KEY)
+
+
 ## Quick Start
 
 ### One-Command Setup
-For a quick setup, run these commands in sequence:
+For a quick and automated setup, run these commands in sequence:
 
 ### 1. Set up environment variables
 Copy the example environment file and fill in your credentials:
 ```bash
 cp .env.example .env
-# Edit .env with your DATABASE_URL, OPENAI_API_KEY (or use GEMINI_API_KEY / GROQ_API_KEY), and BETTER_AUTH_SECRET
+# Edit .env with your DATABASE_URL, OPENAI_API_KEY (or use GEMINI_API_KEY/GROQ_API_KEY), and BETTER_AUTH_SECRET
 ```
 
 ### 2. Run the deployment script
 ```bash
 ./scripts/deploy.sh
 ```
-This script will:
-- ✅ Validate prerequisites
-- ✅ Start Minikube (if not running)
-- ✅ Configure Docker to use Minikube's daemon
-- ✅ Build frontend and backend images
-- ✅ Create the `todoboard` namespace
-- ✅ Deploy the application using Helm
-- ✅ Wait for pods to be ready
+This script will handle all the necessary steps:
+- ✅ Verify that all prerequisite tools are installed.
+- ✅ Start Minikube cluster (if not running).
+- ✅ Configure Docker to use Minikube's daemon.
+- ✅ Build the Docker images for the frontend and backend.
+- ✅ Load the environment variables from your `.env` file.
+- ✅ Create a dedicated Kubernetes namespace for the application.
+- ✅ Deploy the application using the Helm chart.
+- ✅ Wait for all application pods to become ready.
+- ✅ Provide you with the URL to access the application.
 
-### 3. Access the application
-Once deployment completes, the application will be available at:
-
-**Frontend UI**: `http://<minikube-ip>:3000`
-To get the Minikube IP:
-```bash
-minikube ip
-```
-
-Or directly access the service:
-```bash
-minikube service todoboard-frontend -n todoboard --url
 ```
 *Note: You may need to run `minikube tunnel` in a separate terminal to expose the LoadBalancer service.*
 
 ### Alternative: Automated Setup Script (Step-by-Step)
-If you prefer to deploy manually, you can use the following scripts to automate the setup:
-
-```bash
-#!/bin/bash
+If you prefer to deploy manually, you can follow these instruction for the setup:
 
 # 1. Start Minikube
 minikube start --cpus=2 --memory=4096 --driver=docker
+
+# Set up Docker Environment
+# Configure your shell to use Minikube's Docker daemon.
 eval $(minikube docker-env)
 
-# 2. Build Docker images
+# 2. Build Docker images for the frontend and backend applications.
 docker build -t todoboard-backend:latest phase4-kubernetes-deployment/backend/
 docker build -t todoboard-frontend:latest phase4-kubernetes-deployment/frontend/
 
-# 3. Create namespace
+# 3. Create a separate namespace in Kubernetes for the application.
 kubectl create namespace todoboard
 
 # 4. Create secrets (update with your actual values)
@@ -162,11 +172,19 @@ helm install todoboard k8s/charts/todoboard \
 
 echo "Deployment complete! Starting tunnel..."
 minikube tunnel
+
+# 6. Verify the Deployment
+# Check the status of your pods to ensure they are running correctly.
+# Get the status of all pods in the namespace
+kubectl get pods -n todo-app
+
+# Wait for the pods to be ready
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=todo-app -n todo-app --timeout=120s
 ```
 
 ## Accessing the Application
 
-The application will be available at:
+After a successful deployment, the application will be available at:
 
 **Frontend UI**: `http://<minikube-ip>:3000`
 To get the Minikube IP:
@@ -227,26 +245,35 @@ The `values-minikube.yaml` file includes overrides suitable for Minikube:
 - **ConfigMap**: `todoboard-config` for non-sensitive data
 - **Secret**: `todoboard-secrets` for credentials
 
-## Useful Commands
-
+## Kubernetes Management Useful Commands
 We have provided several scripts in the `scripts/` directory to simplify common tasks.
+Here are some useful commands for managing and observing your application in Kubernetes.
 
 ### Pods and Resources
 ```bash
 # View all pods (shortcuts)
 ./scripts/get-pods.sh
 
-# View all resources in the namespace
+# View all Cluster resources in the namespace
 kubectl get all -n todoboard
 
 # View specific resources
+
+# List pods with more detailed information
 kubectl get pods -n todoboard -o wide
+
+# List all services in the namespace
 kubectl get svc -n todoboard
+
+# List all deployments
 kubectl get deployments -n todoboard
+
+# View the application's configuration maps
 kubectl get configmaps -n todoboard
+
+# View the application's secrets
 kubectl get secrets -n todoboard
 ```
-
 
 ## AI-Assisted Operations
 
@@ -269,17 +296,17 @@ docker ai "Best practices for multi-stage builds"
 
 ## Troubleshooting
 
-- **Pods in ImagePullBackOff**: Ensure you ran `eval $(minikube docker-env)` before building images.
+- **Pods in ImagePullBackOff**: Image Not Found Errors. If you see `ImagePullBackOff` or `ErrImagePull`, make sure you have run `eval $(minikube docker-env)` in your terminal before building the Docker images.
 - **Database Connection**: Check if `todoboard-postgres` pod is ready and logs show successful initialization.
 - **Frontend Unreachable**: Ensure `minikube tunnel` is running if you are using LoadBalancer type on a system that doesn't support it natively.
+- **Pod Crashes**: Use `kubectl describe pod -n todo-app <pod-name>` to see events and `kubectl logs -n todo-app <pod-name>` to check for application errors. This can often point to missing environment variables or database connection issues.
+- **Connection Issues**: Ensure that your database URL is correct and that the database is accessible. For frontend connection issues, verify the service is correctly exposed.
 
 
 ### View logs using the scripts
-`./scripts/check-logs.sh frontend`
+`./scripts/check-logs.sh frontend`, `./scripts/check-logs.sh backend`
 
-`./scripts/check-logs.sh backend`
-
-- Manual log viewing: `kubectl logs -n todoboard <pod-name>`
+Manual log viewing: `kubectl logs -n todoboard <pod-name>`
 
 ### Pods Not Starting
 - Check events(Describe a pod for detailed events): `kubectl describe pod <pod-name> -n todoboard`
@@ -296,6 +323,18 @@ docker ai "Best practices for multi-stage builds"
 - Check postgres service: `kubectl get svc todoboard-postgres -n todoboard`
 - Check postgres logs: `kubectl logs -n todoboard -l app=todoboard-postgres`
 
+### Inspecting Logs and Debugging Pods
+```bash
+# Stream the logs from the frontend application
+kubectl logs -n todoboard -l app.kubernetes.io/component=frontend --tail=100 -f
+
+# Stream the logs from the backend application
+kubectl logs -n todoboard -l app.kubernetes.io/component=backend --tail=100 -f
+
+# Execute a command inside a running pod (e.g., to see environment variables)
+kubectl exec -n todoboard <your-pod-name> -- env
+```
+
 
 ## Development
 
@@ -308,28 +347,41 @@ docker build -t todoboard-backend:dev phase4-kubernetes-deployment/backend/
 docker build -t todoboard-frontend:dev phase4-kubernetes-deployment/frontend/
 ```
 
-### Scaling
+### Application Scaling
 ```bash
-# Scale backend to 3 replicas
-kubectl scale deployment -n todoboard todoboard-backend --replicas=3
+# Scale the number of frontend replicas to 3
+kubectl scale deployment -n todo-app todo-app-frontend --replicas=3
 
-# Or update via Helm
-helm upgrade todoboard k8s/charts/todoboard -n todoboard --set backend.replicaCount=3
+# Scale the number of backend replicas to 3
+kubectl scale deployment -n todo-app todo-app-backend --replicas=3
+```
+Alternatively, you can manage scaling through Helm:
+```bash
+helm upgrade todo-app ./helm/todo-app \
+  -f ./helm/todo-app/values-dev.yaml \
+  -n todo-app \
+  --set replicaCount.frontend=3 \
+  --set replicaCount.backend=3
 ```
 
-### Updates
+### Deploying Updates
+To apply changes to your application:
 ```bash
-# After making code changes, rebuild images:
+# 1. After making code changes, rebuild images:
 eval $(minikube docker-env)
 docker build -t todoboard-frontend:latest ./frontend
+# or
 docker build -t todoboard-backend:latest ./backend
 
-# Restart deployments to use new images
+# 2. Trigger a rolling restart of the deployment to use new images
 kubectl rollout restart deployment -n todoboard todoboard-frontend
+# or
 kubectl rollout restart deployment -n todoboard todoboard-backend
-```
 
-### Updating Deployment
+# 3. Monitor the status of the rollout
+kubectl rollout status deployment -n todoboard todoboard-frontend
+```
+Updating Deployment:
 ```bash
 # Upgrade with new values
 helm upgrade todoboard k8s/charts/todoboard \
@@ -340,15 +392,22 @@ helm upgrade todoboard k8s/charts/todoboard \
 ```
 
 ### Cleanup
+To remove the application and shut down the local cluster, follow these steps.
 ```bash
 # Uninstall chart
 helm uninstall todoboard -n todoboard
 
-# Delete namespace
+# Delete the Kubernetes namespace
 kubectl delete namespace todoboard
 
 # Cleanup tunnel
 minikube tunnel --cleanup
+
+# Stop the Minikube cluster
+minikube stop
+
+# To delete the cluster and all its data
+minikube delete
 ```
 
 To completely remove the deployment:
