@@ -275,8 +275,9 @@ docker ai "Best practices for multi-stage builds"
 
 
 ### View logs using the scripts
-./scripts/check-logs.sh frontend
-./scripts/check-logs.sh backend
+`./scripts/check-logs.sh frontend`
+
+`./scripts/check-logs.sh backend`
 
 - Manual log viewing: `kubectl logs -n todoboard <pod-name>`
 
