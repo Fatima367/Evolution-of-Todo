@@ -1,39 +1,122 @@
-# Minikube-specific overrides for todoboard chart
+# Minikube-specific values for todoboard Helm chart
+# Override default values for local development with Minikube
 
-# Use LoadBalancer with Minikube tunnel
-frontend:
-  service:
-    type: "LoadBalancer"
+#############################################################################
+# Global Configuration
+#############################################################################
 
-# Use standard storage class for Minikube
-postgres:
-  persistence:
-    storageClass: "standard"
+global:
+  environment: development
+  imagePullPolicy: IfNotPresent
 
-# Reduce resource requirements for local development
-frontend:
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "50m"
-    limits:
-      memory: "256Mi"
-      cpu: "200m"
+#############################################################################
+# Backend Configuration
+#############################################################################
 
 backend:
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
+  replicaCount: 1
 
-postgres:
+  image:
+    repository: todoboard-backend
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+
   resources:
     requests:
+      cpu: "100m"
       memory: "128Mi"
-      cpu: "50m"
     limits:
-      memory: "256Mi"
+      cpu: "500m"
+      memory: "512Mi"
+
+  env:
+    LOG_LEVEL: "DEBUG"
+    CORS_ORIGINS: "http://localhost:3000,http://localhost:30000"
+
+#############################################################################
+# Frontend Configuration
+#############################################################################
+
+frontend:
+  replicaCount: 1
+
+  image:
+    repository: todoboard-frontend
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30000
+
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
       cpu: "200m"
+      memory: "256Mi"
+
+  env:
+    NODE_ENV: "development"
+
+  apiUrl: "http://todoboard-backend:8000"
+
+#############################################################################
+# Database Configuration
+#############################################################################
+
+postgresql:
+  replicaCount: 1
+
+  image:
+    repository: postgres
+    tag: "16-alpine"
+
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: "5Gi"
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+#############################################################################
+# ConfigMap Configuration
+#############################################################################
+
+configMap:
+  backend:
+    DATABASE_URL: "postgresql://postgres:changeme@todoboard-postgres:5432/todoboard"
+    CORS_ORIGINS: "http://localhost:3000,http://localhost:30000"
+    LOG_LEVEL: "DEBUG"
+
+  frontend:
+    NEXT_PUBLIC_API_URL: "http://todoboard-backend:8000"
+    NODE_ENV: "development"
+
+#############################################################################
+# Optional Features (Disabled for Minikube)
+#############################################################################
+
+ingress:
+  enabled: false
+
+networkPolicy:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+monitoring:
+  enabled: false

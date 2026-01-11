@@ -1,294 +1,309 @@
-# Phase 4 - Kubernetes Deployment
+# Phase IV: Local Kubernetes Deployment
 
-This repository contains the Kubernetes deployment configuration for the fullstack Todo Web application, with an AI-powered todo chatbot. This is Phase 4 of the Evolution of Todo project, focusing on containerization and Kubernetes deployment.
+This directory contains the Kubernetes deployment configuration for the TodoBoard application, enabling local development and testing in a containerized, orchestrated environment.
 
 ## Overview
 
-A full-stack Todo web application that combines:
-- Frontend: Next.js UI with chatbot interface
-- Backend: FastAPI server with AI integration
-- Database: PostgreSQL for persistent storage
-
-## Required Environment Variables for Kubernetes Deployment
-
-The application requires the following environment variables to be configured in Kubernetes secrets and deployments:
-
-### Backend Environment Variables (Configured in Kubernetes Secret)
-- `DATABASE_URL`: PostgreSQL connection string (configured in secret)
-- `GROQ_API_KEY`: Groq API key for AI functionality (configured in secret as `openai-api-key`)
-- `JWT_SECRET_KEY`: Secret key for JWT token generation (configured in secret as `better-auth-secret`)
-- `JWT_ALGORITHM`: Algorithm for JWT signing (default: `HS256`)
-- `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration time (default: `10080`)
-- `CORS_ORIGINS`: Allowed origins for CORS (default: `["http://localhost:3000"]`)
-- `APP_NAME`: Application name (default: `Todo Web Application`)
-- `APP_VERSION`: Application version (default: `1.0.0`)
-- `ENVIRONMENT`: Environment setting (default: `development`)
-
-### Frontend Environment Variables (Configured in Kubernetes Secret)
-- `NEXT_PUBLIC_CHATKIT_DOMAIN_KEY`: ChatKit domain key for chat functionality (configured in secret)
-- `NEXT_PUBLIC_API_URL`: Backend API URL (default: `http://localhost:8000`)
-
-### Kubernetes-Specific Environment Variables (Automatically Configured)
-- `DATABASE_URL`: PostgreSQL connection string (from secret, value: `postgresql://todo:password@todo-postgres:5432/todoboard`)
-- `OPENAI_API_KEY`: OpenAI API key (from secret as `openai-api-key`)
-- `BETTER_AUTH_SECRET`: Better Auth secret (from secret as `better-auth-secret`)
-- `NEXT_PUBLIC_BETTER_AUTH_URL`: Internal backend URL (value: `http://todo-backend:8000`)
-- `BACKEND_URL`: Internal backend service URL (value: `http://todo-backend:8000`)
-- `NEXTAUTH_URL`: NextAuth URL for the frontend in Kubernetes environment (value: `http://todo-frontend:3000`)
-
-
-## Prerequisites
-
-Before starting, ensure you have the following tools installed:
-
-### 1. **Minikube** - Local Kubernetes cluster
-```bash
-# macOS
-brew install minikube
-
-# Linux
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
-
-# Windows (WSL2)
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
-```
-
-### 2. **Helm 3** - Kubernetes package manager
-```bash
-# macOS
-brew install helm
-
-# Linux/WSL2
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-```
-
-### 3. **Docker** - Container runtime
-```bash
-# macOS
-brew install --cask docker
-
-# Linux/WSL2
-# Follow: https://docs.docker.com/engine/install/
-```
-
-### 4. **kubectl** - Kubernetes CLI
-```bash
-# macOS
-brew install kubectl
-
-# Linux/WSL2
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-```
+Phase IV implements local Kubernetes deployment using:
+- **Docker**: Container runtime for packaging applications
+- **Minikube**: Local Kubernetes cluster for development
+- **Helm**: Package manager for Kubernetes resources
+- **kubectl**: Command-line tool for cluster management
 
 ## Quick Start
 
-### One-Command Setup
-For a quick setup, run these commands in sequence:
+### Prerequisites
 
-1. Start Minikube:
+- Docker Desktop 4.25+
+- Minikube 1.32+
+- kubectl 1.28+
+- Helm 3.13+
+
+### Deploy in 5 Minutes
+
 ```bash
+# 1. Start Minikube
 minikube start --cpus=2 --memory=4096 --driver=docker
-eval $(minikube docker-env)
+
+# 2. Build and load images
+docker build -t todoboard-backend:0.1.0 ./backend
+docker build -t todoboard-frontend:0.1.0 ./frontend
+minikube image load todoboard-backend:0.1.0
+minikube image load todoboard-frontend:0.1.0
+
+# 3. Create secrets
+kubectl create secret generic app-secrets \
+  --from-literal=POSTGRES_PASSWORD=changeme \
+  --from-literal=JWT_SECRET=your-jwt-secret \
+  --from-literal=OPENAI_API_KEY=your-key \
+  --from-literal=GROQ_API_KEY=your-key
+
+# 4. Deploy with Helm
+cd k8s/charts/todoboard
+helm install todoboard . -f values-minikube.yaml
+
+# 5. Access application
+minikube service todoboard-frontend
 ```
 
-2. Build Docker images:
-```bash
-# Backend
-docker build -t todoboard-backend:latest phase4-kubernetes-deployment/backend/
+## Project Structure
 
-# Frontend
-docker build -t todoboard-frontend:latest phase4-kubernetes-deployment/frontend/
+```
+phase4-kubernetes-deployment/
+├── backend/
+│   ├── src/                    # FastAPI application code
+│   ├── Dockerfile              # Backend container image
+│   ├── .dockerignore           # Docker build exclusions
+│   └── requirements.txt        # Python dependencies
+│
+├── frontend/
+│   ├── app/                    # Next.js application code
+│   ├── Dockerfile              # Frontend container image
+│   ├── .dockerignore           # Docker build exclusions
+│   └── package.json            # Node.js dependencies
+│
+├── k8s/
+│   └── charts/
+│       └── todoboard/          # Helm chart
+│           ├── Chart.yaml      # Chart metadata
+│           ├── values.yaml     # Default configuration
+│           ├── values-minikube.yaml  # Local dev overrides
+│           └── templates/      # Kubernetes resource templates
+│               ├── deployment-backend.yaml
+│               ├── deployment-frontend.yaml
+│               ├── deployment-postgres.yaml
+│               ├── service-*.yaml
+│               ├── configmap.yaml
+│               ├── secret.yaml
+│               ├── pvc.yaml
+│               ├── ingress.yaml
+│               ├── networkpolicy.yaml
+│               └── hooks-db-migration.yaml
+│
+└── docs/
+    ├── QUICKSTART.md           # Quick start guide
+    ├── ENVIRONMENT_SETUP.md    # Detailed setup instructions
+    ├── KUBECTL_AI.md           # AI-assisted kubectl usage
+    ├── KAGENT.md               # Cluster analysis tool
+    ├── GORDON.md               # Docker AI assistant
+    └── TROUBLESHOOTING.md      # Common issues and solutions
 ```
 
-3. Create namespace and secrets:
-```bash
-kubectl create namespace todoboard
+## Architecture
 
-# Create secrets (replace with your actual values)
-kubectl create secret generic todoboard-secrets \
-  --from-literal=postgres-password=your-secure-password \
-  --from-literal=openai-api-key=your-api-key \
-  --from-literal=better-auth-secret=your-auth-secret \
-  --from-literal=postgres-db=todoboard \
-  --from-literal=postgres-user=todoboard \
-  --from-literal=postgres-url=postgresql://todoboard:your-secure-password@todoboard-postgres:5432/todoboard \
-  --namespace=todoboard
+### Components
+
+1. **Backend (FastAPI)**
+   - Python 3.13+ application
+   - REST API for task management
+   - AI chatbot integration (OpenAI/Groq)
+   - PostgreSQL database connection
+
+2. **Frontend (Next.js)**
+   - TypeScript/React application
+   - Server-side rendering
+   - Responsive UI with Tailwind CSS
+   - Better Auth integration
+
+3. **Database (PostgreSQL)**
+   - PostgreSQL 16 Alpine
+   - Persistent storage via PVC
+   - Automated migrations via Helm hooks
+
+### Networking
+
+- **Backend Service**: ClusterIP (internal only)
+- **Frontend Service**: NodePort 30000 (external access)
+- **Database Service**: ClusterIP (internal only)
+
+### Storage
+
+- **PersistentVolumeClaim**: 5Gi for PostgreSQL data
+- **StorageClass**: standard (Minikube hostPath)
+- **Data Persistence**: Survives pod restarts and redeployments
+
+## Configuration
+
+### Environment-Specific Values
+
+**Minikube (values-minikube.yaml)**:
+- NodePort service for frontend
+- Single replicas for all services
+- Reduced resource limits (4GB total)
+- Local storage class
+
+**Production (values-production.yaml)** - Phase V:
+- LoadBalancer service for frontend
+- Multiple replicas with autoscaling
+- Higher resource limits
+- Cloud storage class (gp3/pd-ssd)
+
+### Secrets Management
+
+**Phase IV (Local)**:
+```bash
+kubectl create secret generic app-secrets \
+  --from-literal=POSTGRES_PASSWORD=<password> \
+  --from-literal=JWT_SECRET=<secret> \
+  --from-literal=OPENAI_API_KEY=<key> \
+  --from-literal=GROQ_API_KEY=<key>
 ```
 
-4. Deploy with Helm:
+**Phase V (Cloud)**: External Secrets Operator + Cloud Secret Manager
+
+## Common Operations
+
+### View Status
+
 ```bash
-helm install todoboard k8s/charts/todoboard \
-  --namespace=todoboard \
-  --values k8s/charts/todoboard/values-minikube.yaml
+# Check pods
+kubectl get pods
+
+# Check services
+kubectl get services
+
+# Check deployments
+kubectl get deployments
+
+# View logs
+kubectl logs -f -l app=todoboard-backend
 ```
 
-5. Access the application:
-```bash
-# Start tunnel to expose LoadBalancer services
-minikube tunnel
+### Update Deployment
 
-# Get frontend URL
-echo "Frontend: http://$(kubectl get svc todoboard-frontend -n todoboard -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):3000"
+```bash
+# Modify configuration
+vim k8s/charts/todoboard/values-minikube.yaml
+
+# Upgrade deployment
+helm upgrade todoboard ./k8s/charts/todoboard -f values-minikube.yaml
+
+# Check rollout status
+kubectl rollout status deployment/todoboard-backend
 ```
 
-### Alternative: Automated Setup Script
-You can also use the following script to automate the setup:
+### Scale Services
 
 ```bash
-#!/bin/bash
+# Scale backend
+kubectl scale deployment todoboard-backend --replicas=3
 
-# Start Minikube
-minikube start --cpus=2 --memory=4096 --driver=docker
-eval $(minikube docker-env)
-
-# Build Docker images
-docker build -t todoboard-backend:latest phase4-kubernetes-deployment/backend/
-docker build -t todoboard-frontend:latest phase4-kubernetes-deployment/frontend/
-
-# Create namespace
-kubectl create namespace todoboard
-
-# Create secrets (update with your actual values)
-kubectl create secret generic todoboard-secrets \
-  --from-literal=postgres-password=your-secure-password \
-  --from-literal=openai-api-key=your-api-key \
-  --from-literal=better-auth-secret=your-auth-secret \
-  --from-literal=postgres-db=todoboard \
-  --from-literal=postgres-user=todoboard \
-  --from-literal=postgres-url=postgresql://todoboard:your-secure-password@todoboard-postgres:5432/todoboard \
-  --namespace=todoboard
-
-# Deploy with Helm
-helm install todoboard k8s/charts/todoboard \
-  --namespace=todoboard \
-  --values k8s/charts/todoboard/values-minikube.yaml
-
-echo "Deployment complete! Starting tunnel..."
-minikube tunnel
+# Or via Helm
+helm upgrade todoboard ./k8s/charts/todoboard --set backend.replicaCount=3
 ```
 
-## Accessing the Application
+### Database Operations
 
-The application will be available at:
-
-**Frontend UI**: `http://<minikube-ip>:3000`
-To get the Minikube IP:
 ```bash
-minikube ip
-```
+# Connect to database
+kubectl exec -it deployment/todoboard-postgres -- psql -U postgres -d todoboard
 
-Or directly access the service:
-```bash
-minikube service todoboard-frontend -n todoboard --url
-```
+# Backup database
+kubectl exec deployment/todoboard-postgres -- pg_dump -U postgres todoboard > backup.sql
 
-## Helm Chart Configuration
-
-The Helm chart supports the following configuration options:
-
-### Global Values
-- `global.imagePullPolicy`: Image pull policy (default: "IfNotPresent")
-- `global.imageRegistry`: Registry prefix (default: "")
-- `global.namespace`: Target namespace (default: "todoboard")
-
-### Frontend Values
-- `frontend.enabled`: Enable frontend deployment (default: true)
-- `frontend.replicaCount`: Number of frontend replicas (default: 2)
-- `frontend.image.repository`: Frontend image repository (default: "todoboard-frontend")
-- `frontend.image.tag`: Frontend image tag (default: "latest")
-- `frontend.service.type`: Service type (default: "LoadBalancer")
-- `frontend.service.port`: Service port (default: 3000)
-
-### Backend Values
-- `backend.enabled`: Enable backend deployment (default: true)
-- `backend.replicaCount`: Number of backend replicas (default: 2)
-- `backend.image.repository`: Backend image repository (default: "todoboard-backend")
-- `backend.image.tag`: Backend image tag (default: "latest")
-- `backend.service.type`: Service type (default: "ClusterIP")
-- `backend.service.port`: Service port (default: 8000)
-
-### PostgreSQL Values
-- `postgres.enabled`: Enable postgres deployment (default: true)
-- `postgres.replicaCount`: Number of postgres replicas (default: 1)
-- `postgres.image.repository`: Postgres image repository (default: "postgres")
-- `postgres.image.tag`: Postgres image tag (default: "16")
-- `postgres.persistence.enabled`: Enable persistent storage (default: true)
-- `postgres.persistence.size`: Storage size (default: "1Gi")
-
-## Minikube-Specific Configuration
-
-The `values-minikube.yaml` file includes overrides suitable for Minikube:
-- Uses LoadBalancer service type for frontend
-- Reduced resource requirements for local development
-- Standard storage class for persistence
-
-## AI-Assisted Operations
-
-This deployment supports AI-assisted Kubernetes operations:
-
-### Using kubectl-ai
-```bash
-# Natural language kubectl commands
-kubectl-ai "scale the frontend to 3 replicas"
-kubectl-ai "show me recent errors in backend logs"
-kubectl-ai "what's the status of all pods"
-```
-
-### Using Docker AI (Gordon)
-```bash
-# Get Docker assistance
-docker ai "How do I optimize this Dockerfile?"
-docker ai "Best practices for multi-stage builds"
+# Restore database
+kubectl exec -i deployment/todoboard-postgres -- psql -U postgres todoboard < backup.sql
 ```
 
 ## Troubleshooting
 
 ### Pods Not Starting
-- Check events: `kubectl describe pod <pod-name> -n todoboard`
-- Verify images exist: `docker images | grep todoboard`
-- Check resource constraints: `kubectl describe nodes`
 
-### Connection Issues
-- Verify tunnel is running: `minikube tunnel`
-- Check services: `kubectl get svc -n todoboard`
-- Check endpoints: `kubectl get endpoints -n todoboard`
-
-### Database Connection Issues
-- Check postgres service: `kubectl get svc todoboard-postgres -n todoboard`
-- Check postgres logs: `kubectl logs -n todoboard -l app=todoboard-postgres`
-
-## Development
-
-### Building Images
 ```bash
-# Build backend
-docker build -t todoboard-backend:dev phase4-kubernetes-deployment/backend/
+# Check pod events
+kubectl describe pod <pod-name>
 
-# Build frontend
-docker build -t todoboard-frontend:dev phase4-kubernetes-deployment/frontend/
+# Common fixes:
+# - Reload images: minikube image load <image>
+# - Increase resources: minikube start --memory=8192
+# - Create secrets: kubectl create secret generic app-secrets
 ```
 
-### Updating Deployment
+### Cannot Access Application
+
 ```bash
-# Upgrade with new values
-helm upgrade todoboard k8s/charts/todoboard \
-  --namespace=todoboard \
-  --values k8s/charts/todoboard/values-minikube.yaml \
-  --set backend.image.tag=dev \
-  --set frontend.image.tag=dev
+# Get Minikube IP
+minikube ip
+
+# Get NodePort
+kubectl get service todoboard-frontend
+
+# Or use automatic access
+minikube service todoboard-frontend
 ```
 
-### Cleanup
+### Database Connection Errors
+
 ```bash
-# Uninstall chart
-helm uninstall todoboard -n todoboard
+# Check database pod
+kubectl get pod -l app=todoboard-postgres
 
-# Delete namespace
-kubectl delete namespace todoboard
+# Check database logs
+kubectl logs -l app=todoboard-postgres
 
-# Cleanup tunnel
-minikube tunnel --cleanup
+# Verify secret
+kubectl get secret app-secrets -o yaml
 ```
+
+## Documentation
+
+- **[Quick Start Guide](./docs/QUICKSTART.md)**: Deploy in 5 minutes
+- **[Environment Setup](./docs/ENVIRONMENT_SETUP.md)**: Detailed installation instructions
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)**: Common issues and solutions
+- **[kubectl-ai Guide](./docs/KUBECTL_AI.md)**: AI-assisted Kubernetes operations
+- **[Specification](../specs/004-kubernetes-deployment/spec.md)**: Feature requirements
+- **[Implementation Plan](../specs/004-kubernetes-deployment/plan.md)**: Technical design
+
+## Success Criteria
+
+- ✅ Deployment completes in under 5 minutes
+- ✅ Application accessible via browser at `http://<minikube-ip>:30000`
+- ✅ All Phase III features functional (task CRUD, AI chatbot, authentication)
+- ✅ Data persists through pod restarts
+- ✅ Configuration manageable via Helm values
+- ✅ Reproducible across developer machines
+
+## Next Steps
+
+### Phase V: Cloud Kubernetes Deployment
+
+After successful local deployment, proceed to Phase V for cloud deployment:
+
+1. **Choose Cloud Provider**: DigitalOcean (DOKS), Google Cloud (GKE), or Azure (AKS)
+2. **Create Kubernetes Cluster**: Use cloud provider console or CLI
+3. **Update Helm Values**: Use `values-production.yaml` with cloud-specific settings
+4. **Configure Ingress**: Set up Ingress controller with TLS certificates
+5. **Enable Autoscaling**: Configure HPA for automatic scaling
+6. **Set Up Monitoring**: Deploy Prometheus and Grafana
+7. **Implement CI/CD**: Automate deployments with GitOps (ArgoCD/Flux)
+
+### Bonus Features
+
+- **+200 points**: Create reusable Claude subagents/skills for Kubernetes deployment
+- **+200 points**: Build Cloud-Native Blueprints for 1-click infrastructure setup
+- **+100 points**: Add Urdu language support to chatbot
+- **+200 points**: Implement voice commands via Web Speech API
+
+## Resources
+
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [Helm Documentation](https://helm.sh/docs/)
+- [Minikube Documentation](https://minikube.sigs.k8s.io/docs/)
+- [Docker Documentation](https://docs.docker.com/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Next.js Documentation](https://nextjs.org/docs/)
+
+## Support
+
+For issues or questions:
+1. Check [Troubleshooting Guide](./docs/TROUBLESHOOTING.md)
+2. Review Kubernetes events: `kubectl get events --sort-by='.lastTimestamp'`
+3. Check application logs: `kubectl logs -l app=todoboard-backend`
+4. Consult project documentation in `specs/004-kubernetes-deployment/`
+
+---
+
+**Phase IV Status**: ✅ Complete
+**Deployment Time**: ~5 minutes
+**Feature Parity**: 100% with Phase III
+**Cloud Ready**: Yes (Phase V)
