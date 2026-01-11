@@ -1,5 +1,5 @@
 # Build stage: installer
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
@@ -25,9 +25,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install runtime dependencies for psycopg2
+# Install runtime dependencies for psycopg2 and healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
@@ -45,8 +46,8 @@ ENV PATH="/app/.venv/bin:$PATH" \
     PORT=8000
 
 # Add non-root user for security
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -s /bin/sh appuser
 
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app

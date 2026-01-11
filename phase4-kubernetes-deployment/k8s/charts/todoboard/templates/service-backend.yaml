@@ -1,18 +1,20 @@
-{{- if .Values.backend.enabled }}
+{{- if .Values.backend.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "todoboard.fullname" . }}-backend
   labels:
-    {{- include "todoboard.labels" . | nindent 4 }}
+    {{- include "todoboard.backend.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.backend.service.type }}
   ports:
-    - port: {{ .Values.backend.service.port }}
-      targetPort: 8000
-      protocol: TCP
-      name: http
+  - port: {{ .Values.backend.service.port }}
+    targetPort: {{ .Values.backend.service.targetPort }}
+    protocol: TCP
+    name: http
+    {{- if and (eq .Values.backend.service.type "NodePort") .Values.backend.service.nodePort }}
+    nodePort: {{ .Values.backend.service.nodePort }}
+    {{- end }}
   selector:
-    {{- include "todoboard.selectorLabels" . | nindent 4 }}
-    app: {{ include "todoboard.fullname" . }}-backend
+    {{- include "todoboard.backend.selectorLabels" . | nindent 4 }}
 {{- end }}

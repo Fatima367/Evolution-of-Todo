@@ -1,39 +1,96 @@
-Thank you for installing {{ .Chart.Name }}.
+🎉 TodoBoard has been successfully deployed!
 
-Your release is named {{ .Release.Name }}.
+Release Name: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+Chart Version: {{ .Chart.Version }}
+App Version: {{ .Chart.AppVersion }}
 
-To learn more about the release, try:
-
-  $ helm status {{ .Release.Name }}
-  $ helm get all {{ .Release.Name }}
-
-{{- if eq .Values.frontend.service.type "LoadBalancer" }}
-To access the frontend service:
-
-{{- if contains "NodePort" .Values.frontend.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "todoboard.fullname" . }}-frontend)
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
-
-{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
-  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-  Watch the status with: 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ include "todoboard.fullname" . }}-frontend'
-
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "todoboard.fullname" . }}-frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  echo "Visit http://${SERVICE_IP}:{{ .Values.frontend.service.port }} to use your application"
-
-{{- else if contains "ClusterIP" .Values.frontend.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ include "todoboard.fullname" . }}-frontend" -o jsonpath="{.items[0].metadata.name}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.frontend.service.port }}
-
+📋 Deployment Summary:
+{{- if .Values.backend.enabled }}
+  ✓ Backend (FastAPI): {{ .Values.backend.replicaCount }} replica(s)
 {{- end }}
+{{- if .Values.frontend.enabled }}
+  ✓ Frontend (Next.js): {{ .Values.frontend.replicaCount }} replica(s)
+{{- end }}
+{{- if .Values.postgresql.enabled }}
+  ✓ Database (PostgreSQL): {{ .Values.postgresql.replicaCount }} replica(s)
 {{- end }}
 
-Don't forget to set your secrets for database and API keys:
+🔍 Check Deployment Status:
+  kubectl get pods -n {{ .Release.Namespace }}
+  kubectl get services -n {{ .Release.Namespace }}
 
-  kubectl create secret generic {{ include "todoboard.fullname" . }}-secrets \
-    --from-literal=postgres-password=YOUR_PASSWORD \
-    --from-literal=openai-api-key=YOUR_OPENAI_KEY \
-    --from-literal=better-auth-secret=YOUR_AUTH_SECRET \
-    --namespace {{ .Release.Namespace }}
+{{- if eq .Values.frontend.service.type "NodePort" }}
+
+🌐 Access the Application:
+  1. Get Minikube IP:
+     minikube ip
+
+  2. Access the frontend:
+     http://<minikube-ip>:{{ .Values.frontend.service.nodePort }}
+
+  3. Or use minikube service:
+     minikube service {{ include "todoboard.fullname" . }}-frontend -n {{ .Release.Namespace }}
+{{- else if eq .Values.frontend.service.type "LoadBalancer" }}
+
+🌐 Access the Application:
+  1. Get the LoadBalancer IP:
+     kubectl get service {{ include "todoboard.fullname" . }}-frontend -n {{ .Release.Namespace }}
+
+  2. Access the frontend:
+     http://<EXTERNAL-IP>:{{ .Values.frontend.service.port }}
+{{- end }}
+
+📊 View Logs:
+  Backend:  kubectl logs -f -l app=todoboard-backend -n {{ .Release.Namespace }}
+  Frontend: kubectl logs -f -l app=todoboard-frontend -n {{ .Release.Namespace }}
+  Database: kubectl logs -f -l app=todoboard-postgres -n {{ .Release.Namespace }}
+
+🔧 Useful Commands:
+  # Port forward to backend
+  kubectl port-forward service/{{ include "todoboard.fullname" . }}-backend {{ .Values.backend.service.port }}:{{ .Values.backend.service.port }} -n {{ .Release.Namespace }}
+
+  # Port forward to frontend
+  kubectl port-forward service/{{ include "todoboard.fullname" . }}-frontend {{ .Values.frontend.service.port }}:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
+
+  # Connect to database
+  kubectl exec -it deployment/{{ include "todoboard.fullname" . }}-postgres -n {{ .Release.Namespace }} -- psql -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }}
+
+  # View deployment details
+  helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+  # Upgrade the deployment
+  helm upgrade {{ .Release.Name }} . -f values-minikube.yaml -n {{ .Release.Namespace }}
+
+  # Rollback to previous version
+  helm rollback {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+  # Uninstall the deployment
+  helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+{{- if .Values.postgresql.persistence.enabled }}
+
+💾 Data Persistence:
+  Your data is stored in a PersistentVolume and will survive pod restarts.
+  PVC Name: {{ include "todoboard.fullname" . }}-postgres-data
+  Storage: {{ .Values.postgresql.persistence.size }}
+{{- end }}
+
+⚠️  Important Notes:
+  - Make sure to create secrets before deployment:
+    kubectl create secret generic app-secrets \
+      --from-literal=POSTGRES_PASSWORD=<your-password> \
+      --from-literal=JWT_SECRET=<your-jwt-secret> \
+      --from-literal=OPENAI_API_KEY=<your-openai-key> \
+      --from-literal=GROQ_API_KEY=<your-groq-key> \
+      -n {{ .Release.Namespace }}
+
+  - For production deployments, update the secrets and resource limits
+  - Enable ingress and network policies for production environments
+
+📚 Documentation:
+  - Quickstart Guide: phase4-kubernetes-deployment/docs/QUICKSTART.md
+  - Troubleshooting: phase4-kubernetes-deployment/docs/TROUBLESHOOTING.md
+  - Helm Values: phase4-kubernetes-deployment/k8s/charts/todoboard/values.yaml
+
+🚀 Happy Task Managing!

@@ -1,46 +1,41 @@
+{{- if .Values.migration.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "todoboard.fullname" . }}-db-migrate
+  name: {{ include "todoboard.fullname" . }}-db-migration
   labels:
     {{- include "todoboard.labels" . | nindent 4 }}
+    component: migration
   annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- range $key, $value := .Values.migration.hookAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
   template:
     metadata:
-      name: {{ include "todoboard.fullname" . }}-db-migrate
       labels:
         {{- include "todoboard.selectorLabels" . | nindent 8 }}
+        component: migration
     spec:
-      {{- if .Values.securityContext.enabled }}
-      securityContext:
-        runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
-        runAsUser: {{ .Values.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.securityContext.fsGroup }}
-      {{- end }}
       restartPolicy: Never
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "todoboard.serviceAccountName" . }}
       containers:
-        - name: migrate
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
-          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
-          command: ["python", "-m", "alembic", "upgrade", "head"]
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "todoboard.fullname" . }}-secrets
-                  key: postgres-url
-          {{- if .Values.securityContext.enabled }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            runAsNonRoot: true
-            runAsUser: {{ .Values.securityContext.runAsUser }}
-            capabilities:
-              drop:
-                - ALL
-          {{- end }}
+      - name: migration
+        image: {{ .Values.migration.image.repository }}:{{ .Values.migration.image.tag }}
+        imagePullPolicy: {{ .Values.migration.image.pullPolicy }}
+        command:
+          {{- toYaml .Values.migration.command | nindent 10 }}
+        env:
+        - name: DATABASE_URL
+          value: {{ .Values.configMap.backend.DATABASE_URL | quote }}
+        envFrom:
+        - secretRef:
+            name: app-secrets
+        resources:
+          {{- toYaml .Values.migration.resources | nindent 10 }}
+  backoffLimit: 3
+{{- end }}

@@ -1,355 +1,620 @@
-# Helm Values Schema: todoboard Chart
+# Helm Values Contract: TodoBoard Application
+# Feature: 004-kubernetes-deployment
+# Date: 2026-01-11
+# Purpose: Define the configuration schema and default values for the TodoBoard Helm chart
 
-## Overview
+# This file serves as both documentation and contract for the Helm chart values.
+# All values shown here are defaults that can be overridden via:
+# - values-{environment}.yaml files (e.g., values-minikube.yaml)
+# - --set flags during helm install/upgrade
+# - Custom values files passed with -f flag
 
-This document defines the configuration contract for the `todoboard` Helm chart. All values must conform to this schema.
+#############################################################################
+# Global Configuration
+#############################################################################
 
-## Schema
-
-### Global Configuration
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "global": {
-      "type": "object",
-      "description": "Global settings applied to all resources",
-      "properties": {
-        "imagePullPolicy": {
-          "type": "string",
-          "enum": ["Always", "IfNotPresent", "Never"],
-          "default": "IfNotPresent"
-        },
-        "imageRegistry": {
-          "type": "string",
-          "description": "Docker registry prefix (empty for local images)",
-          "default": ""
-        },
-        "namespace": {
-          "type": "string",
-          "description": "Target namespace",
-          "default": "todoboard"
-        }
-      }
-    }
-  }
-}
-```
-
-### Frontend Configuration
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "frontend": {
-      "type": "object",
-      "description": "Frontend deployment configuration",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable frontend deployment",
-          "default": true
-        },
-        "replicaCount": {
-          "type": "integer",
-          "description": "Number of replicas",
-          "minimum": 1,
-          "default": 2
-        },
-        "image": {
-          "type": "object",
-          "properties": {
-            "repository": { "type": "string", "default": "todoboard-frontend" },
-            "tag": { "type": "string", "default": "latest" },
-            "pullPolicy": {
-              "type": "string",
-              "enum": ["Always", "IfNotPresent", "Never"],
-              "default": "IfNotPresent"
-            }
-          }
-        },
-        "service": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
-              "description": "Service type for frontend",
-              "default": "LoadBalancer"
-            },
-            "port": {
-              "type": "integer",
-              "description": "Service port",
-              "default": 3000
-            }
-          }
-        },
-        "resources": {
-          "type": "object",
-          "description": "Resource requests and limits",
-          "properties": {
-            "requests": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            },
-            "limits": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            }
-          }
-        },
-        "env": {
-          "type": "array",
-          "description": "Environment variables",
-          "items": {
-            "type": "object",
-            "oneOf": [
-              {
-                "properties": {
-                  "name": { "type": "string" },
-                  "value": { "type": "string" }
-                }
-              },
-              {
-                "properties": {
-                  "name": { "type": "string" },
-                  "valueFrom": {
-                    "type": "object",
-                    "properties": {
-                      "secretKeyRef": {
-                        "type": "object",
-                        "properties": {
-                          "name": { "type": "string" },
-                          "key": { "type": "string" }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-### Backend Configuration
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "backend": {
-      "type": "object",
-      "description": "Backend deployment configuration",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "default": true
-        },
-        "replicaCount": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 2
-        },
-        "image": {
-          "type": "object",
-          "properties": {
-            "repository": { "type": "string", "default": "todoboard-backend" },
-            "tag": { "type": "string", "default": "latest" },
-            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
-          }
-        },
-        "service": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
-              "default": "ClusterIP"
-            },
-            "port": { "type": "integer", "default": 8000 }
-          }
-        },
-        "resources": {
-          "type": "object",
-          "properties": {
-            "requests": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            },
-            "limits": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-### PostgreSQL Configuration
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "postgres": {
-      "type": "object",
-      "description": "PostgreSQL deployment configuration",
-      "properties": {
-        "enabled": { "type": "boolean", "default": true },
-        "replicaCount": { "type": "integer", "minimum": 1, "maximum": 1, "default": 1 },
-        "image": {
-          "type": "object",
-          "properties": {
-            "repository": { "type": "string", "default": "postgres" },
-            "tag": { "type": "string", "default": "16" },
-            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
-          }
-        },
-        "service": {
-          "type": "object",
-          "properties": {
-            "type": { "type": "string", "enum": ["ClusterIP"], "default": "ClusterIP" },
-            "port": { "type": "integer", "default": 5432 }
-          }
-        },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean", "default": true },
-            "storageClass": { "type": "string", "default": "standard" },
-            "size": { "type": "string", "pattern": "^[0-9]+(Gi|Ti)$", "default": "1Gi" }
-          }
-        },
-        "resources": {
-          "type": "object",
-          "properties": {
-            "requests": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            },
-            "limits": {
-              "type": "object",
-              "properties": {
-                "memory": { "type": "string", "pattern": "^[0-9]+(Mi|Gi)$" },
-                "cpu": { "type": "string", "pattern": "^[0-9]+m?$" }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## Default Values (values.yaml)
-
-```yaml
 global:
-  imagePullPolicy: "IfNotPresent"
-  imageRegistry: ""
-  namespace: "todoboard"
+  # Application name used for resource naming
+  appName: todoboard
 
-frontend:
-  enabled: true
-  replicaCount: 2
-  image:
-    repository: "todoboard-frontend"
-    tag: "latest"
-    pullPolicy: "IfNotPresent"
-  service:
-    type: "LoadBalancer"
-    port: 3000
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
-  env: []
+  # Environment identifier (development, staging, production)
+  environment: development
+
+  # Image pull policy for all containers
+  # Options: Always, IfNotPresent, Never
+  imagePullPolicy: IfNotPresent
+
+  # Image pull secrets for private registries (empty for public images)
+  imagePullSecrets: []
+
+#############################################################################
+# Backend Configuration (FastAPI)
+#############################################################################
 
 backend:
+  # Enable/disable backend deployment
   enabled: true
-  replicaCount: 2
-  image:
-    repository: "todoboard-backend"
-    tag: "latest"
-    pullPolicy: "IfNotPresent"
-  service:
-    type: "ClusterIP"
-    port: 8000
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "200m"
-    limits:
-      memory: "1Gi"
-      cpu: "1000m"
-  env: []
 
-postgres:
-  enabled: true
+  # Number of backend pod replicas
   replicaCount: 1
+
   image:
-    repository: "postgres"
-    tag: "16"
-    pullPolicy: "IfNotPresent"
+    # Container registry and repository
+    repository: todoboard-backend
+
+    # Image tag (overrides chart appVersion)
+    tag: "0.1.0"
+
+    # Image pull policy (overrides global if set)
+    pullPolicy: ""
+
+  # Container port configuration
+  containerPort: 8000
+
+  # Service configuration
   service:
-    type: "ClusterIP"
-    port: 5432
-  persistence:
-    enabled: true
-    storageClass: "standard"
-    size: "1Gi"
+    # Service type: ClusterIP, NodePort, LoadBalancer
+    type: ClusterIP
+
+    # Service port (external)
+    port: 8000
+
+    # Target port (container port)
+    targetPort: 8000
+
+    # NodePort (only used if type is NodePort)
+    nodePort: null
+
+  # Resource limits and requests
   resources:
     requests:
-      memory: "256Mi"
       cpu: "100m"
+      memory: "128Mi"
     limits:
-      memory: "512Mi"
       cpu: "500m"
-  env: []
+      memory: "512Mi"
+
+  # Health check probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Environment variables (non-sensitive)
+  env:
+    LOG_LEVEL: "INFO"
+    API_PREFIX: "/api/v1"
+    CORS_ORIGINS: "http://localhost:3000"
+
+  # Environment variables from ConfigMap
+  envFrom:
+    - configMapRef:
+        name: backend-config
+
+  # Environment variables from Secrets
+  envFromSecrets:
+    - secretRef:
+        name: app-secrets
+
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+
+  # Node selector for pod placement
+  nodeSelector: {}
+
+  # Tolerations for pod scheduling
+  tolerations: []
+
+  # Affinity rules
+  affinity: {}
+
+#############################################################################
+# Frontend Configuration (Next.js)
+#############################################################################
+
+frontend:
+  # Enable/disable frontend deployment
+  enabled: true
+
+  # Number of frontend pod replicas
+  replicaCount: 1
+
+  image:
+    # Container registry and repository
+    repository: todoboard-frontend
+
+    # Image tag (overrides chart appVersion)
+    tag: "0.1.0"
+
+    # Image pull policy (overrides global if set)
+    pullPolicy: ""
+
+  # Container port configuration
+  containerPort: 3000
+
+  # Service configuration
+  service:
+    # Service type: ClusterIP, NodePort, LoadBalancer
+    type: NodePort
+
+    # Service port (external)
+    port: 3000
+
+    # Target port (container port)
+    targetPort: 3000
+
+    # NodePort (only used if type is NodePort)
+    # Range: 30000-32767
+    nodePort: 30000
+
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+  # Health check probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 3
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Environment variables (non-sensitive)
+  env:
+    NODE_ENV: "production"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard"
+
+  # Backend API URL (set via ConfigMap)
+  # For Minikube: http://todoboard-backend:8000
+  # For cloud: https://api.todoboard.example.com
+  apiUrl: "http://todoboard-backend:8000"
+
+  # Environment variables from ConfigMap
+  envFrom:
+    - configMapRef:
+        name: frontend-config
+
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+
+  # Node selector for pod placement
+  nodeSelector: {}
+
+  # Tolerations for pod scheduling
+  tolerations: []
+
+  # Affinity rules
+  affinity: {}
+
+#############################################################################
+# Database Configuration (PostgreSQL)
+#############################################################################
+
+postgresql:
+  # Enable/disable PostgreSQL deployment
+  # Set to false if using external database (e.g., Neon Serverless)
+  enabled: true
+
+  # Number of database replicas (always 1 for Phase IV)
+  replicaCount: 1
+
+  image:
+    # Official PostgreSQL image
+    repository: postgres
+
+    # PostgreSQL version
+    tag: "16-alpine"
+
+    # Image pull policy
+    pullPolicy: IfNotPresent
+
+  # Container port configuration
+  containerPort: 5432
+
+  # Service configuration
+  service:
+    # Service type (always ClusterIP for database)
+    type: ClusterIP
+
+    # Service port
+    port: 5432
+
+    # Target port (container port)
+    targetPort: 5432
+
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Health check probes
+  livenessProbe:
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - pg_isready -U postgres
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - pg_isready -U postgres
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Database credentials (from Secret)
+  auth:
+    # Database name
+    database: todoboard
+
+    # Database user
+    username: postgres
+
+    # Database password (set via Secret, not here)
+    # Override with --set postgresql.auth.password=<password>
+    password: ""
+
+    # Existing secret name (if using pre-created secret)
+    existingSecret: ""
+
+  # Persistent storage configuration
+  persistence:
+    # Enable persistent storage
+    enabled: true
+
+    # Storage class name
+    # Minikube: "standard" (hostPath)
+    # Cloud: "gp3" (AWS), "pd-ssd" (GCP), "managed-premium" (Azure)
+    storageClass: "standard"
+
+    # Access mode
+    # ReadWriteOnce: Single node read-write
+    # ReadWriteMany: Multi-node read-write (not supported by most storage classes)
+    accessMode: ReadWriteOnce
+
+    # Storage size
+    size: "5Gi"
+
+    # Mount path in container
+    mountPath: /var/lib/postgresql/data
+
+    # Subpath within volume (avoids permission issues)
+    subPath: postgres
+
+  # Security context
+  securityContext:
+    runAsNonRoot: false  # PostgreSQL requires root for initialization
+    runAsUser: 999       # postgres user in official image
+    fsGroup: 999
+
+  # Node selector for pod placement
+  nodeSelector: {}
+
+  # Tolerations for pod scheduling
+  tolerations: []
+
+  # Affinity rules
+  affinity: {}
+
+#############################################################################
+# Database Migration Configuration
+#############################################################################
+
+migration:
+  # Enable/disable database migration hook
+  enabled: true
+
+  # Migration image (uses backend image)
+  image:
+    repository: todoboard-backend
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+  # Migration command (Alembic)
+  command:
+    - /bin/sh
+    - -c
+    - |
+      echo "Running database migrations..."
+      alembic upgrade head
+      echo "Migrations completed successfully"
+
+  # Resource limits for migration job
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+  # Hook annotations
+  hookAnnotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+
+#############################################################################
+# ConfigMap Configuration
+#############################################################################
+
+configMap:
+  # Backend configuration
+  backend:
+    DATABASE_URL: "postgresql://postgres:{{ .Values.postgresql.auth.password }}@todoboard-postgres:5432/{{ .Values.postgresql.auth.database }}"
+    CORS_ORIGINS: "http://localhost:3000,http://localhost:30000"
+    LOG_LEVEL: "INFO"
+    API_PREFIX: "/api/v1"
+
+  # Frontend configuration
+  frontend:
+    NEXT_PUBLIC_API_URL: "http://todoboard-backend:8000"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard"
+    NODE_ENV: "production"
+
+#############################################################################
+# Secret Configuration
+#############################################################################
+
+secrets:
+  # Create secrets from values (not recommended for production)
+  # For production, use external secret management
+  create: true
+
+  # Secret data (base64 encoded by Helm)
+  data:
+    # Database password
+    POSTGRES_PASSWORD: "changeme"
+
+    # JWT secret for authentication
+    JWT_SECRET: "your-jwt-secret-key-change-in-production"
+
+    # OpenAI API key for chatbot
+    OPENAI_API_KEY: ""
+
+    # Groq API key for LLM
+    GROQ_API_KEY: ""
+
+#############################################################################
+# Ingress Configuration (Optional for Phase IV)
+#############################################################################
 
 ingress:
+  # Enable/disable Ingress
   enabled: false
-```
 
-## Minikube Overrides (values-minikube.yaml)
+  # Ingress class name
+  className: "nginx"
 
-```yaml
-# Use LoadBalancer with Minikube tunnel
-frontend:
-  service:
-    type: "LoadBalancer"
+  # Ingress annotations
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
-# Use standard storage class for Minikube
-postgres:
-  persistence:
-    storageClass: "standard"
-```
+  # Ingress hosts
+  hosts:
+    - host: todoboard.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: todoboard-frontend
+            port: 3000
+        - path: /api
+          pathType: Prefix
+          service:
+            name: todoboard-backend
+            port: 8000
+
+  # TLS configuration
+  tls: []
+    # - secretName: todoboard-tls
+    #   hosts:
+    #     - todoboard.local
+
+#############################################################################
+# Network Policy Configuration (Optional for Phase IV)
+#############################################################################
+
+networkPolicy:
+  # Enable/disable network policies
+  enabled: false
+
+  # Policy type
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # Ingress rules
+  ingress:
+    # Frontend can receive traffic from anywhere
+    frontend:
+      - from: []
+        ports:
+          - protocol: TCP
+            port: 3000
+
+    # Backend can receive traffic from frontend only
+    backend:
+      - from:
+          - podSelector:
+              matchLabels:
+                app: todoboard-frontend
+        ports:
+          - protocol: TCP
+            port: 8000
+
+    # Database can receive traffic from backend only
+    database:
+      - from:
+          - podSelector:
+              matchLabels:
+                app: todoboard-backend
+        ports:
+          - protocol: TCP
+            port: 5432
+
+  # Egress rules
+  egress:
+    # All pods can access DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+    # Backend can access database and external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 443
+
+#############################################################################
+# Service Account Configuration
+#############################################################################
+
+serviceAccount:
+  # Create service account
+  create: true
+
+  # Service account name
+  name: ""
+
+  # Annotations
+  annotations: {}
+
+#############################################################################
+# Pod Disruption Budget (Optional for Phase IV)
+#############################################################################
+
+podDisruptionBudget:
+  # Enable/disable PDB
+  enabled: false
+
+  # Minimum available pods
+  minAvailable: 1
+
+  # Maximum unavailable pods
+  maxUnavailable: null
+
+#############################################################################
+# Horizontal Pod Autoscaler (Optional for Phase IV)
+#############################################################################
+
+autoscaling:
+  # Enable/disable HPA
+  enabled: false
+
+  # Minimum replicas
+  minReplicas: 1
+
+  # Maximum replicas
+  maxReplicas: 3
+
+  # Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 80
+
+  # Target memory utilization percentage
+  targetMemoryUtilizationPercentage: 80
+
+#############################################################################
+# Monitoring Configuration (Optional for Phase IV)
+#############################################################################
+
+monitoring:
+  # Enable/disable Prometheus ServiceMonitor
+  enabled: false
+
+  # ServiceMonitor configuration
+  serviceMonitor:
+    interval: 30s
+    scrapeTimeout: 10s
+
+#############################################################################
+# Notes
+#############################################################################
+
+# Environment-Specific Overrides:
+#
+# Minikube (values-minikube.yaml):
+#   - frontend.service.type: NodePort
+#   - postgresql.persistence.storageClass: standard
+#   - All replicas: 1
+#   - Reduced resource limits
+#
+# Production (values-production.yaml):
+#   - frontend.service.type: LoadBalancer
+#   - postgresql.persistence.storageClass: gp3/pd-ssd
+#   - Increased replicas (2-3)
+#   - Higher resource limits
+#   - ingress.enabled: true
+#   - networkPolicy.enabled: true
+#   - autoscaling.enabled: true
+#
+# Secret Management:
+#   - Phase IV: Manual kubectl create secret
+#   - Phase V: External Secrets Operator + cloud secret manager
+#
+# Usage Examples:
+#   helm install todoboard ./charts/todoboard -f values-minikube.yaml
+#   helm upgrade todoboard ./charts/todoboard --set backend.replicaCount=2
+#   helm install todoboard ./charts/todoboard --set secrets.data.POSTGRES_PASSWORD=securepass

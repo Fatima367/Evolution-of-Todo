@@ -7,8 +7,6 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
 */}}
 {{- define "todoboard.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -51,6 +49,60 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Backend labels
+*/}}
+{{- define "todoboard.backend.labels" -}}
+{{ include "todoboard.labels" . }}
+app: todoboard-backend
+component: backend
+{{- end }}
+
+{{/*
+Backend selector labels
+*/}}
+{{- define "todoboard.backend.selectorLabels" -}}
+{{ include "todoboard.selectorLabels" . }}
+app: todoboard-backend
+component: backend
+{{- end }}
+
+{{/*
+Frontend labels
+*/}}
+{{- define "todoboard.frontend.labels" -}}
+{{ include "todoboard.labels" . }}
+app: todoboard-frontend
+component: frontend
+{{- end }}
+
+{{/*
+Frontend selector labels
+*/}}
+{{- define "todoboard.frontend.selectorLabels" -}}
+{{ include "todoboard.selectorLabels" . }}
+app: todoboard-frontend
+component: frontend
+{{- end }}
+
+{{/*
+PostgreSQL labels
+*/}}
+{{- define "todoboard.postgresql.labels" -}}
+{{ include "todoboard.labels" . }}
+app: todoboard-postgres
+component: database
+{{- end }}
+
+{{/*
+PostgreSQL selector labels
+*/}}
+{{- define "todoboard.postgresql.selectorLabels" -}}
+{{ include "todoboard.selectorLabels" . }}
+app: todoboard-postgres
+component: database
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "todoboard.serviceAccountName" -}}
@@ -59,4 +111,27 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Backend image
+*/}}
+{{- define "todoboard.backend.image" -}}
+{{- $tag := .Values.backend.image.tag | default .Chart.AppVersion }}
+{{- printf "%s:%s" .Values.backend.image.repository $tag }}
+{{- end }}
+
+{{/*
+Frontend image
+*/}}
+{{- define "todoboard.frontend.image" -}}
+{{- $tag := .Values.frontend.image.tag | default .Chart.AppVersion }}
+{{- printf "%s:%s" .Values.frontend.image.repository $tag }}
+{{- end }}
+
+{{/*
+PostgreSQL image
+*/}}
+{{- define "todoboard.postgresql.image" -}}
+{{- printf "%s:%s" .Values.postgresql.image.repository .Values.postgresql.image.tag }}
 {{- end }}

@@ -1,78 +1,67 @@
-{{- if .Values.backend.enabled }}
+{{- if .Values.backend.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "todoboard.fullname" . }}-backend
   labels:
-    {{- include "todoboard.labels" . | nindent 4 }}
-    app: {{ include "todoboard.fullname" . }}-backend
+    {{- include "todoboard.backend.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.backend.replicaCount }}
   selector:
     matchLabels:
-      {{- include "todoboard.selectorLabels" . | nindent 6 }}
-      app: {{ include "todoboard.fullname" . }}-backend
+      {{- include "todoboard.backend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "todoboard.selectorLabels" . | nindent 8 }}
-        app: {{ include "todoboard.fullname" . }}-backend
+        {{- include "todoboard.backend.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.securityContext.enabled }}
-      securityContext:
-        runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
-        runAsUser: {{ .Values.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.securityContext.fsGroup }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ include "todoboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.backend.securityContext | nindent 8 }}
       containers:
-        - name: backend
-          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
-          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
-          ports:
-            - containerPort: 8000
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "todoboard.fullname" . }}-secrets
-                  key: postgres-url
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "todoboard.fullname" . }}-secrets
-                  key: openai-api-key
-            - name: BETTER_AUTH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "todoboard.fullname" . }}-secrets
-                  key: better-auth-secret
-            - name: NEXT_PUBLIC_BETTER_AUTH_URL
-              value: "http://{{ include "todoboard.fullname" . }}-backend:8000"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          resources:
-            {{- toYaml .Values.backend.resources | nindent 12 }}
-          {{- if .Values.securityContext.enabled }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            runAsNonRoot: true
-            runAsUser: {{ .Values.securityContext.runAsUser }}
-            capabilities:
-              drop:
-                - ALL
-          {{- end }}
+      - name: backend
+        image: {{ include "todoboard.backend.image" . }}
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy | default .Values.global.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.backend.containerPort }}
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.backend.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "todoboard.fullname" . }}-backend-config
+        - secretRef:
+            name: app-secrets
+        {{- if .Values.backend.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backend.livenessProbe.httpGet.path }}
+            port: {{ .Values.backend.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.backend.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.backend.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.backend.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.readinessProbe.httpGet.path }}
+            port: {{ .Values.backend.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.backend.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
       {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
