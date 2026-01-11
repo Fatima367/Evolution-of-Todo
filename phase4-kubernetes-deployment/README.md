@@ -35,8 +35,7 @@ minikube image load todoboard-frontend:0.1.0
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=changeme \
   --from-literal=JWT_SECRET=your-jwt-secret \
-  --from-literal=OPENAI_API_KEY=your-key \
-  --from-literal=GROQ_API_KEY=your-key
+  --from-literal=GROQ_API_KEY=your-groq-api-key
 
 # 4. Deploy with Helm
 cd k8s/charts/todoboard
@@ -145,8 +144,7 @@ phase4-kubernetes-deployment/
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=<password> \
   --from-literal=JWT_SECRET=<secret> \
-  --from-literal=OPENAI_API_KEY=<key> \
-  --from-literal=GROQ_API_KEY=<key>
+  --from-literal=GROQ_API_KEY=<your-groq-api-key>
 ```
 
 **Phase V (Cloud)**: External Secrets Operator + Cloud Secret Manager
