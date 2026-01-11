@@ -20,6 +20,7 @@ async def get_tasks(
     current_user: Annotated[User, Depends(get_current_user)],
     status_filter: Optional[TaskStatus] = Query(None, alias="status", description="Filter by status"),
     priority: Optional[TaskPriority] = Query(None, description="Filter by priority"),
+    is_favorite: Optional[bool] = Query(None, description="Filter by favorite status"),
     sort_by: Optional[SortField] = Query(SortField.CREATED_AT, description="Field to sort by"),
     sort_order: Optional[SortOrder] = Query(SortOrder.DESC, description="Sort direction"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of tasks"),
@@ -34,6 +35,7 @@ async def get_tasks(
         current_user=current_user,
         status=status_filter,
         priority=priority,
+        is_favorite=is_favorite,
         sort_by=sort_by,
         sort_order=sort_order,
         limit=limit,
@@ -93,6 +95,28 @@ async def update_task(
         current_user=current_user
     )
     return task
+
+
+@router.patch("/{task_id}/favorite", response_model=TaskRead)
+async def toggle_favorite(
+    task_id: UUID,
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Toggle favorite status of a task"""
+    task = TaskService.get_task_by_id(
+        session=session,
+        task_id=task_id,
+        current_user=current_user
+    )
+    # Toggle favorite status
+    updated_task = TaskService.update_task(
+        session=session,
+        task_id=task_id,
+        task_data=TaskUpdate(is_favorite=not task.is_favorite),
+        current_user=current_user
+    )
+    return updated_task
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)

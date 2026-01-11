@@ -132,7 +132,7 @@ export function CreateTaskModal() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
-              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#163cb7] to-[#149c8c] dark:from-[#6EB8E1] dark:to-[#4EB5A9] bg-clip-text text-transparent">
                 Create New Task
               </h2>
               <motion.button
@@ -163,7 +163,7 @@ export function CreateTaskModal() {
                   className={`
                     w-full px-4 py-3 glass-card rounded-xl
                     border-2 ${errors.title ? 'border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'}
-                    focus:outline-none focus:ring-2 focus:ring-purple-500/50
+                    focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50
                     text-gray-900 dark:text-white placeholder:text-gray-500
                   `}
                 />
@@ -190,7 +190,7 @@ export function CreateTaskModal() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Add a description (optional)..."
                   rows={3}
-                  className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-gray-900 dark:text-white placeholder:text-gray-500 resize-none"
+                  className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white placeholder:text-gray-500 resize-none"
                 />
               </div>
 
@@ -243,7 +243,7 @@ export function CreateTaskModal() {
                       className={`
                         w-full pl-10 pr-4 py-3 glass-card rounded-xl
                         border-2 ${errors.dueDate ? 'border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'}
-                        focus:outline-none focus:ring-2 focus:ring-purple-500/50
+                        focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50
                         text-gray-900 dark:text-white
                       `}
                     />
@@ -278,7 +278,7 @@ export function CreateTaskModal() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleAddTag}
                     placeholder="Type and press Enter to add tags..."
-                    className="w-full pl-10 pr-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-gray-900 dark:text-white placeholder:text-gray-500"
+                    className="w-full pl-10 pr-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white placeholder:text-gray-500"
                   />
                 </div>
                 {tags.length > 0 && (
@@ -289,13 +289,13 @@ export function CreateTaskModal() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-medium border border-purple-400/50"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white rounded-lg text-sm font-medium border border-[#4EB5A9]"
                       >
                         {tag}
                         <button
                           type="button"
                           onClick={() => handleRemoveTag(tag)}
-                          className="ml-1 hover:text-purple-300"
+                          className="ml-1 hover:text-[#d6f9f5] font-bold"
                         >
                           <X size={14} />
                         </button>
@@ -333,7 +333,7 @@ export function CreateTaskModal() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed glow-purple"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Creating...' : 'Create Task'}
                 </motion.button>

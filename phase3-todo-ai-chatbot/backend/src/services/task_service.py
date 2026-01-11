@@ -47,6 +47,7 @@ class TaskService:
         current_user: User,
         status: Optional[TaskStatus] = None,
         priority: Optional[str] = None,
+        is_favorite: Optional[bool] = None,
         sort_by: Optional[SortField] = SortField.CREATED_AT,
         sort_order: Optional[SortOrder] = SortOrder.DESC,
         limit: int = 50,
@@ -59,6 +60,7 @@ class TaskService:
             current_user: Authenticated user
             status: Optional status filter
             priority: Optional priority filter
+            is_favorite: Optional favorite status filter
             sort_by: Field to sort by (default: created_at)
             sort_order: Sort direction (default: desc)
             limit: Maximum number of tasks to return
@@ -75,6 +77,8 @@ class TaskService:
             statement = statement.where(Task.status == status)
         if priority:
             statement = statement.where(Task.priority == priority)
+        if is_favorite is not None:
+            statement = statement.where(Task.is_favorite == is_favorite)
 
         # Get total count
         count_statement = select(func.count()).select_from(statement.subquery())

@@ -11,7 +11,9 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  User
+  User,
+  Calendar,
+  Star
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useUIStore } from '@/store'
@@ -20,6 +22,8 @@ import { Button } from '../ui/Button'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Tasks', href: '/dashboard/tasks', icon: CheckSquare },
+  { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
+  { name: 'Favorites', href: '/dashboard/favorites', icon: Star },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -56,13 +60,16 @@ export function DashboardSidebar() {
           width: isSidebarOpen ? 280 : 0,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-0 h-screen bg-white/95 dark:bg-[#1A1A3A] border-r border-[#BAD0CC] dark:border-[#3A3A4A] z-50 lg:sticky lg:top-0 backdrop-blur-xl"
+        className="fixed left-0 top-0 h-screen bg-white/80 dark:bg-[#0E0E34]/95 border-r border-[#BAD0CC]/50 dark:border-[#252E8A]/50 z-50 lg:sticky lg:top-0 backdrop-blur-2xl"
       >
         <div className="flex flex-col h-full p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <CheckSquare className="h-8 w-8 text-[#6EB8E1]" />
+            <Link href="/dashboard" className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="absolute inset-0 blur-lg opacity-50 rounded-xl" />
+                <CheckSquare className="h-8 w-8 text-[#6EB8E1] relative" />
+              </div>
               <span className="text-xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] bg-clip-text text-transparent">
                 TodoBoard
               </span>
@@ -71,7 +78,7 @@ export function DashboardSidebar() {
             {/* Close button (mobile) / Collapse button (desktop) */}
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors lg:hidden"
+              className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-700/50 transition-colors lg:hidden"
             >
               <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>
@@ -88,22 +95,59 @@ export function DashboardSidebar() {
                   key={item.name}
                   href={item.href}
                   className={`
-                    flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
+                    group relative flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300
                     ${isActive
-                      ? 'bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white shadow-lg'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-[#D6E6F2] dark:hover:bg-[#252E8A]/40'
+                      ? 'bg-gradient-to-r from-[#6EB8E1] to-[#7be1d5] dark:from-[#252E8A]/50 dark:to-[#1A1A3A]/50 border border-[#6EB8E1]/30 dark:border-[#4EB5A9]/30'
+                      : 'hover:bg-gray-100/60 dark:hover:bg-gray-800/40 border border-transparent'
                     }
                   `}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.name}</span>
+                  {/* Active indicator */}
+                  {isActive && (
+                    <>
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-[#6EB8E1] to-[#4EB5A9] rounded-r-full shadow-[0_0_10px_rgba(110,184,225,0.5)]" />
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#6EB8E1]/10 to-[#4EB5A9]/10 blur-md" />
+                    </>
+                  )}
+
+                  {/* Icon with glow effect */}
+                  <div className={`
+                    relative p-2 rounded-lg transition-all duration-300
+                    ${isActive
+                      ? 'bg-transparent dark:bg-[#4EB5A9]/20'
+                      : 'group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
+                    }
+                  `}>
+                    <Icon className={`
+                      h-5 w-5 transition-all duration-300
+                      ${isActive
+                        ? 'text-white dark:text-[#4EB5A9] drop-shadow-[0_0_8px_rgba(110,184,225,0.5)]'
+                        : 'text-gray-500 dark:text-gray-400 group-hover:text-[#6EB8E1] dark:group-hover:text-[#4EB5A9]'
+                      }
+                    `} />
+                  </div>
+
+                  <span className={`
+                    font-medium transition-all duration-300 z-10
+                    ${isActive
+                      ? 'text-white'
+                      : 'text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                    }
+                  `}>
+                    {item.name}
+                  </span>
+
+                  {/* Hover glow effect */}
+                  {!isActive && (
+                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#6EB8E1]/5 to-[#4EB5A9]/5 blur-md" />
+                  )}
                 </Link>
               )
             })}
           </nav>
 
           {/* User Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+          <div className="border-t border-[#BAD0CC]/50 dark:border-[#252E8A]/50 pt-4 space-y-4">
             <div className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#252E3F]/30">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#6EB8E1] to-[#4EB5A9] flex items-center justify-center text-white font-semibold">
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
