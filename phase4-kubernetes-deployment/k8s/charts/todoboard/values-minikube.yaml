@@ -35,7 +35,6 @@ backend:
 
   env:
     LOG_LEVEL: "DEBUG"
-    CORS_ORIGINS: "http://localhost:3000,http://localhost:30000"
 
 #############################################################################
 # Frontend Configuration
@@ -82,6 +81,7 @@ postgresql:
     enabled: true
     storageClass: "standard"
     size: "5Gi"
+    subPath: "postgres-clean"
 
   resources:
     requests:
@@ -91,6 +91,62 @@ postgresql:
       cpu: "500m"
       memory: "512Mi"
 
+  securityContext:
+    runAsNonRoot: false
+    runAsUser: 999
+    fsGroup: 999
+
+#############################################################################
+# Database Migration Configuration
+#############################################################################
+
+migration:
+  enabled: true
+
+  image:
+    repository: todoboard-backend
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    - /bin/sh
+    - -c
+    - |
+      echo "Waiting for database..."
+      python -c "
+      import socket, os, time, sys
+      from urllib.parse import urlparse
+      u = urlparse(os.environ['DATABASE_URL'])
+      host = u.hostname
+      port = u.port or 5432
+      print(f'Waiting for {host}:{port}...')
+      for i in range(60):
+          try:
+              with socket.create_connection((host, port), timeout=2):
+                  print('Connected!')
+                  sys.exit(0)
+          except Exception:
+              time.sleep(2)
+      print('Timeout waiting for database')
+      sys.exit(1)
+      "
+      echo "Running database migrations..."
+      alembic upgrade head
+      echo "Migrations completed successfully"
+
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+  hookAnnotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+
 #############################################################################
 # ConfigMap Configuration
 #############################################################################
@@ -98,12 +154,29 @@ postgresql:
 configMap:
   backend:
     DATABASE_URL: "postgresql://postgres:changeme@todoboard-postgres:5432/todoboard"
-    CORS_ORIGINS: "http://localhost:3000,http://localhost:30000"
+    CORS_ORIGINS: '["http://localhost:3000","http://localhost:30000"]'
     LOG_LEVEL: "DEBUG"
 
   frontend:
     NEXT_PUBLIC_API_URL: "http://todoboard-backend:8000"
     NODE_ENV: "development"
+
+#############################################################################
+# Secret Configuration
+#############################################################################
+
+secrets:
+  # Set to false - secrets should be created manually using kubectl
+  # See QUICKSTART.md Step 3 for instructions:
+  # kubectl create secret generic app-secrets \
+  #   --from-literal=POSTGRES_PASSWORD=changeme \
+  #   --from-literal=JWT_SECRET_KEY=your-jwt-secret-key \
+  #   --from-literal=GROQ_API_KEY=your-groq-api-key
+  create: false
+  data:
+    POSTGRES_PASSWORD: ""
+    JWT_SECRET_KEY: ""
+    GROQ_API_KEY: ""
 
 #############################################################################
 # Optional Features (Disabled for Minikube)
