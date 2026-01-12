@@ -35,7 +35,16 @@ class User(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     is_active: bool = Field(default=True, nullable=False)
 
+    # Notification settings
+    email_notifications: bool = Field(default=True)
+    task_reminders: bool = Field(default=True)
+    weekly_summary: bool = Field(default=True)
+    
+    # Soft delete fields
+    deletion_scheduled: bool = Field(default=False, nullable=False)
+    scheduled_for_deletion_at: Optional[datetime] = Field(default=None, nullable=True)
+
     # Relationships
-    tasks: List["Task"] = Relationship(back_populates="user", cascade_delete=True)
+    tasks: List["Task"] = Relationship(back_populates="user")
     conversations: List["Conversation"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
     messages: List["Message"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})

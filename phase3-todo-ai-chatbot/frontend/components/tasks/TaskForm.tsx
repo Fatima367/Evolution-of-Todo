@@ -1,17 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import type { TaskCreate, TaskPriority } from '@/lib/types';
+import { Repeat } from 'lucide-react';
+import type { TaskCreate, TaskPriority, RecurringType } from '@/lib/types';
 
 interface TaskFormProps {
   onSubmit: (data: TaskCreate) => Promise<void>;
   onCancel?: () => void;
+  initialData?: Partial<TaskCreate>;
 }
 
-export function TaskForm({ onSubmit, onCancel }: TaskFormProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<TaskPriority>('medium');
+export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium');
+  const [recurringType, setRecurringType] = useState<RecurringType>(initialData?.recurring_type || 'none');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,10 +26,12 @@ export function TaskForm({ onSubmit, onCancel }: TaskFormProps) {
         title,
         description: description || undefined,
         priority,
+        recurring_type: recurringType,
       });
       setTitle('');
       setDescription('');
       setPriority('medium');
+      setRecurringType('none');
     } catch (error) {
       console.error('Failed to create task:', error);
     } finally {
@@ -67,21 +72,42 @@ export function TaskForm({ onSubmit, onCancel }: TaskFormProps) {
         />
       </div>
 
-      <div>
-        <label htmlFor="priority" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-          Priority
-        </label>
-        <select
-          id="priority"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value as TaskPriority)}
-          className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
-        >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="urgent">Urgent</option>
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="priority" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+            Priority
+          </label>
+          <select
+            id="priority"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as TaskPriority)}
+            className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="recurring" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300 flex items-center gap-1">
+            <Repeat size={14} className="text-purple-400" />
+            Recurring
+          </label>
+          <select
+            id="recurring"
+            value={recurringType}
+            onChange={(e) => setRecurringType(e.target.value as RecurringType)}
+            className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+          >
+            <option value="none">One-time</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex gap-2">

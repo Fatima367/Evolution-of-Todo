@@ -189,6 +189,16 @@ kubectl scale deployment todoboard-backend --replicas=3
 # Or via Helm
 helm upgrade todoboard ./k8s/charts/todoboard --set backend.replicaCount=3
 ```
+This script will handle all the necessary steps:
+- ✅ Verify that all prerequisite tools are installed.
+- ✅ Start Minikube cluster (if not running).
+- ✅ Configure Docker to use Minikube's daemon.
+- ✅ Build the Docker images for the frontend and backend.
+- ✅ Load the environment variables from your `.env` file.
+- ✅ Create a dedicated Kubernetes namespace for the application.
+- ✅ Deploy the application using the Helm chart.
+- ✅ Wait for all application pods to become ready.
+- ✅ Provide you with the URL to access the application.
 
 ### Database Operations
 

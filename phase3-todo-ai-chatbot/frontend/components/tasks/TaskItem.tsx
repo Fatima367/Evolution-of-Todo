@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Edit2, Trash2, Tag } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Tag, Star, Repeat } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { Task } from '@/lib/types';
 import { useUIStore } from '@/store/uiStore';
@@ -11,15 +11,25 @@ interface TaskItemProps {
   task: Task;
   onUpdate: (id: string, data: any) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite?: (id: string) => void;
 }
 
-export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
+export function TaskItem({ task, onUpdate, onDelete, onToggleFavorite }: TaskItemProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { openEditTaskModal, openDeleteConfirmModal } = useUIStore();
 
   const toggleComplete = () => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     onUpdate(task.id, { status: newStatus });
+  };
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(task.id);
+    } else {
+      onUpdate(task.id, { is_favorite: !task.is_favorite });
+    }
   };
 
   // Priority-based neon border colors
@@ -48,14 +58,32 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
       onHoverEnd={() => setIsHovered(false)}
       className={`
         glass-card rounded-2xl p-5
+        bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl
         border-2 ${priorityBorders[task.priority]}
         transition-all duration-300
         hover:shadow-2xl
         relative
       `}
     >
-      {/* Priority Badge - Top Right Corner */}
-      <div className="absolute top-4 right-4">
+      {/* Top Row: Priority Badge with Star on its left */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        {/* Favorite Button - immediately left of priority */}
+        <motion.button
+          whileHover={{ scale: 1.2, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleToggleFavorite}
+          className={`
+            p-1.5 rounded-lg transition-all
+            ${task.is_favorite
+              ? 'bg-yellow-500/20 text-yellow-400'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }
+          `}
+          aria-label={task.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Star size={18} className={task.is_favorite ? 'fill-yellow-400' : ''} />
+        </motion.button>
+
         <span
           className={`
             px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
@@ -66,7 +94,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
         </span>
       </div>
 
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 pt-2">
         {/* Left: Checkbox */}
         <motion.div
           whileHover={{ scale: 1.1 }}
@@ -77,12 +105,12 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
             type="checkbox"
             checked={task.status === 'completed'}
             onChange={toggleComplete}
-            className="w-6 h-6 rounded-lg cursor-pointer accent-purple-500 transition-all"
+            className="w-6 h-6 rounded-lg cursor-pointer accent-blue-500 transition-all"
           />
         </motion.div>
 
         {/* Center: Task Details */}
-        <div className="flex-1 min-w-0 pr-12">
+        <div className="flex-1 min-w-0">
           {/* Title */}
           <h3
             className={`
@@ -104,18 +132,22 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
             </p>
           )}
 
-          {/* Dates */}
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3">
+          {/* Meta Info Row */}
+          <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400 mb-3">
             <div className="flex items-center gap-1">
-              <Calendar size={14} />
-              <span>Created: {formatDate(task.created_at)}</span>
+              <Calendar size={14} className="text-gray-400 align-middle" />
+              <span className="align-middle leading-none">Created: {formatDate(task.created_at)}</span>
             </div>
             {task.due_date && (
               <div className="flex items-center gap-1">
-                <Calendar size={14} />
-                <span className="text-orange-500 dark:text-orange-400">
-                  Due: {formatDate(task.due_date)}
-                </span>
+                <Calendar size={14} className="text-orange-400 align-middle" />
+                <span className="text-orange-500 dark:text-orange-400 align-middle leading-none">Due: {formatDate(task.due_date)}</span>
+              </div>
+            )}
+            {task.recurring_type && task.recurring_type !== 'none' && (
+              <div className="flex items-center gap-1">
+                <Repeat size={14} className="text-blue-400 align-middle" />
+                <span className="text-blue-400 capitalize align-middle leading-none">{task.recurring_type}</span>
               </div>
             )}
           </div>
@@ -126,7 +158,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
               {task.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-500/10 text-purple-400 rounded-lg text-xs font-medium border border-purple-400/30 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-400/40"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-xs font-medium border border-blue-400/30 dark:bg-blue-500/20 dark:text-blue-300 dark:blue-blue-400/40"
                 >
                   <Tag size={12} />
                   {tag}
@@ -141,7 +173,7 @@ export function TaskItem({ task, onUpdate, onDelete }: TaskItemProps) {
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 10 }}
           transition={{ duration: 0.2 }}
-          className="flex flex-col gap-2 absolute top-14 right-4"
+          className="flex flex-col gap-2"
         >
           <motion.button
             whileHover={{ scale: 1.1 }}

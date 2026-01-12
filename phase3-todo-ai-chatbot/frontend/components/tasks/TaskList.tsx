@@ -10,9 +10,10 @@ interface TaskListProps {
   loading: boolean;
   onUpdate: (id: string, data: any) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite?: (id: string) => void;
 }
 
-export function TaskList({ tasks, loading, onUpdate, onDelete }: TaskListProps) {
+export function TaskList({ tasks, loading, onUpdate, onDelete, onToggleFavorite }: TaskListProps) {
   if (loading) {
     return (
       <motion.div
@@ -68,6 +69,7 @@ export function TaskList({ tasks, loading, onUpdate, onDelete }: TaskListProps) 
             task={task}
             onUpdate={onUpdate}
             onDelete={onDelete}
+            onToggleFavorite={onToggleFavorite}
           />
         ))}
       </AnimatePresence>

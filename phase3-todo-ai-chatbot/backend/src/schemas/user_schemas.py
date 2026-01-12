@@ -1,5 +1,6 @@
 """User API schemas for request/response validation"""
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
@@ -30,13 +31,21 @@ class UserRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     is_active: bool
+    email_notifications: bool
+    task_reminders: bool
+    weekly_summary: bool
+    deletion_scheduled: bool
+    scheduled_for_deletion_at: Optional[datetime]
 
     model_config = {"from_attributes": True}
 
 
 class UserUpdate(BaseModel):
-    """Schema for user update request (only name can be updated)"""
-    name: str = Field(..., min_length=1, max_length=100)
+    """Schema for user update request"""
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    email_notifications: Optional[bool] = None
+    task_reminders: Optional[bool] = None
+    weekly_summary: Optional[bool] = None
 
 
 class UserLogin(BaseModel):
@@ -50,3 +59,14 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserRead
+
+
+class PasswordChange(BaseModel):
+    """Schema for password change request"""
+    current_password: str
+    new_password: str
+
+
+class PasswordConfirmation(BaseModel):
+    """Schema for password confirmation (e.g., for account deletion)"""
+    password: str

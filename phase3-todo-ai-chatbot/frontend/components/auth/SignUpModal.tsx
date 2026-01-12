@@ -67,7 +67,7 @@ export function SignUpModal() {
               </button>
 
               <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-[#6EB8E1] to-[#5A7FC8] bg-clip-text text-transparent">
                   Get Started
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">
