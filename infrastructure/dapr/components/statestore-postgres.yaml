@@ -1,0 +1,31 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore-postgres
+  namespace: default
+spec:
+  type: state.postgresql
+  version: v1
+  metadata:
+  # PostgreSQL connection string
+  - name: connectionString
+    secretKeyRef:
+      name: postgres-secret
+      key: connectionString
+  # Table name for state storage
+  - name: tableName
+    value: "dapr_state"
+  # Metadata table name
+  - name: metadataTableName
+    value: "dapr_metadata"
+  # Timeout for database operations (seconds)
+  - name: timeout
+    value: "30"
+  # Enable optimistic concurrency control
+  - name: actorStateStore
+    value: "false"
+scopes:
+- backend
+- notification-service
+- recurring-task-service
+- audit-service
