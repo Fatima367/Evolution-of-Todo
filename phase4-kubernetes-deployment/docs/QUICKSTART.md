@@ -65,7 +65,7 @@ minikube image ls | grep todoboard
 # Create secrets for sensitive data
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=changeme \
-  --from-literal=JWT_SECRET=your-jwt-secret-key \
+  --from-literal=JWT_SECRET_KEY=your-jwt-secret-key \
   --from-literal=GROQ_API_KEY=your-groq-api-key
 
 # Verify secret created
