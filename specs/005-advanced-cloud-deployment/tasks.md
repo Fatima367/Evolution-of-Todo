@@ -174,23 +174,23 @@ This is a distributed web application with microservices:
 ### Implementation for User Story 4
 
 - [X] T081 [P] [US4] Create cloud cluster setup script for Oracle Cloud (OKE) in scripts/cloud/setup-cluster-oke.sh
-- [ ] T082 [P] [US4] Create cloud cluster setup script for Google Cloud (GKE) in scripts/cloud/setup-cluster-gke.sh
-- [ ] T083 [P] [US4] Create cloud cluster setup script for Azure (AKS) in scripts/cloud/setup-cluster-aks.sh
+- [X] T082 [P] [US4] Create cloud cluster setup script for Google Cloud (GKE) in scripts/cloud/setup-cluster-gke.sh
+- [X] T083 [P] [US4] Create cloud cluster setup script for Azure (AKS) in scripts/cloud/setup-cluster-aks.sh
 - [X] T084 [US4] Create Helm values file for cloud deployment in infrastructure/helm/todo-app/values-cloud.yaml
 - [X] T085 [US4] Configure HorizontalPodAutoscaler for backend in infrastructure/helm/todo-app/templates/backend/hpa.yaml
-- [ ] T086 [P] [US4] Configure HorizontalPodAutoscaler for notification service in infrastructure/helm/todo-app/templates/notification-service/hpa.yaml
-- [ ] T087 [P] [US4] Configure HorizontalPodAutoscaler for recurring task service in infrastructure/helm/todo-app/templates/recurring-task-service/hpa.yaml
-- [ ] T088 [US4] Add liveness and readiness probes to all deployments in Helm templates
-- [ ] T089 [US4] Configure rolling update strategy with maxSurge and maxUnavailable in Helm templates
-- [ ] T090 [US4] Create NetworkPolicy for service-to-service communication in infrastructure/helm/todo-app/templates/networkpolicy.yaml
-- [ ] T091 [US4] Configure TLS/SSL certificates using cert-manager in infrastructure/helm/todo-app/templates/certificate.yaml
-- [ ] T092 [US4] Create Ingress configuration for cloud with TLS in infrastructure/helm/todo-app/templates/ingress-cloud.yaml
+- [X] T086 [P] [US4] Configure HorizontalPodAutoscaler for notification service in infrastructure/helm/todo-app/templates/notification-service/hpa.yaml
+- [X] T087 [P] [US4] Configure HorizontalPodAutoscaler for recurring task service in infrastructure/helm/todo-app/templates/recurring-task-service/hpa.yaml
+- [X] T088 [US4] Add liveness and readiness probes to all deployments in Helm templates
+- [X] T089 [US4] Configure rolling update strategy with maxSurge and maxUnavailable in Helm templates
+- [X] T090 [US4] Create NetworkPolicy for service-to-service communication in infrastructure/helm/todo-app/templates/networkpolicy.yaml
+- [X] T091 [US4] Configure TLS/SSL certificates using cert-manager in infrastructure/helm/todo-app/templates/certificate.yaml
+- [X] T092 [US4] Create Ingress configuration for cloud with TLS in infrastructure/helm/todo-app/templates/ingress-cloud.yaml
 - [X] T093 [US4] Configure PodDisruptionBudget for high availability in infrastructure/helm/todo-app/templates/pdb.yaml
-- [ ] T094 [US4] Add resource requests and limits for production in values-cloud.yaml
+- [X] T094 [US4] Add resource requests and limits for production in values-cloud.yaml
 - [X] T095 [US4] Create cloud deployment script in scripts/cloud/deploy-cloud.sh
-- [ ] T096 [US4] Create cloud teardown script in scripts/cloud/teardown-cloud.sh
-- [ ] T097 [US4] Configure Kafka with replication for durability in infrastructure/helm/todo-app/values-cloud.yaml
-- [ ] T098 [US4] Add database connection pooling configuration in todo-board-backend/src/database.py
+- [X] T096 [US4] Create cloud teardown script in scripts/cloud/teardown-cloud.sh
+- [X] T097 [US4] Configure Kafka with replication for durability in infrastructure/helm/todo-app/values-cloud.yaml
+- [X] T098 [US4] Add database connection pooling configuration in todo-board-backend/src/database.py
 
 **Checkpoint**: At this point, all user stories should work in production cloud environment
 
@@ -207,20 +207,20 @@ This is a distributed web application with microservices:
 - [X] T099 [P] [US5] Create build and test workflow in .github/workflows/build-and-test.yml
 - [X] T100 [P] [US5] Create deploy to staging workflow in .github/workflows/deploy-staging.yml
 - [X] T101 [P] [US5] Create deploy to production workflow in .github/workflows/deploy-production.yml
-- [ ] T102 [US5] Add Docker image build and push steps in build-and-test.yml
-- [ ] T103 [US5] Add backend unit tests execution in build-and-test.yml
-- [ ] T104 [US5] Add frontend unit tests execution in build-and-test.yml
-- [ ] T105 [US5] Add integration tests execution in build-and-test.yml
-- [ ] T106 [US5] Add Helm chart linting and validation in build-and-test.yml
-- [ ] T107 [US5] Add dependency vulnerability scanning with safety (Python) in build-and-test.yml
-- [ ] T108 [US5] Add dependency vulnerability scanning with npm audit (Node) in build-and-test.yml
-- [ ] T109 [US5] Add container image scanning with Trivy in build-and-test.yml
-- [ ] T110 [US5] Configure automatic deployment to staging on main branch in deploy-staging.yml
-- [ ] T111 [US5] Add smoke tests after staging deployment in deploy-staging.yml
-- [ ] T112 [US5] Configure manual approval gate for production in deploy-production.yml
-- [ ] T113 [US5] Add rollback on failed health checks in deploy-production.yml
-- [ ] T114 [US5] Configure GitHub Secrets for cloud credentials and API keys
-- [ ] T115 [US5] Add deployment notifications to Slack/Discord (optional) in workflows
+- [X] T102 [US5] Add Docker image build and push steps in build-and-test.yml
+- [X] T103 [US5] Add backend unit tests execution in build-and-test.yml
+- [X] T104 [US5] Add frontend unit tests execution in build-and-test.yml
+- [X] T105 [US5] Add integration tests execution in build-and-test.yml
+- [X] T106 [US5] Add Helm chart linting and validation in build-and-test.yml
+- [X] T107 [US5] Add dependency vulnerability scanning with safety (Python) in build-and-test.yml
+- [X] T108 [US5] Add dependency vulnerability scanning with npm audit (Node) in build-and-test.yml
+- [X] T109 [US5] Add container image scanning with Trivy in build-and-test.yml
+- [X] T110 [US5] Configure automatic deployment to staging on main branch in deploy-staging.yml
+- [X] T111 [US5] Add smoke tests after staging deployment in deploy-staging.yml
+- [X] T112 [US5] Configure manual approval gate for production in deploy-production.yml
+- [X] T113 [US5] Add rollback on failed health checks in deploy-production.yml
+- [X] T114 [US5] Configure GitHub Secrets for cloud credentials and API keys
+- [X] T115 [US5] Add deployment notifications to Slack/Discord (optional) in workflows
 
 **Checkpoint**: CI/CD pipeline should be fully automated and reliable
 
@@ -234,22 +234,22 @@ This is a distributed web application with microservices:
 
 ### Implementation for User Story 6
 
-- [ ] T116 [P] [US6] Create Prometheus configuration in monitoring/prometheus/config.yaml
-- [ ] T117 [P] [US6] Create Grafana dashboard for Kubernetes cluster in monitoring/grafana/dashboards/cluster.json
-- [ ] T118 [P] [US6] Create Grafana dashboard for application metrics in monitoring/grafana/dashboards/application.json
-- [ ] T119 [P] [US6] Create Grafana dashboard for Kafka metrics in monitoring/grafana/dashboards/kafka.json
+- [X] T116 [P] [US6] Create Prometheus configuration in monitoring/prometheus/config.yaml
+- [X] T117 [P] [US6] Create Grafana dashboard for Kubernetes cluster in monitoring/grafana/dashboards/cluster.json
+- [X] T118 [P] [US6] Create Grafana dashboard for application metrics in monitoring/grafana/dashboards/application.json
+- [X] T119 [P] [US6] Create Grafana dashboard for Kafka metrics in monitoring/grafana/dashboards/kafka.json
 - [X] T120 [US6] Add Prometheus metrics endpoint to backend API in todo-board-backend/src/api/metrics.py
-- [ ] T121 [P] [US6] Add Prometheus metrics endpoint to notification service in services/notification-service/src/metrics.py
-- [ ] T122 [P] [US6] Add Prometheus metrics endpoint to recurring task service in services/recurring-task-service/src/metrics.py
-- [ ] T123 [P] [US6] Add Prometheus metrics endpoint to audit service in services/audit-service/src/metrics.py
+- [X] T121 [P] [US6] Add Prometheus metrics endpoint to notification service in services/notification-service/src/metrics.py
+- [X] T122 [P] [US6] Add Prometheus metrics endpoint to recurring task service in services/recurring-task-service/src/metrics.py
+- [X] T123 [P] [US6] Add Prometheus metrics endpoint to audit service in services/audit-service/src/metrics.py
 - [X] T124 [US6] Implement structured logging with JSON format in todo-board-backend/src/lib/logging.py
 - [X] T125 [US6] Add request ID middleware for distributed tracing in todo-board-backend/src/api/middleware/tracing.py
-- [ ] T126 [US6] Configure OpenTelemetry collector in monitoring/opentelemetry/collector-config.yaml
-- [ ] T127 [US6] Add OpenTelemetry instrumentation to backend in todo-board-backend/src/main.py
-- [ ] T128 [US6] Create Helm chart for Prometheus stack in infrastructure/helm/todo-app/templates/monitoring/prometheus.yaml
-- [ ] T129 [US6] Create Helm chart for Grafana in infrastructure/helm/todo-app/templates/monitoring/grafana.yaml
+- [X] T126 [US6] Configure OpenTelemetry collector in monitoring/opentelemetry/collector-config.yaml
+- [X] T127 [US6] Add OpenTelemetry instrumentation to backend in todo-board-backend/src/main.py
+- [X] T128 [US6] Create Helm chart for Prometheus stack in infrastructure/helm/todo-app/templates/monitoring/prometheus.yaml
+- [X] T129 [US6] Create Helm chart for Grafana in infrastructure/helm/todo-app/templates/monitoring/grafana.yaml
 - [X] T130 [US6] Configure alerting rules for error rate and latency in monitoring/prometheus/alerts.yaml
-- [ ] T131 [US6] Add log aggregation configuration for centralized logging in infrastructure/helm/todo-app/values-cloud.yaml
+- [X] T131 [US6] Add log aggregation configuration for centralized logging in infrastructure/helm/todo-app/values-cloud.yaml
 - [X] T132 [US6] Create runbook documentation for common operational tasks in docs/runbook.md
 
 **Checkpoint**: All observability tools should be functional and providing insights
@@ -261,23 +261,23 @@ This is a distributed web application with microservices:
 **Purpose**: Improvements that affect multiple user stories and final validation
 
 - [X] T133 [P] Update main README.md with Phase V features and deployment instructions
-- [ ] T134 [P] Create architecture diagram showing microservices and event flow in docs/architecture.md
-- [ ] T135 [P] Document Kafka topics and event schemas in docs/event-schemas.md
-- [ ] T136 [P] Document Dapr components and configuration in docs/dapr-setup.md
-- [ ] T137 Add rate limiting to API endpoints in todo-board-backend/src/api/middleware/rate_limit.py
-- [ ] T138 Add request/response logging middleware in todo-board-backend/src/api/middleware/logging.py
-- [ ] T139 Optimize database queries with proper indexes in Alembic migrations
-- [ ] T140 Add caching for frequently accessed data (user preferences, tags) in todo-board-backend/src/services/cache_service.py
-- [ ] T141 Implement graceful shutdown for all services in service main files
-- [ ] T142 Add database connection retry logic in todo-board-backend/src/database.py
-- [ ] T143 Add Kafka connection retry logic in event publisher and consumers
-- [ ] T144 Validate all environment variables on startup in config files
-- [ ] T145 Add CORS configuration for production domains in todo-board-backend/src/main.py
-- [ ] T146 Run security audit on all dependencies and update vulnerable packages
-- [ ] T147 Validate quickstart.md by following steps on clean Minikube installation
-- [ ] T148 Perform load testing with 1000 concurrent users and verify performance targets
-- [ ] T149 Test failure scenarios (pod crashes, network issues) and verify recovery
-- [ ] T150 Final code review and cleanup across all services
+- [X] T134 [P] Create architecture diagram showing microservices and event flow in docs/architecture.md
+- [X] T135 [P] Document Kafka topics and event schemas in docs/event-schemas.md
+- [X] T136 [P] Document Dapr components and configuration in docs/dapr-setup.md
+- [X] T137 Add rate limiting to API endpoints in todo-board-backend/src/api/middleware/rate_limit.py
+- [X] T138 Add request/response logging middleware in todo-board-backend/src/api/middleware/logging.py
+- [X] T139 Optimize database queries with proper indexes in Alembic migrations
+- [X] T140 Add caching for frequently accessed data (user preferences, tags) in todo-board-backend/src/services/cache_service.py
+- [X] T141 Implement graceful shutdown for all services in service main files
+- [X] T142 Add database connection retry logic in todo-board-backend/src/database.py
+- [X] T143 Add Kafka connection retry logic in event publisher and consumers
+- [X] T144 Validate all environment variables on startup in config files
+- [X] T145 Add CORS configuration for production domains in todo-board-backend/src/main.py
+- [X] T146 Run security audit on all dependencies and update vulnerable packages
+- [X] T147 Validate quickstart.md by following steps on clean Minikube installation
+- [X] T148 Perform load testing with 1000 concurrent users and verify performance targets
+- [X] T149 Test failure scenarios (pod crashes, network issues) and verify recovery
+- [X] T150 Final code review and cleanup across all services
 
 ---
 

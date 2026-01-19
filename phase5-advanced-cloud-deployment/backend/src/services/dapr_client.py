@@ -1,9 +1,11 @@
 """Dapr client wrapper for pub/sub and state management"""
 import os
 import json
+import time
 from typing import Any, Dict, Optional
 from dapr.clients import DaprClient
 from dapr.clients.grpc._response import TopicEventResponse
+from grpc import RpcError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,7 +19,17 @@ class DaprClientWrapper:
     - Subscribing to Kafka topics
     - State management via PostgreSQL state store
     - Secret retrieval from Kubernetes secrets
+
+    Features:
+    - Connection retry with exponential backoff
+    - Automatic reconnection on connection loss
+    - Health check for Dapr sidecar availability
     """
+
+    # Retry configuration
+    MAX_RETRIES = int(os.getenv("DAPR_MAX_RETRIES", "5"))
+    RETRY_DELAY = float(os.getenv("DAPR_RETRY_DELAY", "1.0"))  # seconds
+    RETRY_BACKOFF = float(os.getenv("DAPR_RETRY_BACKOFF", "2.0"))  # exponential backoff multiplier
 
     def __init__(self):
         """Initialize Dapr client with configuration from environment"""
@@ -29,13 +41,92 @@ class DaprClientWrapper:
 
         # Initialize Dapr client (uses gRPC by default)
         self._client: Optional[DaprClient] = None
+        self._connection_attempts = 0
+
+    def _create_client_with_retry(self) -> DaprClient:
+        """
+        Create Dapr client with retry logic
+
+        Returns:
+            DaprClient instance
+
+        Raises:
+            Exception: If connection fails after all retries
+        """
+        last_error = None
+        delay = self.RETRY_DELAY
+
+        for attempt in range(1, self.MAX_RETRIES + 1):
+            try:
+                logger.info(f"Attempting to connect to Dapr sidecar (attempt {attempt}/{self.MAX_RETRIES})")
+
+                # Create Dapr client
+                client = DaprClient()
+
+                # Test connection by checking Dapr metadata
+                try:
+                    # Simple health check - try to get metadata
+                    metadata = client.get_metadata()
+                    logger.info(
+                        f"Connected to Dapr sidecar successfully. "
+                        f"App ID: {metadata.id}, Runtime version: {metadata.runtime_version}"
+                    )
+                    self._connection_attempts = attempt
+                    return client
+                except Exception as e:
+                    # Close the client if health check fails
+                    client.close()
+                    raise e
+
+            except (RpcError, Exception) as e:
+                last_error = e
+                logger.warning(
+                    f"Dapr connection attempt {attempt}/{self.MAX_RETRIES} failed: {e}",
+                    extra={"attempt": attempt, "max_retries": self.MAX_RETRIES}
+                )
+
+                if attempt < self.MAX_RETRIES:
+                    logger.info(f"Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                    delay *= self.RETRY_BACKOFF  # Exponential backoff
+                else:
+                    logger.error(
+                        f"Failed to connect to Dapr sidecar after {self.MAX_RETRIES} attempts. "
+                        "Ensure Dapr sidecar is running.",
+                        exc_info=True
+                    )
+
+        # All retries exhausted
+        raise ConnectionError(
+            f"Failed to connect to Dapr sidecar after {self.MAX_RETRIES} attempts. "
+            f"Last error: {last_error}"
+        )
 
     @property
     def client(self) -> DaprClient:
-        """Lazy initialization of Dapr client"""
+        """
+        Lazy initialization of Dapr client with automatic reconnection
+
+        Returns:
+            DaprClient instance
+
+        Raises:
+            ConnectionError: If unable to connect to Dapr sidecar
+        """
         if self._client is None:
-            self._client = DaprClient()
+            self._client = self._create_client_with_retry()
         return self._client
+
+    def reconnect(self) -> None:
+        """Force reconnection to Dapr sidecar"""
+        logger.info("Forcing Dapr client reconnection")
+        if self._client is not None:
+            try:
+                self._client.close()
+            except Exception as e:
+                logger.warning(f"Error closing existing Dapr client: {e}")
+        self._client = None
+        # Next access to self.client will trigger reconnection
 
     async def publish_event(
         self,

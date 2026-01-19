@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-backend-config
+  labels:
+    {{- include "todoboard.backend.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.configMap.backend }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-frontend-config
+  labels:
+    {{- include "todoboard.frontend.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.configMap.frontend }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+---
+{{- if .Values.notificationService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-notification-config
+  labels:
+    {{- include "todoboard.notificationService.labels" . | nindent 4 }}
+data:
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.configMap.backend.KAFKA_BOOTSTRAP_SERVERS | quote }}
+  KAFKA_TOPIC_REMINDERS: {{ .Values.configMap.backend.KAFKA_TOPIC_REMINDERS | quote }}
+  LOG_LEVEL: "INFO"
+{{- end }}
+---
+{{- if .Values.recurringTaskService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-recurring-config
+  labels:
+    {{- include "todoboard.recurringTaskService.labels" . | nindent 4 }}
+data:
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.configMap.backend.KAFKA_BOOTSTRAP_SERVERS | quote }}
+  KAFKA_TOPIC_TASK_EVENTS: {{ .Values.configMap.backend.KAFKA_TOPIC_TASK_EVENTS | quote }}
+  DATABASE_URL: {{ .Values.configMap.backend.DATABASE_URL | quote }}
+  LOG_LEVEL: "INFO"
+{{- end }}

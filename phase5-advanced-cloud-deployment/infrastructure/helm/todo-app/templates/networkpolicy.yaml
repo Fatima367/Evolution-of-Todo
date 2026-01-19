@@ -1,0 +1,225 @@
+{{- if .Values.networkPolicy.enabled -}}
+# Network Policy for Backend Service
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "todoboard.fullname" . }}-backend
+  labels:
+    {{- include "todoboard.backend.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "todoboard.backend.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from frontend
+    - from:
+      - podSelector:
+          matchLabels:
+            {{- include "todoboard.frontend.selectorLabels" . | nindent 12 }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.backend.containerPort }}
+    # Allow traffic from ingress controller
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+      - protocol: TCP
+        port: {{ .Values.backend.containerPort }}
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+    # Allow database access
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgresql
+      ports:
+      - protocol: TCP
+        port: 5432
+    # Allow Kafka access
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kafka
+      ports:
+      - protocol: TCP
+        port: 9092
+    # Allow external API calls (for Neon DB, Groq API, etc.)
+    - to:
+      - namespaceSelector: {}
+      ports:
+      - protocol: TCP
+        port: 443
+      - protocol: TCP
+        port: 80
+---
+# Network Policy for Frontend Service
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "todoboard.fullname" . }}-frontend
+  labels:
+    {{- include "todoboard.frontend.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "todoboard.frontend.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from ingress controller
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+      - protocol: TCP
+        port: {{ .Values.frontend.containerPort }}
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+    # Allow backend API calls
+    - to:
+      - podSelector:
+          matchLabels:
+            {{- include "todoboard.backend.selectorLabels" . | nindent 12 }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.backend.containerPort }}
+    # Allow external API calls
+    - to:
+      - namespaceSelector: {}
+      ports:
+      - protocol: TCP
+        port: 443
+      - protocol: TCP
+        port: 80
+---
+# Network Policy for Notification Service
+{{- if .Values.notificationService.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "todoboard.fullname" . }}-notification-service
+  labels:
+    {{- include "todoboard.notificationService.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "todoboard.notificationService.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from backend (for health checks)
+    - from:
+      - podSelector:
+          matchLabels:
+            {{- include "todoboard.backend.selectorLabels" . | nindent 12 }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.notificationService.containerPort }}
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+    # Allow Kafka access
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kafka
+      ports:
+      - protocol: TCP
+        port: 9092
+    # Allow external notification services (Web Push, email, etc.)
+    - to:
+      - namespaceSelector: {}
+      ports:
+      - protocol: TCP
+        port: 443
+      - protocol: TCP
+        port: 80
+{{- end }}
+---
+# Network Policy for Recurring Task Service
+{{- if .Values.recurringTaskService.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "todoboard.fullname" . }}-recurring-task-service
+  labels:
+    {{- include "todoboard.recurringTaskService.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "todoboard.recurringTaskService.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from backend (for health checks)
+    - from:
+      - podSelector:
+          matchLabels:
+            {{- include "todoboard.backend.selectorLabels" . | nindent 12 }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.recurringTaskService.containerPort }}
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+    # Allow Kafka access
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kafka
+      ports:
+      - protocol: TCP
+        port: 9092
+    # Allow database access
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgresql
+      ports:
+      - protocol: TCP
+        port: 5432
+    # Allow backend API calls
+    - to:
+      - podSelector:
+          matchLabels:
+            {{- include "todoboard.backend.selectorLabels" . | nindent 12 }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.backend.containerPort }}
+{{- end }}
+{{- end }}
