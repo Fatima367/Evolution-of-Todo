@@ -369,6 +369,10 @@ nano infrastructure/helm/todo-app/values-cloud.yaml
 vim infrastructure/helm/todo-app/values-cloud.yaml
 ```
 
+**⚠️ CRITICAL: CORS Configuration**
+
+The CORS configuration is critical for cloud deployment. Incorrect configuration will cause connection errors between frontend and backend.
+
 **Update these sections:**
 
 ```yaml
@@ -391,19 +395,38 @@ ingress:
 configMap:
   backend:
     DATABASE_URL: "postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require"
-    CORS_ORIGINS: '["https://todoboard.yourdomain.com","http://localhost:3000"]'
+    # IMPORTANT: CORS_ORIGINS must match your frontend URL exactly
+    CORS_ORIGINS: '["https://todoboard.yourdomain.com"]'
     ENVIRONMENT: "production"
 
   frontend:
+    # IMPORTANT: NEXT_PUBLIC_API_URL must point to your backend
     NEXT_PUBLIC_API_URL: "https://todoboard.yourdomain.com/api"
 ```
 
 **If you don't have a domain**, use nip.io:
+
+First, get your ingress IP (you'll need to deploy first, then update):
+```bash
+# After initial deployment, get ingress IP
+INGRESS_IP=$(kubectl get ingress -n todoboard -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+echo "Your URL will be: http://$INGRESS_IP.nip.io"
+```
+
+Then update values:
 ```yaml
 ingress:
   hosts:
-    - host: todoboard.<INGRESS-IP>.nip.io  # Replace <INGRESS-IP> with actual IP
+    - host: 34.123.45.67.nip.io  # Replace with your actual ingress IP
+
+configMap:
+  backend:
+    CORS_ORIGINS: '["http://34.123.45.67.nip.io","https://34.123.45.67.nip.io"]'
+  frontend:
+    NEXT_PUBLIC_API_URL: "http://34.123.45.67.nip.io/api"
 ```
+
+**📖 For detailed CORS configuration guide, see:** [docs/CORS_CONFIGURATION.md](./docs/CORS_CONFIGURATION.md)
 
 ### Step 4: Deploy Application
 
