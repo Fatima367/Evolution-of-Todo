@@ -14,7 +14,7 @@ export function useTasks(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const loadTasks = async () => {
+  const refetch = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -43,7 +43,7 @@ export function useTasks(
   };
 
   useEffect(() => {
-    loadTasks();
+    refetch();
   }, [statusFilter, sortBy, sortOrder, isFavorite]);
 
   const createTask = async (data: TaskCreate) => {
@@ -73,7 +73,7 @@ export function useTasks(
     tasks,
     loading,
     error,
-    loadTasks,
+    refetch,
     createTask,
     updateTask,
     toggleFavorite,

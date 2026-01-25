@@ -4,28 +4,28 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check } from 'lucide-react';
 
-interface FilterOption {
-  value: string;
+interface FilterOption<T extends string = string> {
+  value: T;
   label: string;
 }
 
-interface FilterDropdownProps {
+interface FilterDropdownProps<T extends string = string> {
   label: string;
-  options: FilterOption[];
-  selectedValues: string[];
-  onChange: (values: string[]) => void;
+  options: FilterOption<T>[];
+  selectedValues: T[];
+  onChange: (values: T[]) => void;
   multiSelect?: boolean;
   icon?: React.ReactNode;
 }
 
-export function FilterDropdown({
+export function FilterDropdown<T extends string = string>({
   label,
   options,
   selectedValues,
   onChange,
   multiSelect = true,
   icon
-}: FilterDropdownProps) {
+}: FilterDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +46,7 @@ export function FilterDropdown({
     };
   }, [isOpen]);
 
-  const handleToggle = (value: string) => {
+  const handleToggle = (value: T) => {
     if (multiSelect) {
       if (selectedValues.includes(value)) {
         onChange(selectedValues.filter((v) => v !== value));

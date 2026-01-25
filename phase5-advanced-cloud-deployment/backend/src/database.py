@@ -3,6 +3,7 @@ import os
 import time
 from typing import Generator
 from sqlmodel import create_engine, Session, SQLModel
+from sqlalchemy import text
 from sqlalchemy.pool import NullPool, QueuePool
 from sqlalchemy.exc import OperationalError, DBAPIError
 from src.config import settings
@@ -73,7 +74,7 @@ def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
 
             # Test connection
             with engine.connect() as conn:
-                conn.execute("SELECT 1")
+                conn.execute(text("SELECT 1"))
 
             logger.info("Database connection established successfully")
             return engine
