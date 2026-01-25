@@ -1,0 +1,52 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore-postgres
+  namespace: todoboard
+spec:
+  type: state.postgresql
+  version: v1
+  metadata:
+  # PostgreSQL connection string from secret
+  - name: connectionString
+    secretKeyRef:
+      name: todoboard-secrets
+      key: DATABASE_URL
+
+  # Table name for state storage
+  - name: tableName
+    value: "dapr_state"
+
+  # Metadata table name
+  - name: metadataTableName
+    value: "dapr_metadata"
+
+  # Timeout for database operations
+  - name: timeout
+    value: "20s"
+
+  # Connection pool settings
+  - name: maxConns
+    value: "20"
+
+  # Maximum connection idle time
+  - name: connectionMaxIdleTime
+    value: "5m"
+
+  # Maximum connection lifetime
+  - name: maxConnLifetime
+    value: "30m"
+
+  # Enable optimistic concurrency control
+  - name: actorStateStore
+    value: "true"
+
+  # Cleanup interval for expired state
+  - name: cleanupIntervalInSeconds
+    value: "3600"
+
+scopes:
+  - backend-service
+  - notification-service
+  - recurring-task-service
+  - audit-service

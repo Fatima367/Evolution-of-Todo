@@ -1,0 +1,95 @@
+{{- if .Values.auditService.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todoboard.fullname" . }}-audit-service
+  labels:
+    {{- include "todoboard.auditService.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.auditService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.auditService.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.auditService.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+      {{- include "todoboard.auditService.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "todoboard.auditService.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- if .Values.auditService.dapr.enabled }}
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "audit-service"
+        dapr.io/app-port: "{{ .Values.auditService.containerPort }}"
+        dapr.io/log-level: "info"
+        {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "todoboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.auditService.podSecurityContext | nindent 8 }}
+      containers:
+      - name: audit-service
+        image: {{ include "todoboard.auditService.image" . }}
+        imagePullPolicy: {{ .Values.auditService.image.pullPolicy | default .Values.global.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.auditService.containerPort }}
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.auditService.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "todoboard.fullname" . }}-audit-config
+        - secretRef:
+            name: {{ include "todoboard.fullname" . }}-secrets
+        {{- if .Values.auditService.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.auditService.livenessProbe.httpGet.path }}
+            port: {{ .Values.auditService.livenessProbe.httpGet.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.auditService.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.auditService.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.auditService.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.auditService.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.auditService.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.auditService.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.auditService.readinessProbe.httpGet.path }}
+            port: {{ .Values.auditService.readinessProbe.httpGet.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.auditService.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.auditService.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.auditService.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.auditService.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.auditService.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.auditService.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.auditService.securityContext | nindent 10 }}
+      {{- with .Values.auditService.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.auditService.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.auditService.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

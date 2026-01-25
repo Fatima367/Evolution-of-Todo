@@ -1,0 +1,54 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: dapr-config
+  namespace: todoboard
+spec:
+  # Distributed tracing
+  tracing:
+    samplingRate: "1"
+    zipkin:
+      endpointAddress: "http://zipkin.todoboard.svc:9411/api/v2/spans"
+
+  # Metrics
+  metric:
+    enabled: true
+
+  # mTLS configuration
+  mtls:
+    enabled: true
+    workloadCertTTL: "24h"
+    allowedClockSkew: "15m"
+
+  # Access control
+  accessControl:
+    defaultAction: allow
+    trustDomain: "public"
+
+  # API configuration
+  api:
+    allowed:
+    - name: state
+      version: v1
+      protocol: grpc
+    - name: pubsub
+      version: v1
+      protocol: grpc
+    - name: bindings
+      version: v1
+      protocol: grpc
+    - name: secrets
+      version: v1
+      protocol: grpc
+
+  # Middleware pipeline
+  httpPipeline:
+    handlers:
+    - name: ratelimit
+      type: middleware.http.ratelimit
+
+  # Logging
+  logging:
+    apiLogging:
+      enabled: true
+      obfuscateURLs: false

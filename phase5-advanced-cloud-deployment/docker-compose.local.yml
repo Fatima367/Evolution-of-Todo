@@ -1,0 +1,214 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database for local development
+  postgres:
+    image: postgres:16-alpine
+    container_name: phase5-postgres
+    environment:
+      POSTGRES_DB: todoboard_db
+      POSTGRES_USER: todoboard_user
+      POSTGRES_PASSWORD: todoboard_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todoboard_user -d todoboard_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - todoboard-network
+
+  # Redpanda (Kafka-compatible) for event streaming
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.3
+    container_name: phase5-redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --smp 1
+      - --memory 1G
+      - --mode dev-container
+      - --default-log-level=info
+    ports:
+      - "18081:18081"
+      - "18082:18082"
+      - "19092:19092"
+      - "19644:9644"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - todoboard-network
+
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: phase5-backend
+    environment:
+      DATABASE_URL: postgresql://todoboard_user:todoboard_password@postgres:5432/todoboard_db
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: llama-3.3-70b-versatile
+      JWT_SECRET_KEY: local-dev-secret-key-change-in-production-min-32-chars
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 10080
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      APP_NAME: TodoBoard
+      APP_VERSION: 1.0.0
+      ENVIRONMENT: development
+      DAPR_HTTP_PORT: 3500
+      DAPR_GRPC_PORT: 50001
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - todoboard-network
+
+  # Frontend Next.js service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: phase5-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    networks:
+      - todoboard-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: phase5-notification-service
+    environment:
+      SERVICE_NAME: notification-service
+      DAPR_HTTP_PORT: 3500
+      DAPR_PUBSUB_NAME: pubsub-kafka
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+    ports:
+      - "8001:8000"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    volumes:
+      - ./services/notification-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - todoboard-network
+
+  # Recurring Task Service
+  recurring-task-service:
+    build:
+      context: ./services/recurring-task-service
+      dockerfile: Dockerfile
+    container_name: phase5-recurring-task-service
+    environment:
+      SERVICE_NAME: recurring-task-service
+      DAPR_HTTP_PORT: 3500
+      DAPR_PUBSUB_NAME: pubsub-kafka
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      DATABASE_URL: postgresql://todoboard_user:todoboard_password@postgres:5432/todoboard_db
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    volumes:
+      - ./services/recurring-task-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - todoboard-network
+
+  # Audit Service
+  audit-service:
+    build:
+      context: ./services/audit-service
+      dockerfile: Dockerfile
+    container_name: phase5-audit-service
+    environment:
+      SERVICE_NAME: audit-service
+      DAPR_HTTP_PORT: 3500
+      DAPR_PUBSUB_NAME: pubsub-kafka
+      DAPR_STATE_STORE: statestore-postgres
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      DATABASE_URL: postgresql://todoboard_user:todoboard_password@postgres:5432/todoboard_db
+    ports:
+      - "8003:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    volumes:
+      - ./services/audit-service:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - todoboard-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redpanda_data:
+    driver: local
+
+networks:
+  todoboard-network:
+    driver: bridge

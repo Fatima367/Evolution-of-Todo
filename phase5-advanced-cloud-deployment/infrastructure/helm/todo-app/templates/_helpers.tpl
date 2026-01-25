@@ -178,3 +178,33 @@ Recurring Task Service image
 {{- printf "%s:%s" .Values.recurringTaskService.image.repository (.Values.recurringTaskService.image.tag | default .Chart.AppVersion) }}
 {{- end }}
 {{- end }}
+
+{{/*
+Audit Service labels
+*/}}
+{{- define "todoboard.auditService.labels" -}}
+helm.sh/chart: {{ include "todoboard.chart" . }}
+{{ include "todoboard.auditService.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/component: audit-service
+{{- end }}
+
+{{- define "todoboard.auditService.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "todoboard.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: audit-service
+{{- end }}
+
+{{/*
+Audit Service image
+*/}}
+{{- define "todoboard.auditService.image" -}}
+{{- if .Values.global.registry }}
+{{- printf "%s/%s:%s" .Values.global.registry .Values.auditService.image.repository (.Values.auditService.image.tag | default .Chart.AppVersion) }}
+{{- else }}
+{{- printf "%s:%s" .Values.auditService.image.repository (.Values.auditService.image.tag | default .Chart.AppVersion) }}
+{{- end }}
+{{- end }}

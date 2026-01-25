@@ -1,0 +1,87 @@
+---
+# Task Events Topic - All task CRUD operations
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: task-events
+  namespace: todoboard
+  labels:
+    strimzi.io/cluster: todoboard-kafka
+    app.kubernetes.io/name: kafka-topic
+    app.kubernetes.io/component: messaging
+    app.kubernetes.io/part-of: todoboard
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 2592000000  # 30 days
+    segment.bytes: 1073741824  # 1GB
+    compression.type: producer
+    min.insync.replicas: 2
+    cleanup.policy: delete
+
+---
+# Reminders Topic - Scheduled reminder triggers
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: reminders
+  namespace: todoboard
+  labels:
+    strimzi.io/cluster: todoboard-kafka
+    app.kubernetes.io/name: kafka-topic
+    app.kubernetes.io/component: messaging
+    app.kubernetes.io/part-of: todoboard
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 604800000  # 7 days
+    segment.bytes: 536870912  # 512MB
+    compression.type: producer
+    min.insync.replicas: 2
+    cleanup.policy: delete
+
+---
+# Task Updates Topic - Real-time client sync
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: task-updates
+  namespace: todoboard
+  labels:
+    strimzi.io/cluster: todoboard-kafka
+    app.kubernetes.io/name: kafka-topic
+    app.kubernetes.io/component: messaging
+    app.kubernetes.io/part-of: todoboard
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: 86400000  # 24 hours
+    segment.bytes: 268435456  # 256MB
+    compression.type: producer
+    min.insync.replicas: 2
+    cleanup.policy: delete
+
+---
+# Dead Letter Queue - Failed message processing
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: dead-letter-queue
+  namespace: todoboard
+  labels:
+    strimzi.io/cluster: todoboard-kafka
+    app.kubernetes.io/name: kafka-topic
+    app.kubernetes.io/component: messaging
+    app.kubernetes.io/part-of: todoboard
+spec:
+  partitions: 1
+  replicas: 3
+  config:
+    retention.ms: 7776000000  # 90 days
+    segment.bytes: 1073741824  # 1GB
+    compression.type: producer
+    min.insync.replicas: 2
+    cleanup.policy: delete

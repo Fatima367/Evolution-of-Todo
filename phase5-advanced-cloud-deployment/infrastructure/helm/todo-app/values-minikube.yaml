@@ -1,0 +1,591 @@
+# Minikube Values for TodoBoard Helm Chart
+# This file contains configurations optimized for local Minikube deployment
+# with reduced resource requirements and simplified setup
+
+#############################################################################
+# Global Configuration
+#############################################################################
+
+global:
+  appName: todoboard
+  environment: development
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  # Use local images (built with minikube docker-env)
+  registry: ""
+
+#############################################################################
+# Backend Configuration (FastAPI)
+#############################################################################
+
+backend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: todoboard-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8000
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  # Reduced resource limits for Minikube
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 20
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling disabled for Minikube
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 85
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: backend-service
+    appPort: 8000
+
+  env:
+    LOG_LEVEL: "DEBUG"
+    ENVIRONMENT: "development"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#############################################################################
+# Frontend Configuration (Next.js)
+#############################################################################
+
+frontend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: todoboard-frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+
+  # Reduced resource limits for Minikube
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling disabled for Minikube
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 85
+
+  env:
+    NODE_ENV: "development"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard (Minikube)"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#############################################################################
+# Notification Service Configuration
+#############################################################################
+
+notificationService:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: notification-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8001
+
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+
+  # Reduced resource limits for Minikube
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8001
+    initialDelaySeconds: 20
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8001
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling disabled for Minikube
+  autoscaling:
+    enabled: false
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: notification-service
+    appPort: 8001
+
+  env:
+    SERVICE_NAME: "notification-service"
+    LOG_LEVEL: "DEBUG"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+
+#############################################################################
+# Recurring Task Service Configuration
+#############################################################################
+
+recurringTaskService:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: recurring-task-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8002
+
+  service:
+    type: ClusterIP
+    port: 8002
+    targetPort: 8002
+
+  # Reduced resource limits for Minikube
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8002
+    initialDelaySeconds: 20
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8002
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling disabled for Minikube
+  autoscaling:
+    enabled: false
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: recurring-task-service
+    appPort: 8002
+
+  env:
+    SERVICE_NAME: "recurring-task-service"
+    LOG_LEVEL: "DEBUG"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+
+#############################################################################
+# Audit Service Configuration
+#############################################################################
+
+auditService:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: audit-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8003
+
+  service:
+    type: ClusterIP
+    port: 8003
+    targetPort: 8003
+
+  # Reduced resource limits for Minikube
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8003
+    initialDelaySeconds: 20
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8003
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling disabled for Minikube
+  autoscaling:
+    enabled: false
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: audit-service
+    appPort: 8003
+
+  env:
+    SERVICE_NAME: "audit-service"
+    LOG_LEVEL: "DEBUG"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+
+#############################################################################
+# Kafka Configuration (Strimzi)
+#############################################################################
+
+kafka:
+  enabled: true
+  # Kafka will be deployed separately via Strimzi operator
+  # See infrastructure/kafka/ for Kafka cluster configuration
+  bootstrapServers: "todoboard-kafka-kafka-bootstrap.todoboard.svc:9092"
+
+#############################################################################
+# Dapr Configuration
+#############################################################################
+
+dapr:
+  enabled: true
+  # Dapr will be installed separately via dapr init -k
+  # See infrastructure/dapr/ for Dapr component configurations
+
+#############################################################################
+# Ingress Configuration
+#############################################################################
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: todoboard.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    enabled: false
+
+#############################################################################
+# ConfigMap Configuration
+#############################################################################
+
+configMap:
+  backend:
+    # Use local PostgreSQL or Neon for development
+    DATABASE_URL: "postgresql://todo_user:todo_password@postgres:5432/todo_db"
+    JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+    JWT_ALGORITHM: "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "10080"
+    CORS_ORIGINS: '["http://todoboard.local", "http://localhost:3000"]'
+    APP_NAME: "TodoBoard Minikube"
+    APP_VERSION: "1.0.0"
+    ENVIRONMENT: "development"
+    # Kafka configuration
+    KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.todoboard.svc:9092"
+    # Dapr configuration
+    DAPR_HTTP_PORT: "3500"
+    DAPR_GRPC_PORT: "50001"
+    DAPR_PUBSUB_NAME: "pubsub-kafka"
+    DAPR_STATE_STORE_NAME: "statestore-postgres"
+
+  frontend:
+    NEXT_PUBLIC_API_URL: "http://todoboard.local/api"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard (Minikube)"
+
+#############################################################################
+# Secrets Configuration
+#############################################################################
+
+secrets:
+  # For Minikube, use simple secrets
+  # In production, use proper secret management
+  POSTGRES_PASSWORD: "todo_password"
+  JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+  GROQ_API_KEY: ""  # Add your Groq API key here
+
+#############################################################################
+# PostgreSQL Configuration (Optional - for local DB)
+#############################################################################
+
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  env:
+    POSTGRES_DB: "todo_db"
+    POSTGRES_USER: "todo_user"
+    POSTGRES_PASSWORD: "todo_password"
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: "standard"
+
+#############################################################################
+# Monitoring Configuration
+#############################################################################
+
+monitoring:
+  prometheus:
+    enabled: false  # Disable for Minikube to save resources
+  grafana:
+    enabled: false  # Disable for Minikube to save resources
+
+#############################################################################
+# Pod Disruption Budget
+#############################################################################
+
+podDisruptionBudget:
+  enabled: false  # Disable for Minikube (single node)
+
+#############################################################################
+# Network Policy
+#############################################################################
+
+networkPolicy:
+  enabled: false  # Disable for Minikube for easier debugging
