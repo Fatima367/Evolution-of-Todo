@@ -46,3 +46,17 @@ data:
   DATABASE_URL: {{ .Values.configMap.backend.DATABASE_URL | quote }}
   LOG_LEVEL: "INFO"
 {{- end }}
+---
+{{- if .Values.auditService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-audit-config
+  labels:
+    {{- include "todoboard.auditService.labels" . | nindent 4 }}
+data:
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.configMap.backend.KAFKA_BOOTSTRAP_SERVERS | quote }}
+  KAFKA_TOPIC_AUDIT_LOGS: {{ .Values.configMap.backend.KAFKA_TOPIC_AUDIT_LOGS | quote }}
+  DATABASE_URL: {{ .Values.configMap.backend.DATABASE_URL | quote }}
+  LOG_LEVEL: "INFO"
+{{- end }}
