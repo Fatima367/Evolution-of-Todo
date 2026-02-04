@@ -48,6 +48,8 @@ class TaskService:
         status: Optional[TaskStatus] = None,
         priority: Optional[str] = None,
         is_favorite: Optional[bool] = None,
+        tags: Optional[List[str]] = None,
+        search_query: Optional[str] = None,
         sort_by: Optional[SortField] = SortField.CREATED_AT,
         sort_order: Optional[SortOrder] = SortOrder.DESC,
         limit: int = 50,
@@ -61,6 +63,8 @@ class TaskService:
             status: Optional status filter
             priority: Optional priority filter
             is_favorite: Optional favorite status filter
+            tags: Optional list of tags to filter by (matches if task has ANY of these tags)
+            search_query: Optional full-text search query for title and description
             sort_by: Field to sort by (default: created_at)
             sort_order: Sort direction (default: desc)
             limit: Maximum number of tasks to return
@@ -79,6 +83,26 @@ class TaskService:
             statement = statement.where(Task.priority == priority)
         if is_favorite is not None:
             statement = statement.where(Task.is_favorite == is_favorite)
+
+        # Tags filter: match if task has ANY of the provided tags
+        if tags and len(tags) > 0:
+            from sqlalchemy import or_
+            # Check if any of the provided tags are in the task's tags array
+            tag_conditions = [Task.tags.contains([tag]) for tag in tags]
+            statement = statement.where(or_(*tag_conditions))
+
+        # Full-text search on title and description
+        if search_query and search_query.strip():
+            from sqlalchemy import text, func
+            # Sanitize search query for tsquery (replace spaces with &)
+            sanitized_query = search_query.strip().replace(' ', ' & ')
+            # Use PostgreSQL full-text search with GIN indexes
+            statement = statement.where(
+                text(
+                    "(to_tsvector('english', title) || to_tsvector('english', COALESCE(description, ''))) "
+                    "@@ to_tsquery('english', :search_query)"
+                ).bindparams(search_query=sanitized_query)
+            )
 
         # Get total count
         count_statement = select(func.count()).select_from(statement.subquery())

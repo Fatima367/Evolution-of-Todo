@@ -10,6 +10,8 @@ from src.database import create_db_and_tables, engine
 from src.api.auth_router import router as auth_router
 from src.api.task_router import router as task_router
 from src.api.chat_router import router as chat_router
+from src.api.routers.recurring import router as recurring_router
+from src.api.routers.reminders import router as reminders_router
 from src.api.middleware.tracing import TracingMiddleware
 from src.api.middleware.rate_limit import RateLimitMiddleware
 from src.api.middleware.logging import LoggingMiddleware
@@ -178,6 +180,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(task_router)
 app.include_router(chat_router)
+app.include_router(recurring_router)
+app.include_router(reminders_router)
 
 
 @app.get("/")

@@ -169,6 +169,17 @@ frontend:
     successThreshold: 1
     failureThreshold: 3
 
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 20
+
   # Rolling update strategy
   rollingUpdate:
     maxSurge: 1
@@ -495,6 +506,10 @@ ingress:
           service: backend
   tls:
     enabled: false
+  rateLimiting:
+    enabled: false
+  cors:
+    enabled: false
 
 #############################################################################
 # ConfigMap Configuration
@@ -503,7 +518,7 @@ ingress:
 configMap:
   backend:
     # Use local PostgreSQL or Neon for development
-    DATABASE_URL: "postgresql://todo_user:todo_password@postgres:5432/todo_db"
+    # DATABASE_URL will be set from secret
     JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
     JWT_ALGORITHM: "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "10080"
@@ -513,6 +528,9 @@ configMap:
     ENVIRONMENT: "development"
     # Kafka configuration
     KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.todoboard.svc:9092"
+    KAFKA_TOPIC_TASK_EVENTS: "task-events"
+    KAFKA_TOPIC_REMINDERS: "reminders"
+    KAFKA_TOPIC_AUDIT_LOGS: "audit-logs"
     # Dapr configuration
     DAPR_HTTP_PORT: "3500"
     DAPR_GRPC_PORT: "50001"
@@ -530,6 +548,7 @@ configMap:
 secrets:
   # For Minikube, use simple secrets
   # In production, use proper secret management
+  DATABASE_URL: "postgresql://your_neon_username:your_neon_password@your_neon_endpoint.neon.tech/neondb?sslmode=require"
   POSTGRES_PASSWORD: "todo_password"
   JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
   GROQ_API_KEY: ""  # Add your Groq API key here
@@ -589,3 +608,12 @@ podDisruptionBudget:
 
 networkPolicy:
   enabled: false  # Disable for Minikube for easier debugging
+
+#############################################################################
+# Service Account Configuration
+#############################################################################
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "todoboard-sa"

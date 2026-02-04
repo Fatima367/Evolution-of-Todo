@@ -1,0 +1,56 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "todoboard.fullname" . }}-local
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.ingress.localHost | default "todoboard.local" }}
+      http:
+        paths:
+          # Frontend routes
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" . }}-frontend
+                port:
+                  number: 3000
+
+          # Backend API routes
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" . }}-backend
+                port:
+                  number: 8000
+
+          # Health check endpoints
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" . }}-backend
+                port:
+                  number: 8000
+
+          # Metrics endpoints
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" . }}-backend
+                port:
+                  number: 8000
+{{- end }}

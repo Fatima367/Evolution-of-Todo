@@ -1,5 +1,5 @@
 """Task management API endpoints"""
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlmodel import Session
@@ -22,14 +22,22 @@ async def get_tasks(
     status_filter: Optional[TaskStatus] = Query(None, alias="status", description="Filter by status"),
     priority: Optional[TaskPriority] = Query(None, description="Filter by priority"),
     is_favorite: Optional[bool] = Query(None, description="Filter by favorite status"),
+    tags: Optional[List[str]] = Query(None, description="Filter by tags (matches if task has ANY of these tags)"),
+    search: Optional[str] = Query(None, description="Full-text search in title and description"),
     sort_by: Optional[SortField] = Query(SortField.CREATED_AT, description="Field to sort by"),
     sort_order: Optional[SortOrder] = Query(SortOrder.DESC, description="Sort direction"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of tasks"),
     offset: int = Query(0, ge=0, description="Number of tasks to skip")
 ):
-    """Get all tasks for the authenticated user with optional filtering and sorting
+    """Get all tasks for the authenticated user with optional filtering, searching, and sorting
 
     Enforces user isolation by filtering tasks by current_user.id
+
+    Supports:
+    - Status, priority, favorite filtering
+    - Tag filtering (OR logic - matches if task has ANY of the provided tags)
+    - Full-text search on title and description
+    - Sorting by created_at, due_date, priority, or title
     """
     tasks, total = TaskService.get_user_tasks(
         session=session,
@@ -37,6 +45,8 @@ async def get_tasks(
         status=status_filter,
         priority=priority,
         is_favorite=is_favorite,
+        tags=tags,
+        search_query=search,
         sort_by=sort_by,
         sort_order=sort_order,
         limit=limit,
