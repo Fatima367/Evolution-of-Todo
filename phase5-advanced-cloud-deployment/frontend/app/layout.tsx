@@ -3,9 +3,11 @@ import './globals.css'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 import { AuthProvider } from '@/contexts/auth'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { NotificationProvider } from '@/components/providers/NotificationProvider'
 import { SignUpModal } from '@/components/auth/SignUpModal'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { CreateTaskModal } from '@/components/tasks/CreateTaskModal'
+import { AuditLogModal } from '@/components/tasks/AuditLogModal'
 import { FloatingChatButton } from '@/components/chat/FloatingChatButton'
 
 export const metadata: Metadata = {
@@ -36,15 +38,17 @@ export default function RootLayout({
           <AuthProvider>
             <ThemeProvider>
               <QueryProvider>
-                {children}
+                <NotificationProvider>
+                  {children}
 
-                {/* Global Modals */}
-                <SignUpModal />
-                <LoginModal />
-                <CreateTaskModal />
-
-                {/* AI Chat Assistant */}
-                <FloatingChatButton />
+                  {/* Global Modals */}
+                                  <SignUpModal />
+                                  <LoginModal />
+                                  <CreateTaskModal />
+                                  <AuditLogModal />
+                  
+                                  {/* AI Chat Assistant */}                  <FloatingChatButton />
+                </NotificationProvider>
               </QueryProvider>
             </ThemeProvider>
           </AuthProvider>

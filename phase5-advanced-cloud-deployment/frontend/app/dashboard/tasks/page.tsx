@@ -2,11 +2,12 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Filter, ListChecks, ArrowUpDown } from 'lucide-react';
+import { Plus, Filter, ListChecks, ArrowUpDown, History, Bell, BellRing } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { useTaskFilters } from '@/lib/hooks/useTaskFilters';
 import { useTaskSort } from '@/lib/hooks/useTaskSort';
 import { useUIStore } from '@/store/uiStore';
+import { useNotifications } from '@/components/providers/NotificationProvider';
 import { TaskList } from '@/components/tasks/TaskList';
 import { SearchBar } from '@/components/tasks/SearchBar';
 import { FilterDropdown } from '@/components/tasks/FilterDropdown';
@@ -16,7 +17,9 @@ import { getWebSocketClient, type WebSocketMessage } from '@/lib/websocket';
 
 export default function TasksPage() {
   const openCreateTaskModal = useUIStore((state) => state.openCreateTaskModal);
+  const openAuditLogModal = useUIStore((state) => state.openAuditLogModal);
   const triggerTaskRefresh = useUIStore((state) => state.triggerTaskRefresh);
+  const { isSupported, isSubscribed, subscribe } = useNotifications();
   const { sort, onChange, toggleDirection } = useTaskSort();
   const { tasks, loading, updateTask, deleteTask, toggleFavorite, refetch } = useTasks(undefined, sort.field, sort.direction);
   const { filteredTasks, filters, updateFilter, activeFilterCount } = useTaskFilters(tasks);
@@ -104,15 +107,43 @@ export default function TasksPage() {
             )}
           </motion.p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={openCreateTaskModal}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-        >
-          <Plus size={20} />
-          New Task
-        </motion.button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Notification Button */}
+          {isSupported && !isSubscribed && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={subscribe}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-[#201761]/30 text-[#5A7FC8] dark:text-[#6EB8E1] border-2 border-[#6EB8E1]/30 dark:border-[#5A7FC8]/30 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+              title="Enable Push Notifications"
+            >
+              <BellRing size={18} />
+              <span className="hidden sm:inline">Enable Notifications</span>
+            </motion.button>
+          )}
+
+          {/* Activity Log Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openAuditLogModal}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-[#201761]/30 text-[#5A7FC8] dark:text-[#6EB8E1] border-2 border-[#6EB8E1]/30 dark:border-[#5A7FC8]/30 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+          >
+            <History size={18} />
+            <span className="hidden sm:inline">Activity Log</span>
+          </motion.button>
+
+          {/* New Task Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCreateTaskModal}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6EB8E1] to-[#4EB5A9] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            <Plus size={20} />
+            New Task
+          </motion.button>
+        </div>
       </div>
 
       {/* Search and Filters */}

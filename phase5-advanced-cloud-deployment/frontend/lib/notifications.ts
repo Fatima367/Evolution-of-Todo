@@ -1,6 +1,7 @@
 /**
  * Push notification subscription and management
  */
+import { apiClient } from './api';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -89,6 +90,10 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
     }
 
     // Subscribe to push notifications
+    if (!VAPID_PUBLIC_KEY) {
+      console.error('NEXT_PUBLIC_VAPID_PUBLIC_KEY is not defined in environment variables');
+      return null;
+    }
     const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
@@ -142,26 +147,7 @@ export async function unsubscribeFromPushNotifications(): Promise<boolean> {
  */
 async function savePushSubscription(subscription: PushSubscription): Promise<boolean> {
   try {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      console.error('No auth token found');
-      return false;
-    }
-
-    const response = await fetch('/api/push-subscription', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(subscription.toJSON()),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to save push subscription:', response.statusText);
-      return false;
-    }
-
+    await apiClient.savePushSubscription(subscription.toJSON());
     console.log('Push subscription saved to backend');
     return true;
   } catch (error) {
@@ -175,24 +161,7 @@ async function savePushSubscription(subscription: PushSubscription): Promise<boo
  */
 async function removePushSubscription(): Promise<boolean> {
   try {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      console.error('No auth token found');
-      return false;
-    }
-
-    const response = await fetch('/api/push-subscription', {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      console.error('Failed to remove push subscription:', response.statusText);
-      return false;
-    }
-
+    await apiClient.removePushSubscription();
     console.log('Push subscription removed from backend');
     return true;
   } catch (error) {

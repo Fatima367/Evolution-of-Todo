@@ -16,6 +16,12 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
   const [priority, setPriority] = useState<TaskPriority>(initialData?.priority || 'medium');
   const [recurringType, setRecurringType] = useState<RecurringType>(initialData?.recurring_type || 'none');
   const [dueDate, setDueDate] = useState(initialData?.due_date || '');
+  const [interval, setInterval] = useState(initialData?.interval || 1);
+  const [dayOfWeek, setDayOfWeek] = useState(initialData?.day_of_week || 0);
+  const [dayOfMonth, setDayOfMonth] = useState(initialData?.day_of_month || 1);
+  const [monthOfYear, setMonthOfYear] = useState(initialData?.month_of_year || 1);
+  const [endDate, setEndDate] = useState(initialData?.end_date || '');
+  const [reminderOffset, setReminderOffset] = useState(initialData?.reminder_offset || 15);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,13 +51,27 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
         priority,
         recurring_type: recurringType,
         due_date: dueDate || undefined,
+        reminder_offset: reminderOffset,
         tags: tags.length > 0 ? tags : undefined,
+        ...(recurringType !== 'none' && {
+            interval: interval,
+            day_of_week: recurringType === 'weekly' ? dayOfWeek : undefined,
+            day_of_month: recurringType === 'monthly' ? dayOfMonth : undefined,
+            month_of_year: recurringType === 'yearly' ? monthOfYear : undefined,
+            end_date: endDate || undefined,
+        }),
       });
       setTitle('');
       setDescription('');
       setPriority('medium');
       setRecurringType('none');
       setDueDate('');
+      setInterval(1);
+      setDayOfWeek(0);
+      setDayOfMonth(1);
+      setMonthOfYear(1);
+      setEndDate('');
+      setReminderOffset(15);
       setTags([]);
       setTagInput('');
     } catch (error) {
@@ -132,6 +152,95 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
         </div>
       </div>
 
+      {recurringType !== 'none' && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="interval" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Repeat Every
+              </label>
+              <input
+                id="interval"
+                type="number"
+                value={interval}
+                onChange={(e) => setInterval(parseInt(e.target.value))}
+                min={1}
+                className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+              />
+            </div>
+
+            {recurringType === 'weekly' && (
+              <div>
+                <label htmlFor="dayOfWeek" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                  Day of Week
+                </label>
+                <select
+                  id="dayOfWeek"
+                  value={dayOfWeek}
+                  onChange={(e) => setDayOfWeek(parseInt(e.target.value))}
+                  className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+                >
+                  <option value={0}>Sunday</option>
+                  <option value={1}>Monday</option>
+                  <option value={2}>Tuesday</option>
+                  <option value={3}>Wednesday</option>
+                  <option value={4}>Thursday</option>
+                  <option value={5}>Friday</option>
+                  <option value={6}>Saturday</option>
+                </select>
+              </div>
+            )}
+
+            {recurringType === 'monthly' && (
+              <div>
+                <label htmlFor="dayOfMonth" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                  Day of Month
+                </label>
+                <input
+                  id="dayOfMonth"
+                  type="number"
+                  value={dayOfMonth}
+                  onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
+                  min={1}
+                  max={31}
+                  className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+                />
+              </div>
+            )}
+
+            {recurringType === 'yearly' && (
+              <div>
+                <label htmlFor="monthOfYear" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                  Month of Year
+                </label>
+                <input
+                  id="monthOfYear"
+                  type="number"
+                  value={monthOfYear}
+                  onChange={(e) => setMonthOfYear(parseInt(e.target.value))}
+                  min={1}
+                  max={12}
+                  className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="endDate" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300 flex items-center gap-1">
+              End Date (Optional)
+            </label>
+            <input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+            />
+          </div>
+        </>
+      )}
+
       <div>
         <label htmlFor="dueDate" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300 flex items-center gap-1">
           <Calendar size={14} className="text-blue-400" />
@@ -145,6 +254,23 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
           className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
         />
       </div>
+
+      {dueDate && (
+        <div>
+          <label htmlFor="reminderOffset" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+            Reminder (minutes before due date)
+          </label>
+          <input
+            id="reminderOffset"
+            type="number"
+            value={reminderOffset}
+            onChange={(e) => setReminderOffset(parseInt(e.target.value))}
+            min={0}
+            max={1440}
+            className="w-full px-4 py-2.5 border border-[#BAD0CC] dark:border-[#5A7FC8]/50 bg-white dark:bg-[#201761]/30 text-[#201761] dark:text-[#F7F6F7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/20 transition-all"
+          />
+        </div>
+      )}
 
       <div>
         <label htmlFor="tags" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300 flex items-center gap-1">

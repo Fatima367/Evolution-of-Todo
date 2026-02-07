@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
-from src.database import create_db_and_tables
+from src.database import initialize_database
 from src.api.auth_router import router as auth_router
 from src.api.task_router import router as task_router
 from src.api.chat_router import router as chat_router
@@ -31,8 +31,8 @@ app.include_router(chat_router)
 
 @app.on_event("startup")
 def on_startup():
-    """Initialize database tables on startup"""
-    create_db_and_tables()
+    """Initialize database on startup"""
+    initialize_database()
 
 
 @app.get("/")

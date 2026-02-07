@@ -41,9 +41,15 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   due_date: string | null;
+  reminder_offset?: number;
   tags: string[] | null;
   is_favorite: boolean;
   recurring_type: RecurringType;
+  interval?: number; // e.g., every 2 days
+  day_of_week?: number; // 0-6 (Sunday-Saturday) for weekly
+  day_of_month?: number; // 1-31 for monthly
+  month_of_year?: number; // 1-12 for yearly
+  end_date?: string; // When to stop recurring
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -55,9 +61,15 @@ export interface TaskCreate {
   description?: string;
   priority?: TaskPriority;
   due_date?: string;
+  reminder_offset?: number;
   tags?: string[];
   is_favorite?: boolean;
   recurring_type?: RecurringType;
+  interval?: number;
+  day_of_week?: number;
+  day_of_month?: number;
+  month_of_year?: number;
+  end_date?: string;
 }
 
 export interface TaskUpdate {
@@ -66,9 +78,15 @@ export interface TaskUpdate {
   status?: TaskStatus;
   priority?: TaskPriority;
   due_date?: string;
+  reminder_offset?: number;
   tags?: string[];
   is_favorite?: boolean;
   recurring_type?: RecurringType;
+  interval?: number;
+  day_of_week?: number;
+  day_of_month?: number;
+  month_of_year?: number;
+  end_date?: string;
 }
 
 export interface UserCreate {

@@ -2,13 +2,16 @@
 from datetime import datetime
 from typing import List, Optional, TYPE_CHECKING
 from uuid import UUID, uuid4
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, Column, JSON
 from pydantic import EmailStr
 
 if TYPE_CHECKING:
     from .task import Task
     from .conversation import Conversation
     from .message import Message
+    from .recurring_pattern import RecurringPattern
+    from .reminder import Reminder
+    from .audit_log import AuditLog
 
 
 class User(SQLModel, table=True):
@@ -39,6 +42,7 @@ class User(SQLModel, table=True):
     email_notifications: bool = Field(default=True)
     task_reminders: bool = Field(default=True)
     weekly_summary: bool = Field(default=True)
+    push_subscription: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     
     # Soft delete fields
     deletion_scheduled: bool = Field(default=False, nullable=False)
@@ -48,3 +52,6 @@ class User(SQLModel, table=True):
     tasks: List["Task"] = Relationship(back_populates="user")
     conversations: List["Conversation"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
     messages: List["Message"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    recurring_patterns: List["RecurringPattern"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    reminders: List["Reminder"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    audit_logs: List["AuditLog"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
