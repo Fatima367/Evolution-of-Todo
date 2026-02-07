@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Tag as TagIcon, AlertCircle } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useTasks } from '@/hooks/useTasks';
-import type { TaskPriority } from '@/lib/types';
+import type { TaskPriority, RecurringType } from '@/lib/types';
 
 const priorityOptions: { value: TaskPriority; label: string; color: string }[] = [
   { value: 'low', label: 'Low', color: 'bg-green-500' },
@@ -25,6 +25,13 @@ export function CreateTaskModal() {
   const [dueDate, setDueDate] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [recurringType, setRecurringType] = useState<RecurringType>('none');
+  const [interval, setInterval] = useState(1);
+  const [dayOfWeek, setDayOfWeek] = useState(0);
+  const [dayOfMonth, setDayOfMonth] = useState(1);
+  const [monthOfYear, setMonthOfYear] = useState(1);
+  const [endDate, setEndDate] = useState('');
+  const [reminderOffset, setReminderOffset] = useState(15);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,6 +52,13 @@ export function CreateTaskModal() {
       setDueDate('');
       setTags([]);
       setTagInput('');
+      setRecurringType('none');
+      setInterval(1);
+      setDayOfWeek(0);
+      setDayOfMonth(1);
+      setMonthOfYear(1);
+      setEndDate('');
+      setReminderOffset(15);
       setErrors({});
     }, 300);
   };
@@ -100,7 +114,16 @@ export function CreateTaskModal() {
         description: description.trim() || undefined,
         priority,
         due_date: dueDate || undefined,
+        reminder_offset: reminderOffset,
         tags: tags.length > 0 ? tags : undefined,
+        recurring_type: recurringType,
+        ...(recurringType !== 'none' && {
+            interval: interval,
+            day_of_week: recurringType === 'weekly' ? dayOfWeek : undefined,
+            day_of_month: recurringType === 'monthly' ? dayOfMonth : undefined,
+            month_of_year: recurringType === 'yearly' ? monthOfYear : undefined,
+            end_date: endDate || undefined,
+        }),
       });
 
       handleClose();
@@ -259,6 +282,140 @@ export function CreateTaskModal() {
                     </motion.p>
                   )}
                 </div>
+              </div>
+
+              {/* Reminder Offset (Only if Due Date is set) */}
+              {dueDate && (
+                <div>
+                  <label htmlFor="reminderOffset" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Reminder (minutes before due date)
+                  </label>
+                  <input
+                    id="reminderOffset"
+                    type="number"
+                    value={reminderOffset}
+                    onChange={(e) => setReminderOffset(parseInt(e.target.value))}
+                    min={0}
+                    max={1440}
+                    className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                  />
+                </div>
+              )}
+
+              {/* Recurring Type and Details */}
+              <div className="space-y-4">
+                {/* Recurring Type Select */}
+                <div>
+                  <label htmlFor="recurringType" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Recurring Type
+                  </label>
+                  <select
+                    id="recurringType"
+                    value={recurringType}
+                    onChange={(e) => setRecurringType(e.target.value as RecurringType)}
+                    className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                  >
+                    <option value="none">None</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+
+                {recurringType !== 'none' && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Interval */}
+                      <div>
+                        <label htmlFor="interval" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          Repeat Every (Days/Weeks/Months/Years)
+                        </label>
+                        <input
+                          id="interval"
+                          type="number"
+                          value={interval}
+                          onChange={(e) => setInterval(parseInt(e.target.value))}
+                          min={1}
+                          className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                        />
+                      </div>
+
+                      {/* Day of Week (for Weekly) */}
+                      {recurringType === 'weekly' && (
+                        <div>
+                          <label htmlFor="dayOfWeek" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Day of Week
+                          </label>
+                          <select
+                            id="dayOfWeek"
+                            value={dayOfWeek}
+                            onChange={(e) => setDayOfWeek(parseInt(e.target.value))}
+                            className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                          >
+                            <option value={0}>Sunday</option>
+                            <option value={1}>Monday</option>
+                            <option value={2}>Tuesday</option>
+                            <option value={3}>Wednesday</option>
+                            <option value={4}>Thursday</option>
+                            <option value={5}>Friday</option>
+                            <option value={6}>Saturday</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Day of Month (for Monthly) */}
+                      {recurringType === 'monthly' && (
+                        <div>
+                          <label htmlFor="dayOfMonth" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Day of Month
+                          </label>
+                          <input
+                            id="dayOfMonth"
+                            type="number"
+                            value={dayOfMonth}
+                            onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
+                            min={1}
+                            max={31}
+                            className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      )}
+
+                      {/* Month of Year (for Yearly) */}
+                      {recurringType === 'yearly' && (
+                        <div>
+                          <label htmlFor="monthOfYear" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Month of Year
+                          </label>
+                          <input
+                            id="monthOfYear"
+                            type="number"
+                            value={monthOfYear}
+                            onChange={(e) => setMonthOfYear(parseInt(e.target.value))}
+                            min={1}
+                            max={12}
+                            className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* End Date (for all recurring types except 'none') */}
+                    <div>
+                      <label htmlFor="endDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        End Date (Optional)
+                      </label>
+                      <input
+                        id="endDate"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full px-4 py-3 glass-card rounded-xl border-2 border-gray-200/50 dark:border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-[#6EB8E1]/50 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Tags */}

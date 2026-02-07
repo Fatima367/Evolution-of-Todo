@@ -29,6 +29,9 @@ RETRY_DELAY = float(os.getenv("DB_RETRY_DELAY", "1.0"))  # seconds
 RETRY_BACKOFF = float(os.getenv("DB_RETRY_BACKOFF", "2.0"))  # exponential backoff multiplier
 
 
+engine = None
+
+
 def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
     """
     Create database engine with retry logic
@@ -52,7 +55,7 @@ def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
             # Configure engine based on environment
             if USE_CONNECTION_POOLING:
                 # Production cloud deployment with connection pooling
-                engine = create_engine(
+                db_engine = create_engine(
                     settings.database_url,
                     echo=settings.environment == "development",
                     poolclass=QueuePool,
@@ -65,7 +68,7 @@ def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
                 )
             else:
                 # Neon Serverless or local development - use NullPool
-                engine = create_engine(
+                db_engine = create_engine(
                     settings.database_url,
                     echo=settings.environment == "development",
                     poolclass=NullPool,
@@ -73,11 +76,11 @@ def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
                 )
 
             # Test connection
-            with engine.connect() as conn:
+            with db_engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
 
             logger.info("Database connection established successfully")
-            return engine
+            return db_engine
 
         except (OperationalError, DBAPIError) as e:
             last_error = e
@@ -104,20 +107,22 @@ def create_engine_with_retry(max_retries: int = MAX_RETRIES) -> any:
     )
 
 
-# Create engine with retry logic
-engine = create_engine_with_retry()
-
-
-def create_db_and_tables():
-    """Create all database tables"""
+def initialize_database():
+    """Create database engine and tables"""
+    global engine
+    engine = create_engine_with_retry()
+    logger.info("Creating database tables...")
     SQLModel.metadata.create_all(engine)
+    logger.info("Database tables created successfully.")
 
 
-def get_session():
+def get_session() -> Generator[Session, None, None]:
     """Dependency for database session
 
     Yields:
         Session: SQLModel session for database operations
     """
+    if engine is None:
+        raise RuntimeError("Database not initialized. Call initialize_database() first.")
     with Session(engine) as session:
         yield session

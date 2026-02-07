@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 from fastapi import HTTPException, status
-from sqlmodel import Session, select, func, col, case
-from sqlalchemy import literal_column
+from sqlmodel import Session, select, col, case
+from sqlalchemy import literal_column, func, text
 from src.models.task import Task, TaskStatus, TaskPriority
 from src.models.user import User
 from src.schemas.task_schemas import TaskCreate, TaskUpdate, SortField, SortOrder
@@ -93,7 +93,7 @@ class TaskService:
 
         # Full-text search on title and description
         if search_query and search_query.strip():
-            from sqlalchemy import text, func
+
             # Sanitize search query for tsquery (replace spaces with &)
             sanitized_query = search_query.strip().replace(' ', ' & ')
             # Use PostgreSQL full-text search with GIN indexes

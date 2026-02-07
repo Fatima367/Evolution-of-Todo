@@ -10,6 +10,7 @@ interface UIState {
   isDeleteConfirmModalOpen: boolean
   deletingTaskId: string | null
   deletingTaskTitle: string | null
+  isAuditLogModalOpen: boolean
   theme: 'light' | 'dark'
   taskRefreshTrigger: number
   toggleSidebar: () => void
@@ -24,6 +25,8 @@ interface UIState {
   closeEditTaskModal: () => void
   openDeleteConfirmModal: (taskId: string, taskTitle: string) => void
   closeDeleteConfirmModal: () => void
+  openAuditLogModal: () => void
+  closeAuditLogModal: () => void
   toggleTheme: () => void
   setTheme: (theme: 'light' | 'dark') => void
   triggerTaskRefresh: () => void
@@ -62,6 +65,7 @@ export const useUIStore = create<UIState>((set) => ({
   isDeleteConfirmModalOpen: false,
   deletingTaskId: null,
   deletingTaskTitle: null,
+  isAuditLogModalOpen: false,
   theme: 'light', // Default to light for SSR
   taskRefreshTrigger: 0,
 
@@ -82,6 +86,9 @@ export const useUIStore = create<UIState>((set) => ({
 
   openDeleteConfirmModal: (taskId, taskTitle) => set({ isDeleteConfirmModalOpen: true, deletingTaskId: taskId, deletingTaskTitle: taskTitle }),
   closeDeleteConfirmModal: () => set({ isDeleteConfirmModalOpen: false, deletingTaskId: null, deletingTaskTitle: null }),
+
+  openAuditLogModal: () => set({ isAuditLogModalOpen: true }),
+  closeAuditLogModal: () => set({ isAuditLogModalOpen: false }),
 
   toggleTheme: () => set((state) => {
     const newTheme = state.theme === 'light' ? 'dark' : 'light';

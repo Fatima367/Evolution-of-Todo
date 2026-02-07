@@ -34,6 +34,25 @@ black==24.10.0
 ruff==0.8.4
 mypy==1.13.0
 
+# OpenTelemetry
+opentelemetry-api==1.28.2
+opentelemetry-sdk==1.28.2
+opentelemetry-exporter-otlp-proto-grpc==1.28.2
+opentelemetry-instrumentation-fastapi==0.49b2
+opentelemetry-instrumentation-sqlalchemy==0.49b2
+opentelemetry-instrumentation-requests==0.49b2
+
+
 # OpenAI SDKs
+
 openai-chatkit<=1.4.0
 openai-agents[litellm]<=0.6.2
+
+# Kafka
+aiokafka
+
+# Dapr
+dapr
+
+# Monitoring
+prometheus-client

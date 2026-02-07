@@ -184,6 +184,25 @@ class ApiClient {
   async deleteTask(id: string): Promise<void> {
     return this.request<void>(`/tasks/${id}`, { method: 'DELETE' });
   }
+
+  // Audit endpoints
+  async getAuditLogs(limit: number = 100, offset: number = 0): Promise<any[]> {
+    return this.request<any[]>(`/audit/?limit=${limit}&offset=${offset}`);
+  }
+
+  // Notification endpoints
+  async savePushSubscription(subscription: any): Promise<void> {
+    return this.request<void>('/push-subscription/', {
+      method: 'POST',
+      body: JSON.stringify(subscription),
+    });
+  }
+
+  async removePushSubscription(): Promise<void> {
+    return this.request<void>('/push-subscription/', {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

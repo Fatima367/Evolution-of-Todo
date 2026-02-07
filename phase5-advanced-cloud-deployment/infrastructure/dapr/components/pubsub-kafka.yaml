@@ -9,7 +9,7 @@ spec:
   metadata:
   # Kafka broker addresses
   - name: brokers
-    value: "todoboard-kafka-kafka-bootstrap.todoboard.svc:9092"
+    value: "todoboard-kafka-kafka-bootstrap.kafka.svc:9092"
 
   # Consumer group for this application
   - name: consumerGroup
@@ -29,7 +29,7 @@ spec:
 
   # Kafka version
   - name: version
-    value: "3.6.0"
+    value: "4.1.1"
 
   # Initial offset for new consumers
   - name: initialOffset
