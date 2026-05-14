@@ -1,5 +1,5 @@
 """Task API schemas for request/response validation"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
 from enum import Enum
@@ -41,7 +41,10 @@ class TaskCreate(BaseModel):
         if v is not None:
             # Only reject dates more than 24 hours in the past
             from datetime import timedelta
-            yesterday = datetime.utcnow() - timedelta(days=1)
+            # Make v timezone-aware if it's naive (assume UTC)
+            if v.tzinfo is None:
+                v = v.replace(tzinfo=timezone.utc)
+            yesterday = datetime.now(timezone.utc) - timedelta(days=1)
             if v < yesterday:
                 raise ValueError('Due date cannot be more than 24 hours in the past')
         return v

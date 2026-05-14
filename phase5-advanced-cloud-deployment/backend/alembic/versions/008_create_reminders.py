@@ -16,6 +16,9 @@ down_revision: Union[str, None] = '007'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+# Database default expressions
+_DB_NOW = sa.text('now()')
+
 
 def upgrade() -> None:
     """Create reminders table for scheduled task reminders"""
@@ -28,7 +31,7 @@ def upgrade() -> None:
         sa.Column('remind_at', sa.DateTime(), nullable=False),
         sa.Column('sent', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('sent_at', sa.DateTime(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(
             ['task_id'],

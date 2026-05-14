@@ -16,6 +16,9 @@ down_revision: Union[str, None] = '008'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+# Database default expressions
+_DB_NOW = sa.text('now()')
+
 
 def upgrade() -> None:
     """Create audit_logs table for complete task operation history"""
@@ -30,7 +33,7 @@ def upgrade() -> None:
         sa.Column('request_id', sa.String(length=255), nullable=True),
         sa.Column('ip_address', sa.String(length=45), nullable=True),
         sa.Column('user_agent', sa.Text(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(
             ['user_id'],

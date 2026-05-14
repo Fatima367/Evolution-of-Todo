@@ -39,8 +39,8 @@ async def register(
         email=user_data.email,
         name=user_data.name,
         password_hash=hashed_password,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
         is_active=True
     )
 

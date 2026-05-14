@@ -1,5 +1,5 @@
 """User entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, TYPE_CHECKING
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship
@@ -31,8 +31,8 @@ class User(SQLModel, table=True):
     email: EmailStr = Field(unique=True, index=True, nullable=False)
     name: str = Field(min_length=1, max_length=100, nullable=False)
     password_hash: str = Field(nullable=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
     is_active: bool = Field(default=True, nullable=False)
 
     # Notification settings

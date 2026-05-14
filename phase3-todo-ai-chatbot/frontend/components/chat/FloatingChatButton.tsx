@@ -249,9 +249,11 @@ export function FloatingChatButton() {
       {isChatOpen && (
         <>
           {/* Backdrop */}
-          <div
+          <button
             onClick={() => setIsChatOpen(false)}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[999]"
+            onKeyDown={(e) => e.key === 'Escape' && setIsChatOpen(false)}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[999] cursor-default"
+            aria-label="Close chat"
           />
 
           {/* Popup Window */}

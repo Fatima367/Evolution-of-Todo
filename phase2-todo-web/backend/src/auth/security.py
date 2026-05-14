@@ -1,5 +1,5 @@
 """Security utilities for password hashing and JWT token generation"""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from passlib.context import CryptContext
 from jose import jwt
@@ -18,12 +18,8 @@ pwd_context = CryptContext(
 )
 
 # Initialize bcrypt backend explicitly to handle potential initialization issues
-try:
-    # Try to explicitly set the bcrypt backend to avoid the internal test that causes issues
-    pwd_context["bcrypt"].set_backend("auto")  # Let passlib choose the best available
-except Exception as e:
-    # If there are backend issues, passlib will handle it automatically
-    pass
+# Note: CryptContext does not support direct scheme access via pwd_context["bcrypt"]
+# passlib handles backend selection automatically, no manual intervention needed
 
 
 def hash_password(password: str) -> str:
@@ -103,9 +99,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     """
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.jwt_access_token_expire_minutes)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_access_token_expire_minutes)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)

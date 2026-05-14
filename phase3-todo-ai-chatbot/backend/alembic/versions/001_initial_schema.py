@@ -16,6 +16,9 @@ down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+# Database default expressions
+_DB_NOW = sa.text('now()')
+
 
 def upgrade() -> None:
     """Create users and tasks tables with proper indexes"""
@@ -27,8 +30,8 @@ def upgrade() -> None:
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('name', sa.String(length=100), nullable=False),
         sa.Column('password_hash', sa.String(), nullable=False),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
-        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
+        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
         sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.PrimaryKeyConstraint('id')
     )
@@ -52,8 +55,8 @@ def upgrade() -> None:
         sa.Column('due_date', sa.DateTime(), nullable=True),
         sa.Column('tags', postgresql.JSON(astext_type=sa.Text()), nullable=True),
         sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
-        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
+        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
         sa.Column('completed_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(

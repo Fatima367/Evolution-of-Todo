@@ -16,6 +16,9 @@ down_revision: Union[str, None] = '006'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+# Database default expressions
+_DB_NOW = sa.text('now()')
+
 
 def upgrade() -> None:
     """Create recurring_patterns table for recurring task configuration"""
@@ -32,8 +35,8 @@ def upgrade() -> None:
         sa.Column('month_of_year', sa.Integer(), nullable=True),
         sa.Column('end_date', sa.DateTime(), nullable=True),
         sa.Column('last_generated_at', sa.DateTime(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
-        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
+        sa.Column('updated_at', sa.DateTime(), nullable=False, server_default=_DB_NOW),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(
             ['task_id'],

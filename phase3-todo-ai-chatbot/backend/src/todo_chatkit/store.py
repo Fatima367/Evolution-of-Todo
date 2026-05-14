@@ -89,7 +89,7 @@ class PostgreSQLStore(Store[ChatContext]):
             conversation = context.session.exec(statement).first()
 
             if conversation:
-                conversation.updated_at = datetime.utcnow()
+                conversation.updated_at = datetime.now(timezone.utc)
                 context.session.add(conversation)
                 context.session.commit()
                 # Ensure thread.id is the UUID string
@@ -100,7 +100,7 @@ class PostgreSQLStore(Store[ChatContext]):
                     id=conversation_uuid,
                     user_id=uuid.UUID(context.user_id),
                     created_at=thread.created_at if isinstance(thread.created_at, datetime) else datetime.fromtimestamp(thread.created_at, tz=timezone.utc),
-                    updated_at=datetime.utcnow()
+                    updated_at=datetime.now(timezone.utc)
                 )
                 context.session.add(conversation)
                 context.session.commit()
@@ -110,7 +110,7 @@ class PostgreSQLStore(Store[ChatContext]):
             conversation = Conversation(
                 user_id=uuid.UUID(context.user_id),
                 created_at=thread.created_at if isinstance(thread.created_at, datetime) else datetime.fromtimestamp(thread.created_at, tz=timezone.utc),
-                updated_at=datetime.utcnow()
+                updated_at=datetime.now(timezone.utc)
             )
             context.session.add(conversation)
             context.session.commit()
@@ -225,7 +225,7 @@ class PostgreSQLStore(Store[ChatContext]):
             conversation_id=conversation_uuid,
             role=role,
             content=content_text,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
 
         context.session.add(message)
@@ -237,7 +237,7 @@ class PostgreSQLStore(Store[ChatContext]):
         )
         conversation = context.session.exec(statement).first()
         if conversation:
-            conversation.updated_at = datetime.utcnow()
+            conversation.updated_at = datetime.now(timezone.utc)
             context.session.add(conversation)
 
         context.session.commit()
