@@ -63,8 +63,9 @@ minikube image ls | grep todoboard
 
 ```bash
 # Create secrets for sensitive data
+# SECURITY: Replace placeholders with strong, unique values before deployment
 kubectl create secret generic app-secrets \
-  --from-literal=POSTGRES_PASSWORD=changeme \
+  --from-literal=POSTGRES_PASSWORD=your-database-password \
   --from-literal=JWT_SECRET=your-jwt-secret-key \
   --from-literal=GROQ_API_KEY=your-groq-api-key
 
