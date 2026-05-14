@@ -34,7 +34,7 @@ minikube image load todoboard-frontend:0.1.0
 # 3. Create secrets
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=changeme \
-  --from-literal=JWT_SECRET=your-jwt-secret \
+  --from-literal=JWT_SECRET_KEY=your-jwt-secret \
   --from-literal=GROQ_API_KEY=your-groq-api-key
 
 # 4. Deploy with Helm
@@ -143,7 +143,7 @@ phase4-kubernetes-deployment/
 ```bash
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=<password> \
-  --from-literal=JWT_SECRET=<secret> \
+  --from-literal=JWT_SECRET_KEY=<secret> \
   --from-literal=GROQ_API_KEY=<your-groq-api-key>
 ```
 
