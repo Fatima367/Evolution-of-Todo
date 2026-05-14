@@ -1,0 +1,264 @@
+{{- if .Values.monitoring.prometheus.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.monitoring.prometheus.scrapeInterval }}
+      scrape_timeout: {{ .Values.monitoring.prometheus.scrapeTimeout }}
+      evaluation_interval: {{ .Values.monitoring.prometheus.evaluationInterval }}
+      external_labels:
+        cluster: {{ .Values.monitoring.prometheus.externalLabels.cluster }}
+        environment: {{ .Values.monitoring.prometheus.externalLabels.environment }}
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+                - {{ .Values.monitoring.prometheus.alertmanager.endpoint }}
+          timeout: 10s
+          api_version: v2
+
+    rule_files:
+      - '/etc/prometheus/alerts.yaml'
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      - job_name: 'todoboard-backend'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - {{ .Release.Namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: {{ include "todoboard.fullname" . }}-backend
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            replacement: $1:8000
+        metrics_path: '/metrics'
+
+      - job_name: 'notification-service'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - {{ .Release.Namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: notification-service
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            replacement: $1:8001
+        metrics_path: '/metrics'
+
+      - job_name: 'recurring-task-service'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - {{ .Release.Namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: recurring-task-service
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            replacement: $1:8002
+        metrics_path: '/metrics'
+
+      - job_name: 'audit-service'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - {{ .Release.Namespace }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: audit-service
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            replacement: $1:8003
+        metrics_path: '/metrics'
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus-storage
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.monitoring.prometheus.storage.size }}
+  {{- if .Values.monitoring.prometheus.storage.storageClass }}
+  storageClassName: {{ .Values.monitoring.prometheus.storage.storageClass }}
+  {{- end }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+spec:
+  replicas: {{ .Values.monitoring.prometheus.replicas }}
+  selector:
+    matchLabels:
+      {{- include "todoboard.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: prometheus
+  template:
+    metadata:
+      labels:
+        {{- include "todoboard.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: prometheus
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      serviceAccountName: {{ include "todoboard.fullname" . }}-prometheus
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      containers:
+        - name: prometheus
+          image: "{{ .Values.monitoring.prometheus.image.repository }}:{{ .Values.monitoring.prometheus.image.tag }}"
+          imagePullPolicy: {{ .Values.monitoring.prometheus.image.pullPolicy }}
+          args:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--storage.tsdb.retention.time={{ .Values.monitoring.prometheus.retention.time }}'
+            - '--storage.tsdb.retention.size={{ .Values.monitoring.prometheus.retention.size }}'
+            - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+            - '--web.console.templates=/usr/share/prometheus/consoles'
+            - '--web.enable-lifecycle'
+          ports:
+            - name: http
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.monitoring.prometheus.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: storage
+              mountPath: /prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "todoboard.fullname" . }}-prometheus-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: {{ include "todoboard.fullname" . }}-prometheus-storage
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+spec:
+  type: {{ .Values.monitoring.prometheus.service.type }}
+  ports:
+    - port: {{ .Values.monitoring.prometheus.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "todoboard.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: prometheus
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "todoboard.fullname" . }}-prometheus
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "todoboard.fullname" . }}-prometheus
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "todoboard.fullname" . }}-prometheus
+    namespace: {{ .Release.Namespace }}
+
+{{- end }}

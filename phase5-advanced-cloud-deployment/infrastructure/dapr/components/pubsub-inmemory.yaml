@@ -1,0 +1,16 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-kafka
+  namespace: todoboard
+spec:
+  type: pubsub.in-memory
+  version: v1
+  metadata:
+  - name: consumerID
+    value: "todoboard-consumer"
+scopes:
+  - backend-service
+  - notification-service
+  - recurring-task-service
+  - audit-service

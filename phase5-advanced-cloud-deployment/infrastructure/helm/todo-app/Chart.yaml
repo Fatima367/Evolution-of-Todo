@@ -1,0 +1,18 @@
+apiVersion: v2
+name: todo-app
+description: A Helm chart for TodoBoard application with microservices architecture
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - todoboard
+  - todo
+  - task-management
+  - microservices
+  - kubernetes
+home: https://github.com/yourusername/Evolution-of-Todo
+sources:
+  - https://github.com/yourusername/Evolution-of-Todo
+maintainers:
+  - name: TodoBoard Team
+    email: team@todoboard.example.com

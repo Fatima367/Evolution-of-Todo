@@ -5,6 +5,9 @@ from src.todo_chatkit.tools import create_task_tools
 from src.models.task import Task
 from src.models.user import User
 
+# Test data constants
+TEST_TASK_TITLE = "Read book"
+
 # Setup in-memory DB
 engine = create_engine("sqlite:///:memory:")
 SQLModel.metadata.create_all(engine)
@@ -56,10 +59,10 @@ def verify_named_references():
         print(f"Task priority in DB: {updated_task.priority}")
 
         print("\n--- 3. Testing Ambiguous Matches ---")
-        add_task.func(ctx, title="Read book")
-        add_task.func(ctx, title="Read book")
+        add_task.func(ctx, title=TEST_TASK_TITLE)
+        add_task.func(ctx, title=TEST_TASK_TITLE)
 
-        res = complete_task.func(ctx, task_id="Read book")
+        res = complete_task.func(ctx, task_id=TEST_TASK_TITLE)
         print(f"Ambiguous result status: {res['status']}")
         print(f"Matches found: {len(res.get('matches', []))}")
 

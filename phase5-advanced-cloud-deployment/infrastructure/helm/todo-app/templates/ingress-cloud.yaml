@@ -1,0 +1,82 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "todoboard.fullname" . }}-cloud
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.ingress.tls.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.tls.issuerRef.name }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "{{ .Values.ingress.sslRedirect }}"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "{{ .Values.ingress.forceSslRedirect }}"
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.proxyBodySize }}"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "{{ .Values.ingress.proxyConnectTimeout }}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.proxySendTimeout }}"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.proxyReadTimeout }}"
+    nginx.ingress.kubernetes.io/enable-cors: "{{ .Values.ingress.enableCors }}"
+    {{- if .Values.ingress.enableCors }}
+    nginx.ingress.kubernetes.io/cors-allow-origin: "{{ .Values.ingress.corsAllowOrigin }}"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "{{ .Values.ingress.corsAllowMethods }}"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "{{ .Values.ingress.corsAllowHeaders }}"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "{{ .Values.ingress.corsAllowCredentials }}"
+    {{- end }}
+    {{- if .Values.ingress.rateLimiting.enabled }}
+    nginx.ingress.kubernetes.io/limit-rps: "{{ .Values.ingress.rateLimiting.rps }}"
+    nginx.ingress.kubernetes.io/limit-connections: "{{ .Values.ingress.rateLimiting.connections }}"
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ .host }}
+        {{- end }}
+      secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          # Frontend routes
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" $ }}-frontend
+                port:
+                  number: {{ $.Values.frontend.service.port }}
+          # Backend API routes
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" $ }}-backend
+                port:
+                  number: {{ $.Values.backend.service.port }}
+          # Health check endpoint
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" $ }}-backend
+                port:
+                  number: {{ $.Values.backend.service.port }}
+          # WebSocket endpoint for real-time updates
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "todoboard.fullname" $ }}-backend
+                port:
+                  number: {{ $.Values.backend.service.port }}
+    {{- end }}
+{{- end }}

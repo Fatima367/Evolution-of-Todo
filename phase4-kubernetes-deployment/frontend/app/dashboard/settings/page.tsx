@@ -82,7 +82,7 @@ export default function SettingsPage() {
       console.error('Error updating notification settings:', err)
       setError('Failed to update notification settings. Please try again.')
       // Revert the change in case of error
-      setNotificationSettings(notificationSettings)
+      setNotificationSettings((prev) => prev)
     } finally {
       setIsUpdatingNotifications(false)
     }

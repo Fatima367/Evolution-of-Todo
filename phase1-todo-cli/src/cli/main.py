@@ -19,6 +19,9 @@ from src.lib.utils import (
     display_info,
 )
 
+# Constants for error messages
+INVALID_TASK_ID_ERROR = "Invalid task ID. Must be a number."
+
 
 console = Console()
 
@@ -132,7 +135,7 @@ def handle_update_task(app: TodoApp) -> None:
     try:
         task_id = int(answers["task_id"])
     except ValueError:
-        display_error("Invalid task ID. Must be a number.")
+        display_error(INVALID_TASK_ID_ERROR)
         sys.exit(2)
 
     title = answers["title"] if answers["title"] else None
@@ -180,7 +183,7 @@ def handle_mark_task(app: TodoApp) -> None:
     try:
         task_id = int(answers["task_id"])
     except ValueError:
-        display_error("Invalid task ID. Must be a number.")
+        display_error(INVALID_TASK_ID_ERROR)
         sys.exit(2)
 
     status = answers["status"]
@@ -218,7 +221,7 @@ def handle_delete_task(app: TodoApp) -> None:
     try:
         task_id = int(answers["task_id"])
     except ValueError:
-        display_error("Invalid task ID. Must be a number.")
+        display_error(INVALID_TASK_ID_ERROR)
         sys.exit(2)
 
     success = app.delete_task(task_id=task_id)

@@ -109,8 +109,8 @@ async def test_save_thread_updates_existing(store: PostgreSQLStore, chat_context
     # Create conversation directly in DB
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -150,8 +150,8 @@ async def test_load_thread_enforces_user_isolation(store: PostgreSQLStore, sessi
     # Create conversation for test_user
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -181,8 +181,8 @@ async def test_add_and_load_thread_items(store: PostgreSQLStore, chat_context: C
     # Create conversation
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -214,8 +214,8 @@ async def test_add_thread_item_user_and_assistant(store: PostgreSQLStore, chat_c
     """Test adding both user and assistant messages"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -255,8 +255,8 @@ async def test_load_thread_items_pagination(store: PostgreSQLStore, chat_context
     """Test message pagination"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -287,8 +287,8 @@ async def test_load_thread_items_ordering(store: PostgreSQLStore, chat_context: 
     """Test message ordering (asc vs desc)"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -328,8 +328,8 @@ async def test_load_thread_items_with_cursor(store: PostgreSQLStore, chat_contex
     """Test cursor-based pagination"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -367,8 +367,8 @@ async def test_save_and_load_item(store: PostgreSQLStore, chat_context: ChatCont
     # Create conversation and message
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -378,7 +378,7 @@ async def test_save_and_load_item(store: PostgreSQLStore, chat_context: ChatCont
         conversation_id=conversation.id,
         role=MessageRole.USER,
         content="Original content",
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     session.add(message)
     session.commit()
@@ -422,8 +422,8 @@ async def test_delete_thread_item(store: PostgreSQLStore, chat_context: ChatCont
     # Create conversation and message
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -433,7 +433,7 @@ async def test_delete_thread_item(store: PostgreSQLStore, chat_context: ChatCont
         conversation_id=conversation.id,
         role=MessageRole.USER,
         content="To be deleted",
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     session.add(message)
     session.commit()
@@ -458,8 +458,8 @@ async def test_load_threads(store: PostgreSQLStore, chat_context: ChatContext, s
     for i in range(3):
         conv = Conversation(
             user_id=test_user.id,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
         )
         session.add(conv)
     session.commit()
@@ -478,8 +478,8 @@ async def test_load_threads_pagination(store: PostgreSQLStore, chat_context: Cha
     for i in range(5):
         conv = Conversation(
             user_id=test_user.id,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
         )
         session.add(conv)
     session.commit()
@@ -497,8 +497,8 @@ async def test_load_threads_user_isolation(store: PostgreSQLStore, session: Sess
     # Create conversation for test_user
     conv1 = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conv1)
 
@@ -515,8 +515,8 @@ async def test_load_threads_user_isolation(store: PostgreSQLStore, session: Sess
 
     conv2 = Conversation(
         user_id=other_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conv2)
     session.commit()
@@ -545,8 +545,8 @@ async def test_delete_thread(store: PostgreSQLStore, chat_context: ChatContext, 
     # Create conversation with messages
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -557,7 +557,7 @@ async def test_delete_thread(store: PostgreSQLStore, chat_context: ChatContext, 
         conversation_id=conversation.id,
         role=MessageRole.USER,
         content="Test",
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     session.add(message)
     session.commit()
@@ -579,8 +579,8 @@ async def test_delete_thread_user_isolation(store: PostgreSQLStore, session: Ses
     # Create conversation for test_user
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -610,8 +610,8 @@ async def test_add_thread_item_updates_conversation_timestamp(store: PostgreSQLS
     """Test that adding a message updates conversation updated_at"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()
@@ -643,8 +643,8 @@ async def test_add_thread_item_ignores_empty_content(store: PostgreSQLStore, cha
     """Test that empty messages are not persisted"""
     conversation = Conversation(
         user_id=test_user.id,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     session.add(conversation)
     session.commit()

@@ -1,0 +1,90 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-kafka
+  namespace: todoboard
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  # Kafka broker addresses
+  - name: brokers
+    value: "todoboard-kafka-kafka-bootstrap.kafka.svc:9092"
+
+  # Consumer group for this application
+  - name: consumerGroup
+    value: "todoboard-consumers"
+
+  # Client ID for Kafka connection
+  - name: clientID
+    value: "todoboard-dapr"
+
+  # Authentication type
+  - name: authType
+    value: "none"
+
+  # Consumer configuration
+  - name: consumeRetryInterval
+    value: "200ms"
+
+  # Kafka version
+  - name: version
+    value: "4.1.1"
+
+  # Initial offset for new consumers
+  - name: initialOffset
+    value: "newest"
+
+  # Maximum message size (1MB)
+  - name: maxMessageBytes
+    value: "1048576"
+
+  # Enable idempotent producer
+  - name: enableIdempotence
+    value: "true"
+
+  # Compression type
+  - name: compressionType
+    value: "snappy"
+
+  # Acknowledgment mode
+  - name: acks
+    value: "all"
+
+  # Retry configuration
+  - name: retries
+    value: "3"
+
+  # Request timeout
+  - name: requestTimeoutMs
+    value: "30000"
+
+  # Session timeout
+  - name: sessionTimeoutMs
+    value: "10000"
+
+  # Heartbeat interval
+  - name: heartbeatIntervalMs
+    value: "3000"
+
+  # Max poll interval
+  - name: maxPollIntervalMs
+    value: "300000"
+
+  # Max poll records
+  - name: maxPollRecords
+    value: "500"
+
+  # Auto commit
+  - name: autoCommit
+    value: "true"
+
+  # Auto commit interval
+  - name: autoCommitIntervalMs
+    value: "5000"
+
+scopes:
+  - backend-service
+  - notification-service
+  - recurring-task-service
+  - audit-service

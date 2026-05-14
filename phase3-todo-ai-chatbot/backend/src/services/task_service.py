@@ -1,5 +1,5 @@
 """Task service with user isolation enforcement"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 from fastapi import HTTPException, status
@@ -241,11 +241,11 @@ class TaskService:
         # Handle status transitions and completed_at
         if 'status' in update_data:
             if task.status == TaskStatus.COMPLETED and task.completed_at is None:
-                task.completed_at = datetime.utcnow()
+                task.completed_at = datetime.now(timezone.utc)
             elif task.status != TaskStatus.COMPLETED:
                 task.completed_at = None
 
-        task.updated_at = datetime.utcnow()
+        task.updated_at = datetime.now(timezone.utc)
 
         session.add(task)
         session.commit()

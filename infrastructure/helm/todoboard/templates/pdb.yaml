@@ -1,0 +1,43 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "todoboard.fullname" . }}-backend
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "todoboard.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "todoboard.fullname" . }}-frontend
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "todoboard.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: frontend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "todoboard.fullname" . }}-notification-service
+  labels:
+    {{- include "todoboard.labels" . | nindent 4 }}
+    app.kubernetes.io/component: notification-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      {{- include "todoboard.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: notification-service
+{{- end }}

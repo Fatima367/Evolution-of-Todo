@@ -1,5 +1,5 @@
 """Task API schemas for request/response validation"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
 from enum import Enum
@@ -31,8 +31,12 @@ class TaskCreate(BaseModel):
     @classmethod
     def validate_due_date(cls, v: Optional[datetime]) -> Optional[datetime]:
         """Validate due date is in the future"""
-        if v is not None and v < datetime.utcnow():
-            raise ValueError('Due date must be in the future')
+        if v is not None:
+            # Make v timezone-aware if it's naive (assume UTC)
+            if v.tzinfo is None:
+                v = v.replace(tzinfo=timezone.utc)
+            if v < datetime.now(timezone.utc):
+                raise ValueError('Due date must be in the future')
         return v
 
 

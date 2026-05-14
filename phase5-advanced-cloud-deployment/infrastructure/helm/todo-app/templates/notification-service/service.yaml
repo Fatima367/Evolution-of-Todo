@@ -1,0 +1,17 @@
+{{- if .Values.notificationService.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todoboard.fullname" . }}-notification-service
+  labels:
+    {{- include "todoboard.notificationService.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.notificationService.service.type }}
+  ports:
+    - port: {{ .Values.notificationService.service.port }}
+      targetPort: {{ .Values.notificationService.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "todoboard.notificationService.selectorLabels" . | nindent 4 }}
+{{- end }}

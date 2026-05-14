@@ -1,0 +1,38 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-kafka
+  namespace: default
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  # Kafka broker addresses
+  - name: brokers
+    value: "kafka:9092"
+  # Consumer group for this application
+  - name: consumerGroup
+    value: "todoboard-group"
+  # Client ID for Kafka connection
+  - name: clientID
+    value: "todoboard-client"
+  # Authentication type (none for local, SASL for production)
+  - name: authType
+    value: "none"
+  # Enable idempotent producer for exactly-once semantics
+  - name: enableIdempotence
+    value: "true"
+  # Maximum message size (10MB)
+  - name: maxMessageBytes
+    value: "10485760"
+  # Consumer session timeout
+  - name: sessionTimeout
+    value: "30000"
+  # Consumer heartbeat interval
+  - name: heartbeatInterval
+    value: "3000"
+scopes:
+- backend
+- notification-service
+- recurring-task-service
+- audit-service

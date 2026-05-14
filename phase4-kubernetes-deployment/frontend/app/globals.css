@@ -120,8 +120,8 @@
 
   *:focus-visible {
     @apply outline-none ring-2 ring-offset-2;
-    ring-color: hsl(var(--ring));
-    ring-offset-color: hsl(var(--background));
+    --tw-ring-color: hsl(var(--ring));
+    --tw-ring-offset-color: hsl(var(--background));
   }
 }
 

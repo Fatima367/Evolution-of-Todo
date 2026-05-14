@@ -1,0 +1,1096 @@
+# Production Cloud Values for TodoBoard Helm Chart
+# This file contains production-grade configurations for cloud deployment
+# Supports: Oracle Cloud (OKE), Google Cloud (GKE), Azure (AKS)
+
+#############################################################################
+# Global Configuration
+#############################################################################
+
+global:
+  appName: todoboard
+  environment: production
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  # Container registry (update with your registry)
+  registry: "your-registry.io/todoboard"
+
+#############################################################################
+# Backend Configuration (FastAPI)
+#############################################################################
+
+backend:
+  enabled: true
+  replicaCount: 3
+
+  image:
+    repository: todoboard-backend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8000
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  # Production resource limits
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 60
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 30
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: backend-service
+    appPort: 8000
+
+  env:
+    LOG_LEVEL: "INFO"
+    ENVIRONMENT: "production"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - backend
+            topologyKey: kubernetes.io/hostname
+
+#############################################################################
+# Frontend Configuration (Next.js)
+#############################################################################
+
+frontend:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: todoboard-frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+
+  # Production resource limits
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 20
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  env:
+    NODE_ENV: "production"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - frontend
+            topologyKey: kubernetes.io/hostname
+
+#############################################################################
+# Notification Service Configuration
+#############################################################################
+
+notificationService:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: notification-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8001
+
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+
+  # Production resource limits
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8001
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8001
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: notification-service
+    appPort: 8001
+
+  env:
+    LOG_LEVEL: "INFO"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#############################################################################
+# Recurring Task Service Configuration
+#############################################################################
+
+recurringTaskService:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: recurring-task-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8002
+
+  service:
+    type: ClusterIP
+    port: 8002
+    targetPort: 8002
+
+  # Production resource limits
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8002
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8002
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: recurring-task-service
+    appPort: 8002
+
+  env:
+    LOG_LEVEL: "INFO"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#############################################################################
+# Audit Service Configuration
+#############################################################################
+
+auditService:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: audit-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8003
+
+  service:
+    type: ClusterIP
+    port: 8003
+    targetPort: 8003
+
+  # Production resource limits
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  # Health probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8003
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 8003
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  # Rolling update strategy
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Dapr configuration
+  dapr:
+    enabled: true
+    appId: audit-service
+    appPort: 8003
+
+  env:
+    LOG_LEVEL: "INFO"
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  podSecurityContext:
+    fsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#############################################################################
+# Kafka Configuration (Production with Replication)
+#############################################################################
+
+kafka:
+  enabled: true
+  replicaCount: 3
+
+  # Kafka broker configuration
+  broker:
+    replicationFactor: 3
+    minInsyncReplicas: 2
+    defaultReplicationFactor: 3
+    offsetsTopicReplicationFactor: 3
+    transactionStateLogReplicationFactor: 3
+    transactionStateLogMinIsr: 2
+
+  # Topic configurations
+  topics:
+    taskEvents:
+      name: task-events
+      partitions: 6
+      replicationFactor: 3
+      config:
+        retention.ms: "604800000"  # 7 days
+        min.insync.replicas: "2"
+
+    reminders:
+      name: reminders
+      partitions: 3
+      replicationFactor: 3
+      config:
+        retention.ms: "86400000"  # 1 day
+        min.insync.replicas: "2"
+
+    taskUpdates:
+      name: task-updates
+      partitions: 6
+      replicationFactor: 3
+      config:
+        retention.ms: "3600000"  # 1 hour
+        min.insync.replicas: "2"
+
+  # Resource limits
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+
+  # Persistence
+  persistence:
+    enabled: true
+    storageClass: "standard"
+    size: "50Gi"
+
+  # Zookeeper configuration
+  zookeeper:
+    enabled: true
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+    persistence:
+      enabled: true
+      storageClass: "standard"
+      size: "20Gi"
+
+#############################################################################
+# Database Configuration (External - Neon Serverless PostgreSQL)
+#############################################################################
+
+postgresql:
+  # Use external Neon database
+  enabled: false
+  external:
+    enabled: true
+    host: "your-neon-host.neon.tech"
+    port: 5432
+    database: "todoboard"
+    username: "todoboard_user"
+    # Password should be in secrets
+    sslMode: "require"
+
+    # Connection pooling configuration
+    pooling:
+      enabled: true
+      minSize: 5
+      maxSize: 20
+      maxOverflow: 10
+      poolTimeout: 30
+      poolRecycle: 3600
+      poolPrePing: true
+
+#############################################################################
+# ConfigMap Configuration
+#############################################################################
+
+configMap:
+  backend:
+    DATABASE_URL: "postgresql://user:pass@neon-host/todoboard?sslmode=require"
+    CORS_ORIGINS: '["https://todoboard.example.com"]'
+    LOG_LEVEL: "INFO"
+    API_PREFIX: "/api/v1"
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+    KAFKA_TOPIC_TASK_EVENTS: "task-events"
+    KAFKA_TOPIC_REMINDERS: "reminders"
+    KAFKA_TOPIC_TASK_UPDATES: "task-updates"
+    # Database connection pooling
+    DB_POOL_SIZE: "20"
+    DB_MAX_OVERFLOW: "10"
+    DB_POOL_TIMEOUT: "30"
+    DB_POOL_RECYCLE: "3600"
+    DB_POOL_PRE_PING: "true"
+
+  frontend:
+    NEXT_PUBLIC_API_URL: "https://todoboard.example.com/api"
+    NEXT_PUBLIC_APP_NAME: "TodoBoard"
+    NODE_ENV: "production"
+
+#############################################################################
+# Secret Configuration
+#############################################################################
+
+secrets:
+  create: true
+  data:
+    POSTGRES_PASSWORD: ""  # Set via CI/CD or kubectl
+    JWT_SECRET_KEY: ""     # Set via CI/CD or kubectl
+    GROQ_API_KEY: ""       # Set via CI/CD or kubectl
+    KAFKA_SASL_USERNAME: ""
+    KAFKA_SASL_PASSWORD: ""
+
+#############################################################################
+# Ingress Configuration (Cloud with TLS)
+#############################################################################
+
+ingress:
+  enabled: true
+  className: "nginx"
+
+  # TLS/SSL configuration
+  tls:
+    enabled: true
+    secretName: todoboard-tls
+    createIssuer: true
+    issuerRef:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
+    acme:
+      email: "admin@example.com"
+    duration: "2160h"  # 90 days
+    renewBefore: "360h"  # 15 days
+    privateKey:
+      algorithm: RSA
+      size: 2048
+
+  # SSL settings
+  sslRedirect: "true"
+  forceSslRedirect: "true"
+
+  # Proxy settings
+  proxyBodySize: "10m"
+  proxyConnectTimeout: "60"
+  proxySendTimeout: "60"
+  proxyReadTimeout: "60"
+
+  # CORS settings
+  enableCors: "true"
+  corsAllowOrigin: "https://todoboard.example.com"
+  corsAllowMethods: "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  corsAllowHeaders: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+  corsAllowCredentials: "true"
+
+  # Rate limiting
+  rateLimiting:
+    enabled: true
+    rps: 100
+    connections: 50
+
+  hosts:
+    - host: todoboard.example.com
+
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+#############################################################################
+# Network Policy Configuration
+#############################################################################
+
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+#############################################################################
+# Service Account Configuration
+#############################################################################
+
+serviceAccount:
+  create: true
+  name: "todoboard-sa"
+  annotations:
+    # Add cloud-specific annotations here
+    # GKE: iam.gke.io/gcp-service-account
+    # AKS: azure.workload.identity/client-id
+    # OKE: oci.oraclecloud.com/compartment-id
+
+#############################################################################
+# Pod Disruption Budget
+#############################################################################
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  # Alternative: maxUnavailable: 1
+
+#############################################################################
+# Monitoring Configuration
+#############################################################################
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+
+  prometheusRule:
+    enabled: true
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+
+#############################################################################
+# Dapr Configuration
+#############################################################################
+
+dapr:
+  enabled: true
+  version: "1.12"
+
+  components:
+    pubsub:
+      enabled: true
+      type: pubsub.kafka
+      version: v1
+      metadata:
+        brokers: "kafka:9092"
+        consumerGroup: "todoboard"
+        authType: "none"
+
+    statestore:
+      enabled: true
+      type: state.postgresql
+      version: v1
+      metadata:
+        connectionString: "host=neon-host user=user password=pass dbname=todoboard sslmode=require"
+
+    secrets:
+      enabled: true
+      type: secretstores.kubernetes
+      version: v1
+
+#############################################################################
+# Log Aggregation Configuration
+#############################################################################
+
+logging:
+  enabled: true
+
+  # Fluentd configuration for log collection
+  fluentd:
+    enabled: true
+    replicas: 2
+    image:
+      repository: fluent/fluentd-kubernetes-daemonset
+      tag: v1.16-debian-elasticsearch8-1
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+    # Log sources configuration
+    sources:
+      - name: containers
+        type: tail
+        path: /var/log/containers/*.log
+        parser: docker
+        tag: kubernetes.*
+      - name: systemd
+        type: systemd
+        path: /var/log/journal
+        tag: systemd.*
+
+    # Log filters and transformations
+    filters:
+      - name: kubernetes-metadata
+        type: kubernetes_metadata
+        merge_json_log: true
+        preserve_json_log: true
+      - name: parser
+        type: parser
+        key_name: log
+        reserve_data: true
+        parsers:
+          - json
+          - nginx
+          - apache2
+      - name: record-transformer
+        type: record_transformer
+        enable_ruby: true
+        records:
+          - key: cluster
+            value: todoboard-production
+          - key: environment
+            value: cloud
+          - key: application
+            value: todoboard
+
+    # Output destinations
+    outputs:
+      # Elasticsearch for log storage and search
+      - name: elasticsearch
+        type: elasticsearch
+        enabled: true
+        host: elasticsearch.logging.svc.cluster.local
+        port: 9200
+        scheme: https
+        ssl_verify: true
+        logstash_format: true
+        logstash_prefix: todoboard
+        index_name: todoboard-logs
+        type_name: _doc
+        include_tag_key: true
+        tag_key: log_type
+        buffer:
+          type: file
+          path: /var/log/fluentd-buffers/elasticsearch.buffer
+          flush_mode: interval
+          flush_interval: 5s
+          flush_thread_count: 2
+          retry_type: exponential_backoff
+          retry_wait: 1s
+          retry_max_interval: 60s
+          retry_timeout: 1h
+          overflow_action: block
+
+      # S3 for long-term log archival
+      - name: s3
+        type: s3
+        enabled: true
+        s3_bucket: todoboard-logs-archive
+        s3_region: us-east-1
+        path: logs/%Y/%m/%d/
+        time_slice_format: "%Y%m%d%H"
+        store_as: gzip
+        buffer:
+          type: file
+          path: /var/log/fluentd-buffers/s3.buffer
+          flush_mode: interval
+          flush_interval: 60s
+          chunk_limit_size: 256m
+
+      # Kafka for real-time log streaming
+      - name: kafka
+        type: kafka2
+        enabled: true
+        brokers: kafka:9092
+        topic: application-logs
+        default_topic: application-logs
+        compression_codec: gzip
+        max_send_retries: 3
+        required_acks: 1
+        buffer:
+          type: file
+          path: /var/log/fluentd-buffers/kafka.buffer
+          flush_mode: interval
+          flush_interval: 10s
+
+    # Log retention policies
+    retention:
+      elasticsearch:
+        hot: 7d
+        warm: 30d
+        cold: 90d
+        delete: 365d
+      s3:
+        standard: 90d
+        glacier: 365d
+        delete: 2555d  # 7 years
+
+  # Elasticsearch configuration
+  elasticsearch:
+    enabled: true
+    replicas: 3
+    image:
+      repository: docker.elastic.co/elasticsearch/elasticsearch
+      tag: 8.8.0
+      pullPolicy: IfNotPresent
+    clusterName: todoboard-logs
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 4Gi
+      limits:
+        cpu: 2000m
+        memory: 8Gi
+    storage:
+      size: 500Gi
+      storageClass: fast-ssd
+    javaOpts: "-Xms4g -Xmx4g"
+
+  # Kibana configuration for log visualization
+  kibana:
+    enabled: true
+    replicas: 2
+    image:
+      repository: docker.elastic.co/kibana/kibana
+      tag: 8.8.0
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    service:
+      type: ClusterIP
+      port: 5601
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      hosts:
+        - host: logs.todoboard.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: kibana-tls
+          hosts:
+            - logs.todoboard.example.com
+
+# Structured logging configuration for applications
+applicationLogging:
+  format: json
+  level: info
+
+  # Log fields to include
+  fields:
+    - timestamp
+    - level
+    - message
+    - service
+    - trace_id
+    - span_id
+    - user_id
+    - request_id
+    - method
+    - path
+    - status_code
+    - duration
+    - error
+    - stack_trace
+
+  # Sensitive fields to redact
+  redactFields:
+    - password
+    - token
+    - api_key
+    - secret
+    - authorization
+    - credit_card
+    - ssn
+
+  # Log sampling for high-volume endpoints
+  sampling:
+    enabled: true
+    rate: 0.1  # Sample 10% of logs for high-volume endpoints
+    excludePaths:
+      - /health
+      - /metrics
+      - /ready
+
+# Alert configuration for log-based alerts
+logAlerts:
+  enabled: true
+
+  rules:
+    - name: high-error-rate
+      condition: error_count > 100 in 5m
+      severity: critical
+      notification:
+        - slack
+        - pagerduty
+
+    - name: authentication-failures
+      condition: auth_failed_count > 50 in 5m
+      severity: warning
+      notification:
+        - slack
+
+    - name: database-errors
+      condition: db_error_count > 10 in 5m
+      severity: critical
+      notification:
+        - slack
+        - pagerduty
+
+    - name: slow-requests
+      condition: p95_latency > 2s
+      severity: warning
+      notification:
+        - slack
+
+# Log compliance and audit configuration
+logCompliance:
+  enabled: true
+
+  # PII detection and masking
+  piiDetection:
+    enabled: true
+    patterns:
+      - email
+      - phone
+      - ssn
+      - credit_card
+      - ip_address
+    action: mask
+
+  # Audit log configuration
+  auditLogs:
+    enabled: true
+    retention: 2555d  # 7 years for compliance
+    immutable: true
+    encryption: true
+    destinations:
+      - elasticsearch
+      - s3
+
+  # Compliance standards
+  standards:
+    - GDPR
+    - SOC2
+    - HIPAA
+    - PCI-DSS

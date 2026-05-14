@@ -1,0 +1,95 @@
+{{- if .Values.notificationService.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todoboard.fullname" . }}-notification-service
+  labels:
+    {{- include "todoboard.notificationService.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.notificationService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.notificationService.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.notificationService.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+      {{- include "todoboard.notificationService.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "todoboard.notificationService.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- if .Values.notificationService.dapr.enabled }}
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "notification-service"
+        dapr.io/app-port: "{{ .Values.notificationService.containerPort }}"
+        dapr.io/log-level: "info"
+        {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "todoboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.notificationService.podSecurityContext | nindent 8 }}
+      containers:
+      - name: notification-service
+        image: {{ include "todoboard.notificationService.image" . }}
+        imagePullPolicy: {{ .Values.notificationService.image.pullPolicy | default .Values.global.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.notificationService.containerPort }}
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.notificationService.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "todoboard.fullname" . }}-notification-config
+        - secretRef:
+            name: {{ include "todoboard.fullname" . }}-secrets
+        {{- if .Values.notificationService.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.notificationService.livenessProbe.httpGet.path }}
+            port: {{ .Values.notificationService.livenessProbe.httpGet.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.notificationService.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.notificationService.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.notificationService.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.notificationService.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.notificationService.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.notificationService.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.notificationService.readinessProbe.httpGet.path }}
+            port: {{ .Values.notificationService.readinessProbe.httpGet.port }}
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.notificationService.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.notificationService.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.notificationService.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.notificationService.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.notificationService.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.notificationService.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.notificationService.securityContext | nindent 10 }}
+      {{- with .Values.notificationService.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.notificationService.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.notificationService.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

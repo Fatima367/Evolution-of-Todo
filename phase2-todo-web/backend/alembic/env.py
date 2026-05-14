@@ -3,7 +3,8 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from src.config import settings
-from src.models import *  # Import all models
+from src.models.task import Task
+from src.models.user import User
 from sqlmodel import SQLModel
 
 # Alembic Config object

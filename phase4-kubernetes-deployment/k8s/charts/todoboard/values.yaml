@@ -162,9 +162,11 @@ postgresql:
     requests:
       cpu: "100m"
       memory: "256Mi"
+      ephemeral-storage: "256Mi"
     limits:
       cpu: "500m"
       memory: "512Mi"
+      ephemeral-storage: "512Mi"
 
   livenessProbe:
     enabled: true
@@ -336,6 +338,9 @@ serviceAccount:
   create: true
   name: ""
   annotations: {}
+  # SECURITY: Disable auto-mounting of service account tokens for security
+  # Pods using this service account will not have a token mounted automatically
+  automountServiceAccountToken: false
 
 #############################################################################
 # Pod Disruption Budget (Optional)
