@@ -1,9 +1,8 @@
 """Recurring task scheduler logic for creating next occurrences"""
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
-from uuid import UUID
 import httpx
 
 # Configure logging
@@ -99,7 +98,7 @@ def calculate_next_occurrence(recurring_pattern: Dict[str, Any]) -> Optional[dat
         if last_generated_str:
             base_date = datetime.fromisoformat(last_generated_str.replace('Z', '+00:00'))
         else:
-            base_date = datetime.utcnow()
+            base_date = datetime.now(timezone.utc)
 
         # Calculate next date based on frequency
         if frequency == "daily":

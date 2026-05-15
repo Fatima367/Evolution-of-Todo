@@ -1,5 +1,5 @@
 """Recurring Pattern entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 from sqlmodel import Field, SQLModel, Relationship
@@ -39,8 +39,8 @@ class RecurringPattern(SQLModel, table=True):
     month_of_year: Optional[int] = Field(default=None, ge=1, le=12)
     end_date: Optional[datetime] = Field(default=None)
     last_generated_at: Optional[datetime] = Field(default=None)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     task: Optional["Task"] = Relationship(back_populates="recurring_pattern")

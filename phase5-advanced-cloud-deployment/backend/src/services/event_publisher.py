@@ -4,10 +4,9 @@ This service provides a centralized interface for publishing task-related events
 to Kafka topics via Dapr pub/sub component.
 """
 import os
-import json
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import httpx
 
 logger = logging.getLogger(__name__)
@@ -48,7 +47,7 @@ class EventPublisher:
                 "task_id": str(task_id),
                 "user_id": str(user_id),
                 "task_data": task_data,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "service": "backend-service"
             }
 
@@ -169,7 +168,7 @@ class EventPublisher:
                 "title": title,
                 "due_at": due_at,
                 "remind_at": remind_at,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "service": "backend-service"
             }
 

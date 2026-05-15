@@ -1,5 +1,5 @@
 """User entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, TYPE_CHECKING
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship, Column, JSON
@@ -12,6 +12,11 @@ if TYPE_CHECKING:
     from .recurring_pattern import RecurringPattern
     from .reminder import Reminder
     from .audit_log import AuditLog
+
+
+def utc_now() -> datetime:
+    """Return current UTC datetime (timezone-aware)"""
+    return datetime.now(timezone.utc)
 
 
 class User(SQLModel, table=True):
@@ -34,8 +39,8 @@ class User(SQLModel, table=True):
     email: EmailStr = Field(unique=True, index=True, nullable=False)
     name: str = Field(min_length=1, max_length=100, nullable=False)
     password_hash: str = Field(nullable=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=utc_now, nullable=False)
+    updated_at: datetime = Field(default_factory=utc_now, nullable=False)
     is_active: bool = Field(default=True, nullable=False)
 
     # Notification settings

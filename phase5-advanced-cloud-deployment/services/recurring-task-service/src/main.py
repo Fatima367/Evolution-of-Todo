@@ -9,9 +9,9 @@ This service:
 import os
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import httpx
@@ -52,7 +52,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": SERVICE_NAME,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -176,7 +176,7 @@ def calculate_next_occurrence(task_data: Dict[str, Any], recurring_type: str) ->
         if due_date_str:
             current_due = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
         else:
-            current_due = datetime.utcnow()
+            current_due = datetime.now(timezone.utc)
 
         # Calculate next due date based on recurring type
         if recurring_type == "daily":
@@ -227,7 +227,7 @@ async def create_next_task_instance(
             "user_id": user_id,
             "original_task_id": original_task_id,
             "task_data": next_task_data,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "service": SERVICE_NAME
         }
 

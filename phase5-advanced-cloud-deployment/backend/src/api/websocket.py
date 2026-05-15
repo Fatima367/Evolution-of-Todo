@@ -119,7 +119,7 @@ async def websocket_endpoint(
             "type": "connection",
             "status": "connected",
             "user_id": user_id,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         })
 
         # Keep connection alive and handle incoming messages
@@ -131,7 +131,7 @@ async def websocket_endpoint(
             if data.get("type") == "ping":
                 await websocket.send_json({
                     "type": "pong",
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 })
 
     except WebSocketDisconnect:
@@ -143,4 +143,4 @@ async def websocket_endpoint(
 
 
 # Import datetime for timestamps
-from datetime import datetime
+from datetime import datetime, timezone

@@ -1,5 +1,5 @@
 """Reminder API schemas for request/response validation"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, Field, field_validator
@@ -14,7 +14,7 @@ class ReminderCreate(BaseModel):
     @classmethod
     def validate_remind_at(cls, v: datetime) -> datetime:
         """Validate remind_at is in the future"""
-        if v < datetime.utcnow():
+        if v < datetime.now(timezone.utc):
             raise ValueError('Reminder time must be in the future')
         return v
 
@@ -28,7 +28,7 @@ class ReminderUpdate(BaseModel):
     @classmethod
     def validate_remind_at(cls, v: Optional[datetime]) -> Optional[datetime]:
         """Validate remind_at is in the future if provided"""
-        if v is not None and v < datetime.utcnow():
+        if v is not None and v < datetime.now(timezone.utc):
             raise ValueError('Reminder time must be in the future')
         return v
 

@@ -2,7 +2,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from src.database import get_session
 from src.models.user import User
@@ -39,8 +39,8 @@ async def register(
         email=user_data.email,
         name=user_data.name,
         password_hash=hashed_password,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
         is_active=True
     )
 
@@ -135,7 +135,7 @@ async def update_current_user_info(
     if user_update.weekly_summary is not None:
         current_user.weekly_summary = user_update.weekly_summary
 
-    current_user.updated_at = datetime.utcnow()
+    current_user.updated_at = datetime.now(timezone.utc)
 
     session.add(current_user)
     session.commit()
@@ -176,7 +176,7 @@ async def change_password(
 
     # Update password
     current_user.password_hash = hash_password(passwords.new_password)
-    current_user.updated_at = datetime.utcnow()
+    current_user.updated_at = datetime.now(timezone.utc)
 
     session.add(current_user)
     session.commit()
@@ -201,8 +201,8 @@ async def delete_account(
     # Soft delete the user
     current_user.is_active = False
     current_user.deletion_scheduled = True
-    current_user.scheduled_for_deletion_at = datetime.utcnow() + timedelta(days=90)
-    current_user.updated_at = datetime.utcnow()
+    current_user.scheduled_for_deletion_at = datetime.now(timezone.utc) + timedelta(days=90)
+    current_user.updated_at = datetime.now(timezone.utc)
 
     session.add(current_user)
     session.commit()

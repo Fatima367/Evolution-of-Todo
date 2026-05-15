@@ -129,8 +129,8 @@ async def start_broadcast_service(connection_manager):
     broadcast_service.set_connection_manager(connection_manager)
     await broadcast_service.start()
 
-    # Run consumer in background
-    asyncio.create_task(broadcast_service.consume())
+    # Run consumer in background - store task to prevent garbage collection
+    _consume_task = asyncio.create_task(broadcast_service.consume())
     logger.info("WebSocket broadcast service started in background")
 
 
