@@ -33,7 +33,7 @@ minikube image load todoboard-frontend:0.1.0
 
 # 3. Create secrets
 kubectl create secret generic app-secrets \
-  --from-literal=POSTGRES_PASSWORD=changeme \
+  --from-literal=POSTGRES_PASSWORD=your-database-password \
   --from-literal=JWT_SECRET=your-jwt-secret \
   --from-literal=GROQ_API_KEY=your-groq-api-key
 

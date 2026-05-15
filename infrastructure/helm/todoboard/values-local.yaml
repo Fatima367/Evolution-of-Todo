@@ -46,7 +46,9 @@ backend:
       memory: "1Gi"
       cpu: "1000m"
   env:
-    DATABASE_URL: "postgresql://todoboard:todoboard@postgres:5432/todoboard"
+    # TODO: Change database password before deployment
+    # See phase5-advanced-cloud-deployment/README.md or your secrets manager
+    DATABASE_URL: "postgresql://todoboard:your-database-password@postgres:5432/todoboard"
     KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
     REDIS_URL: "redis://redis:6379"
   dapr:
@@ -72,7 +74,8 @@ notificationService:
       cpu: "500m"
   env:
     KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
-    DATABASE_URL: "postgresql://todoboard:todoboard@postgres:5432/todoboard"
+    # TODO: Change database password before deployment
+    DATABASE_URL: "postgresql://todoboard:your-database-password@postgres:5432/todoboard"
   dapr:
     enabled: true
     appId: "notification-service"
@@ -95,7 +98,8 @@ recurringTaskService:
       cpu: "500m"
   env:
     KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
-    DATABASE_URL: "postgresql://todoboard:todoboard@postgres:5432/todoboard"
+    # TODO: Change database password before deployment
+    DATABASE_URL: "postgresql://todoboard:your-database-password@postgres:5432/todoboard"
   dapr:
     enabled: true
     appId: "recurring-task-service"
@@ -118,7 +122,8 @@ auditService:
       cpu: "500m"
   env:
     KAFKA_BOOTSTRAP_SERVERS: "todoboard-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
-    DATABASE_URL: "postgresql://todoboard:todoboard@postgres:5432/todoboard"
+    # TODO: Change database password before deployment
+    DATABASE_URL: "postgresql://todoboard:your-database-password@postgres:5432/todoboard"
   dapr:
     enabled: true
     appId: "audit-service"
@@ -129,7 +134,8 @@ postgresql:
   enabled: true
   auth:
     username: todoboard
-    password: todoboard
+    # TODO: Change password before deployment - see phase5-advanced-cloud-deployment/README.md
+    password: your-database-password
     database: todoboard
   primary:
     persistence:
@@ -196,4 +202,5 @@ dapr:
       type: state.postgresql
       metadata:
         - name: connectionString
-          value: "host=postgres user=todoboard password=todoboard dbname=todoboard port=5432 sslmode=disable"
+          # TODO: Change database password before deployment - see phase5-advanced-cloud-deployment/README.md
+          value: "host=postgres user=todoboard password=your-database-password dbname=todoboard port=5432 sslmode=disable"

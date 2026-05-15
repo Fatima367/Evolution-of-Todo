@@ -35,7 +35,8 @@ if ! python -c "import pytest" 2>/dev/null; then
 fi
 
 # Set test environment variables
-export DATABASE_URL="postgresql://todo_user:todo_password@localhost:5432/todo_db"
+# TODO: Change password before deployment
+export DATABASE_URL="postgresql://todo_user:your-database-password@localhost:5432/todo_db"
 export JWT_SECRET_KEY="test-secret-key"
 export ENVIRONMENT="test"
 
