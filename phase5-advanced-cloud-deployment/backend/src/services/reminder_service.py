@@ -8,6 +8,8 @@ from src.models.reminder import Reminder
 from src.models.user import User
 from src.schemas.reminder_schemas import ReminderCreate, ReminderUpdate
 
+REMINDER_NOT_FOUND = "Reminder not found"
+
 
 class ReminderService:
     """Service for reminder operations with user isolation"""
@@ -133,7 +135,7 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         # Update fields
@@ -169,7 +171,7 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         reminder.sent = True
@@ -199,7 +201,7 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         session.delete(reminder)

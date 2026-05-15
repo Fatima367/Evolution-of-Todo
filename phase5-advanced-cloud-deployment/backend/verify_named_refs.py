@@ -9,6 +9,8 @@ from src.models.user import User
 engine = create_engine("sqlite:///:memory:")
 SQLModel.metadata.create_all(engine)
 
+READ_BOOK_TITLE = "Read book"
+
 class MockCtx:
     def __init__(self, session, user_id):
         self.session = session
@@ -56,10 +58,10 @@ def verify_named_references():
         print(f"Task priority in DB: {updated_task.priority}")
 
         print("\n--- 3. Testing Ambiguous Matches ---")
-        add_task.func(ctx, title="Read book")
-        add_task.func(ctx, title="Read book")
+        add_task.func(ctx, title=READ_BOOK_TITLE)
+        add_task.func(ctx, title=READ_BOOK_TITLE)
 
-        res = complete_task.func(ctx, task_id="Read book")
+        res = complete_task.func(ctx, task_id=READ_BOOK_TITLE)
         print(f"Ambiguous result status: {res['status']}")
         print(f"Matches found: {len(res.get('matches', []))}")
 

@@ -13,6 +13,9 @@ if TYPE_CHECKING:
     from .reminder import Reminder
     from .audit_log import AuditLog
 
+# Cascade delete option for relationships
+CASCADE_DELETE_ORPHAN = "all, delete-orphan"
+
 
 def utc_now() -> datetime:
     """Return current UTC datetime (timezone-aware)"""
@@ -55,8 +58,8 @@ class User(SQLModel, table=True):
 
     # Relationships
     tasks: List["Task"] = Relationship(back_populates="user")
-    conversations: List["Conversation"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    messages: List["Message"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    recurring_patterns: List["RecurringPattern"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    reminders: List["Reminder"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    audit_logs: List["AuditLog"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    conversations: List["Conversation"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": CASCADE_DELETE_ORPHAN})
+    messages: List["Message"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": CASCADE_DELETE_ORPHAN})
+    recurring_patterns: List["RecurringPattern"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": CASCADE_DELETE_ORPHAN})
+    reminders: List["Reminder"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": CASCADE_DELETE_ORPHAN})
+    audit_logs: List["AuditLog"] = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": CASCADE_DELETE_ORPHAN})
