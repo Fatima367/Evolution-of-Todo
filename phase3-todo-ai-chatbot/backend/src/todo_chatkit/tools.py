@@ -74,15 +74,96 @@ def _resolve_and_validate_task(
         return None, {"status": "error", "error": str(e)}
 
 
+# ---- Pure helper functions (no closure dependency) ----
+# Extracted from inner functions to reduce cognitive complexity.
+
+def _parse_priority(priority: Optional[str]) -> TaskPriority:
+    """Parse priority string to TaskPriority enum with fallback to MEDIUM."""
+    prio = priority or "medium"
+    try:
+        return TaskPriority(prio.lower())
+    except ValueError:
+        return TaskPriority.MEDIUM
+
+
+def _parse_due_date(due_date: Optional[str]) -> tuple[Optional[datetime], Optional[Dict[str, Any]]]:
+    """Parse due date string to datetime. Returns (datetime, error_response)."""
+    if not due_date:
+        return None, None
+    try:
+        return parser.parse(due_date), None
+    except (ValueError, TypeError) as e:
+        return None, {
+            "status": "error",
+            "error": f"Invalid date format: {str(e)}. Please use ISO format (e.g., '2024-12-31' or '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday')."
+        }
+
+
+def _build_update_data(
+    title: Optional[str],
+    description: Optional[str],
+    priority: Optional[str],
+    status: Optional[str],
+    due_date: Optional[str],
+    tags: Optional[List[str]],
+) -> tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+    """Build update_data dict for update_task. Returns (data, error_response)."""
+    update_data: Dict[str, Any] = {}
+
+    if title is not None:
+        update_data["title"] = title
+    if description is not None:
+        update_data["description"] = description
+    if priority is not None:
+        try:
+            update_data["priority"] = TaskPriority(priority.lower())
+        except ValueError:
+            pass
+    if status is not None:
+        try:
+            update_data["status"] = TaskStatus(status.lower())
+        except ValueError:
+            pass
+    if due_date:
+        try:
+            update_data["due_date"] = parser.parse(due_date)
+        except (ValueError, TypeError) as e:
+            return None, {"status": "error", "error": f"Invalid date format: {str(e)}. Please use ISO format or natural language."}
+    if tags is not None:
+        update_data["tags"] = tags
+
+    return update_data if update_data else None, None
+
+
+def _task_to_dict(task: Task) -> Dict[str, Any]:
+    """Convert task model to dict for API response."""
+    return {
+        "id": str(task.id),
+        "title": task.title,
+        "description": task.description,
+        "status": task.status.value,
+        "priority": task.priority.value,
+        "due_date": task.due_date.isoformat() if task.due_date else None,
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+    }
+
+
 def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[Any]:
-    """Build all task tool functions with shared session/user context."""
+    """Build all task tool functions with shared session/user context.
+
+    Tool functions are defined as inner functions so their signatures
+    only expose user-facing parameters to the OpenAI Agents SDK,
+    while capturing session/user_id via closure (hidden from schema).
+    """
 
     def _get_context(ctx: Any) -> tuple[Session, str]:
+        """Extract session and user from ctx, falling back to captured defaults."""
         session_obj, uid = get_tool_context(ctx)
         if not session_obj or not uid:
             return session, user_id
         return session_obj, uid
 
+    # ---- Tool: add_task ----
     @function_tool(name_override="add_task")
     def add_task(
         ctx: RunContextWrapper[Any],
@@ -96,22 +177,11 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         session_obj, uid = _get_context(ctx)
         mock_user = User(id=uuid.UUID(uid))
 
-        prio = priority or "medium"
-        try:
-            priority_enum = TaskPriority(prio.lower())
-        except ValueError:
-            priority_enum = TaskPriority.MEDIUM
-        
-        due_date_obj = None
-        if due_date:
-            try:
-                due_date_obj = parser.parse(due_date)
-            except (ValueError, TypeError) as e:
-                # Return error for invalid date format
-                return {
-                    "status": "error",
-                    "error": f"Invalid date format: {str(e)}. Please use ISO format (e.g., '2024-12-31' or '2024-12-31T23:59:59') or natural language (e.g., 'tomorrow', 'next monday')."
-                }
+        priority_enum = _parse_priority(priority)
+
+        due_date_obj, err = _parse_due_date(due_date)
+        if err:
+            return err
 
         task_data = TaskCreate(
             title=title,
@@ -132,6 +202,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
             "tags": task.tags
         }
 
+    # ---- Tool: list_tasks ----
     @function_tool(name_override="list_tasks")
     def list_tasks(
         ctx: RunContextWrapper[Any],
@@ -159,20 +230,10 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         return {
             "count": len(tasks),
             "total_count": count,
-            "tasks": [
-                {
-                    "id": str(task.id),
-                    "title": task.title,
-                    "description": task.description,
-                    "status": task.status.value,
-                    "priority": task.priority.value,
-                    "due_date": task.due_date.isoformat() if task.due_date else None,
-                    "created_at": task.created_at.isoformat() if task.created_at else None
-                }
-                for task in tasks
-            ]
+            "tasks": [_task_to_dict(task) for task in tasks]
         }
 
+    # ---- Tool: complete_task ----
     @function_tool(name_override="complete_task")
     def complete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
         """Mark a task as completed using its ID or title"""
@@ -185,6 +246,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         updated_task = TaskService.update_task(session_obj, task.id, task_update, mock_user)
         return {"status": "completed", "task_id": str(updated_task.id), "title": updated_task.title}
 
+    # ---- Tool: delete_task ----
     @function_tool(name_override="delete_task")
     def delete_task(ctx: RunContextWrapper[Any], task_id: str) -> Dict[str, Any]:
         """Delete a task using its ID or title"""
@@ -198,6 +260,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         TaskService.delete_task(session_obj, task_id_val, mock_user)
         return {"status": "deleted", "task_id": str(task_id_val), "title": title}
 
+    # ---- Tool: update_task ----
     @function_tool(name_override="update_task")
     def update_task(
         ctx: RunContextWrapper[Any],
@@ -216,29 +279,9 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         if err:
             return err
 
-        update_data = {}
-        if title is not None:
-            update_data["title"] = title
-        if description is not None:
-            update_data["description"] = description
-        if priority is not None:
-            try:
-                update_data["priority"] = TaskPriority(priority.lower())
-            except ValueError:
-                pass
-        if status is not None:
-            try:
-                update_data["status"] = TaskStatus(status.lower())
-            except ValueError:
-                pass
-        if due_date:
-            try:
-                update_data["due_date"] = parser.parse(due_date)
-            except (ValueError, TypeError) as e:
-                return {"status": "error", "error": f"Invalid date format: {str(e)}. Please use ISO format or natural language."}
-        if tags is not None:
-            update_data["tags"] = tags
-
+        update_data, err_response = _build_update_data(title, description, priority, status, due_date, tags)
+        if err_response:
+            return err_response
         if not update_data:
             return {"status": "no_change", "message": "No fields to update"}
 
@@ -254,6 +297,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
             "tags": updated_task.tags
         }
 
+    # ---- Tool: bulk_complete ----
     @function_tool(name_override="bulk_complete")
     def bulk_complete(
         ctx: RunContextWrapper[Any],
@@ -272,6 +316,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
+    # ---- Tool: bulk_delete ----
     @function_tool(name_override="bulk_delete")
     def bulk_delete(
         ctx: RunContextWrapper[Any],
@@ -290,6 +335,7 @@ def _build_task_tools(session: Session, user_id: str, thread_id: str) -> list[An
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
+    # ---- Tool: clear_all ----
     @function_tool(name_override="clear_all")
     def clear_all(
         ctx: RunContextWrapper[Any],
