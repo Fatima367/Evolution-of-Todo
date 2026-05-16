@@ -1,7 +1,7 @@
 """Request/response logging middleware"""
 import time
 import json
-from typing import Callable
+from typing import Callable, Optional
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import Message
@@ -38,14 +38,19 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Process request with logging"""
         start_time = time.time()
-
-        # Get request ID from context (set by tracing middleware)
         request_id = request_id_var.get() or getattr(request.state, 'request_id', 'unknown')
-
-        # Get user ID if authenticated
         user_id = getattr(request.state, 'user_id', None)
 
-        # Log incoming request
+        await self._log_request(request, request_id, user_id)
+        try:
+            response = await call_next(request)
+        except Exception as e:
+            self._log_error(request, request_id, user_id, start_time, e)
+            raise
+        return await self._log_response(request, response, request_id, user_id, start_time)
+
+    async def _log_request(self, request: Request, request_id: str, user_id: Optional[str]) -> None:
+        """Log incoming request."""
         request_log = {
             'event': 'request_started',
             'method': request.method,
@@ -55,55 +60,42 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             'user_agent': request.headers.get('user-agent'),
             'request_id': request_id,
         }
-
         if user_id:
             request_log['user_id'] = user_id
-
-        # Optionally log request body (be careful with sensitive data)
         if self.log_request_body and request.method in ['POST', 'PUT', 'PATCH']:
             try:
                 body = await request.body()
                 if body:
-                    # Try to parse as JSON
                     try:
                         request_log['request_body'] = json.loads(body.decode())
                     except (json.JSONDecodeError, UnicodeDecodeError):
                         request_log['request_body'] = '<binary or invalid JSON>'
-
-                    # Important: Set body back for route handlers to read
                     async def receive() -> Message:
                         return {"type": "http.request", "body": body}
                     request._receive = receive
             except Exception as e:
                 logger.warning(f"Failed to read request body: {e}")
-
         logger.info("Incoming request", extra=request_log)
 
-        # Process request
-        try:
-            response = await call_next(request)
-        except Exception as e:
-            # Log exception
-            duration = time.time() - start_time
-            error_log = {
-                'event': 'request_failed',
-                'method': request.method,
-                'path': request.url.path,
-                'duration_ms': round(duration * 1000, 2),
-                'error': str(e),
-                'error_type': type(e).__name__,
-                'request_id': request_id,
-            }
-            if user_id:
-                error_log['user_id'] = user_id
-
-            logger.error("Request failed with exception", extra=error_log, exc_info=True)
-            raise
-
-        # Calculate duration
+    def _log_error(self, request: Request, request_id: str, user_id: Optional[str], start_time: float, e: Exception) -> None:
+        """Log request error."""
         duration = time.time() - start_time
+        error_log = {
+            'event': 'request_failed',
+            'method': request.method,
+            'path': request.url.path,
+            'duration_ms': round(duration * 1000, 2),
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'request_id': request_id,
+        }
+        if user_id:
+            error_log['user_id'] = user_id
+        logger.error("Request failed with exception", extra=error_log, exc_info=True)
 
-        # Log response
+    async def _log_response(self, request: Request, response: Response, request_id: str, user_id: Optional[str], start_time: float) -> Response:
+        """Log response and return response."""
+        duration = time.time() - start_time
         response_log = {
             'event': 'request_completed',
             'method': request.method,
@@ -112,26 +104,17 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             'duration_ms': round(duration * 1000, 2),
             'request_id': request_id,
         }
-
         if user_id:
             response_log['user_id'] = user_id
-
-        # Optionally log response body (not recommended for large responses)
         if self.log_response_body:
-            # Note: This requires buffering the response which can impact performance
             response_log['response_body'] = '<body logging not implemented for streaming responses>'
-
-        # Log at appropriate level based on status code
         if response.status_code >= 500:
             logger.error("Request completed with server error", extra=response_log)
         elif response.status_code >= 400:
             logger.warning("Request completed with client error", extra=response_log)
         else:
             logger.info("Request completed successfully", extra=response_log)
-
-        # Add duration header to response
         response.headers['X-Response-Time'] = f"{round(duration * 1000, 2)}ms"
-
         return response
 
 

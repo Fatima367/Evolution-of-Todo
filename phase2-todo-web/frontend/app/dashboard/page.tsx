@@ -63,6 +63,15 @@ const filterTasksByDateRange = (
   })
 }
 
+const COLOR_MAP: Record<string, { bg: string; border: string; icon: string }> = {
+  blue: { bg: '#D6E6F2', border: '#6EB8E1', icon: '#6EB8E1' },
+  yellow: { bg: '#FEF3C7', border: '#F59E0B', icon: '#F59E0B' },
+  green: { bg: '#D1FAE5', border: '#10B981', icon: '#10B981' },
+  red: { bg: '#FEE2E2', border: '#EF4444', icon: '#EF4444' },
+}
+
+const getStatColors = (color: string) => COLOR_MAP[color] || COLOR_MAP.blue
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const { tasks, loading } = useTasks()
@@ -190,7 +199,7 @@ export default function DashboardPage() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -4, scale: 1.02 }}
             >
-              <Card className="bg-white dark:bg-[#1A1A3A] p-6 border-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ borderColor: stat.color === 'blue' ? '#6EB8E1' : stat.color === 'yellow' ? '#F59E0B' : stat.color === 'green' ? '#10B981' : '#EF4444' }}>
+              <Card className="bg-white dark:bg-[#1A1A3A] p-6 border-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300" style={{ borderColor: getStatColors(stat.color).border }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-[#C8C8D8]">
@@ -203,8 +212,8 @@ export default function DashboardPage() {
                       {stat.change} from last week
                     </p>
                   </div>
-                  <div className={`p-3 rounded-xl transition-transform hover:scale-110`} style={{ backgroundColor: stat.color === 'blue' ? '#D6E6F2' : stat.color === 'yellow' ? '#FEF3C7' : stat.color === 'green' ? '#D1FAE5' : '#FEE2E2' }}>
-                    <Icon className={`h-6 w-6`} style={{ color: stat.color === 'blue' ? '#6EB8E1' : stat.color === 'yellow' ? '#F59E0B' : stat.color === 'green' ? '#10B981' : '#EF4444' }} />
+                  <div className={`p-3 rounded-xl transition-transform hover:scale-110`} style={{ backgroundColor: getStatColors(stat.color).bg }}>
+                    <Icon className={`h-6 w-6`} style={{ color: getStatColors(stat.color).icon }} />
                   </div>
                 </div>
               </Card>
