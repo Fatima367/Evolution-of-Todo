@@ -162,31 +162,29 @@ Behavior guidelines:
         # Run agent with streaming
         result = Runner.run_streamed(agent, agent_input, context=agent_context)
 
-        # Track ID mappings to fix LiteLLM/Groq ID collisions
-        # This is CRITICAL when using non-OpenAI providers via LiteLLM
+        # Process events with ID collision fix
+        async for event in self._process_agent_events(agent_context, result, thread, context):
+            yield event
+
+    async def _process_agent_events(
+        self,
+        agent_context: AgentContext,
+        result,
+        thread: ThreadMetadata,
+        context: ChatContext
+    ):
+        """Process streaming events and fix LiteLLM/Groq ID collisions."""
         id_mapping: dict[str, str] = {}
-
         async for event in stream_agent_response(agent_context, result):
-            # Fix potential ID collisions from LiteLLM/Groq
-            if event.type == "thread.item.added":
-                if isinstance(event.item, AssistantMessageItem):
-                    old_id = event.item.id
-                    if old_id not in id_mapping:
-                        # Generate unique ID using store's ID generator
-                        new_id = self.store.generate_item_id("message", thread, context)
-                        id_mapping[old_id] = new_id
-                    # Replace with mapped ID using model_copy (fields may be frozen)
+            if event.type == "thread.item.added" and isinstance(event.item, AssistantMessageItem):
+                old_id = event.item.id
+                if old_id not in id_mapping:
+                    id_mapping[old_id] = self.store.generate_item_id("message", thread, context)
+                event.item = event.item.model_copy(update={"id": id_mapping[old_id]})
+            elif event.type == "thread.item.done" and isinstance(event.item, AssistantMessageItem):
+                old_id = event.item.id
+                if old_id in id_mapping:
                     event.item = event.item.model_copy(update={"id": id_mapping[old_id]})
-
-            elif event.type == "thread.item.done":
-                if isinstance(event.item, AssistantMessageItem):
-                    old_id = event.item.id
-                    if old_id in id_mapping:
-                        event.item = event.item.model_copy(update={"id": id_mapping[old_id]})
-
-            elif event.type == "thread.item.updated":
-                if event.item_id in id_mapping:
-                    # Replace event with updated item_id (event may be frozen)
-                    event = event.model_copy(update={"item_id": id_mapping[event.item_id]})
-
+            elif event.type == "thread.item.updated" and event.item_id in id_mapping:
+                event = event.model_copy(update={"item_id": id_mapping[event.item_id]})
             yield event

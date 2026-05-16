@@ -16,6 +16,33 @@ const getChatKitTheme = (isDark: boolean) => ({
   },
 } as const)
 
+const hideSvgIcons = (button: Element) => {
+  const svgs = button.querySelectorAll('svg');
+  svgs.forEach((svg) => {
+    if (svg instanceof SVGElement) {
+      svg.style.cssText = 'display: none !important; width: 0 !important; height: 0 !important;';
+    }
+  });
+}
+
+const addCustomIcon = (button: Element, document: Document) => {
+  if (!button.querySelector('.custom-send-icon')) {
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'custom-send-icon';
+    iconSpan.innerHTML = '<svg viewBox="0 0 576 512" style="display:block !important; width:18px !important; height:18px !important;"><path fill="currentColor" d="M482.3 192c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2L128 65.7c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l37.8 0c3.4 0 6.1 2.7 6.1 6.1c0 1.3-.4 2.5-1.1 3.4l-14.6 21.8c-1.4 2.1-1.4 4.7 0 6.8l14.6 21.8c.7.9 1.1 2.1 1.1 3.4c0 3.4-2.7 6.1-6.1 6.1l-37.8 0c-3.4 0-6.1-2.7-6.1-6.1c0-32.7-26.4-59.2-64-59.2L64 134c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l290.3 0c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2zM256 352c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96zm224 64H160c-17.7 0-32 14.3-32 32v48h64V448h128v48h64v-48c0-17.7-14.3-32-32-32z"/></svg>';
+    iconSpan.style.cssText = 'display:flex !important; align-items:center !important; justify-content:center !important; width:100% !important; height:100% !important;';
+    button.style.cssText = 'position:relative !important; display:flex !important; align-items:center !important; justify-content:center !important;';
+    button.appendChild(iconSpan);
+  }
+}
+
+const processSubmitButton = (button: Element, document: Document) => {
+  if (button instanceof HTMLElement) {
+    hideSvgIcons(button);
+    addCustomIcon(button, document);
+  }
+}
+
 export function FloatingChatButton() {
   const { user } = useAuth()
   const theme = useUIStore((state) => state.theme)
@@ -165,35 +192,10 @@ export function FloatingChatButton() {
 
     const applyCustomIcon = () => {
       if (typeof document === 'undefined') return;
-
       const wrapper = document.querySelector('.chatkit-wrapper')
       if (!wrapper) return
-
-      // Find the send button (type="submit" in the composer)
       const submitButtons = wrapper.querySelectorAll('button[type="submit"]')
-
-      submitButtons.forEach((button) => {
-        if (button instanceof HTMLElement) {
-          // Hide default SVG icons
-          const svgs = button.querySelectorAll('svg');
-          svgs.forEach((svg) => {
-            if (svg instanceof SVGElement) {
-              svg.style.cssText = 'display: none !important; width: 0 !important; height: 0 !important;';
-            }
-          });
-
-          // Add custom paper plane icon if not already present
-          if (!button.querySelector('.custom-send-icon')) {
-            const iconSpan = document.createElement('span');
-            iconSpan.className = 'custom-send-icon';
-            iconSpan.innerHTML = '<svg viewBox="0 0 576 512" style="display:block !important; width:18px !important; height:18px !important;"><path fill="currentColor" d="M482.3 192c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2L128 65.7c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l37.8 0c3.4 0 6.1 2.7 6.1 6.1c0 1.3-.4 2.5-1.1 3.4l-14.6 21.8c-1.4 2.1-1.4 4.7 0 6.8l14.6 21.8c.7.9 1.1 2.1 1.1 3.4c0 3.4-2.7 6.1-6.1 6.1l-37.8 0c-3.4 0-6.1-2.7-6.1-6.1c0-32.7-26.4-59.2-64-59.2L64 134c-38.6 0-69.8 31.1-69.8 69.5c0 32.7 26.4 59.2 64 59.2l290.3 0c34.2 0 64-26.2 64-58.8c0-32.7-29.8-59.2-64-59.2zM256 352c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96zm224 64H160c-17.7 0-32 14.3-32 32v48h64V448h128v48h64v-48c0-17.7-14.3-32-32-32z"/></svg>';
-            iconSpan.style.cssText = 'display:flex !important; align-items:center !important; justify-content:center !important; width:100% !important; height:100% !important;';
-
-            button.style.cssText = 'position:relative !important; display:flex !important; align-items:center !important; justify-content:center !important;';
-            button.appendChild(iconSpan);
-          }
-        }
-      });
+      submitButtons.forEach((button) => processSubmitButton(button, document))
     }
 
     // Initial application with multiple attempts
@@ -207,18 +209,13 @@ export function FloatingChatButton() {
       const wrapper = document.querySelector('.chatkit-wrapper')
       if (wrapper) {
         observer = new MutationObserver(applyCustomIcon)
-        observer.observe(wrapper, {
-          childList: true,
-          subtree: true,
-        })
+        observer.observe(wrapper, { childList: true, subtree: true })
       }
     }
 
     return () => {
       timeouts.forEach(clearTimeout)
-      if (observer) {
-        observer.disconnect()
-      }
+      if (observer) observer.disconnect()
     }
   }, [isChatOpen])
 

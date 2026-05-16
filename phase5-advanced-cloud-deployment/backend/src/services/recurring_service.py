@@ -150,72 +150,49 @@ class RecurringPatternService:
 
     @staticmethod
     def calculate_next_occurrence(pattern: RecurringPattern, current_date: datetime) -> Optional[datetime]:
-        """Calculate the next occurrence date for a recurring pattern
-
-        Args:
-            pattern: Recurring pattern
-            current_date: Current date/time
-
-        Returns:
-            Next occurrence date or None if pattern has ended
-        """
-        # Check if pattern has ended
+        """Calculate the next occurrence date for a recurring pattern"""
         if pattern.end_date and current_date >= pattern.end_date:
             return None
-
-        next_date = current_date
-
-        if pattern.frequency == 'daily':
-            next_date = current_date + timedelta(days=pattern.interval)
-
-        elif pattern.frequency == 'weekly':
-            # Calculate next occurrence on the specified day of week
-            days_ahead = pattern.day_of_week - current_date.weekday()
-            if days_ahead <= 0:  # Target day already happened this week
-                days_ahead += 7 * pattern.interval
-            next_date = current_date + timedelta(days=days_ahead)
-
-        elif pattern.frequency == 'monthly':
-            # Calculate next occurrence on the specified day of month
-            month = current_date.month
-            year = current_date.year
-
-            # Add interval months
-            month += pattern.interval
-            while month > 12:
-                month -= 12
-                year += 1
-
-            # Handle day overflow (e.g., Feb 31 -> Feb 28/29)
-            try:
-                next_date = current_date.replace(year=year, month=month, day=pattern.day_of_month)
-            except ValueError:
-                # Day doesn't exist in target month, use last day of month
-                import calendar
-                last_day = calendar.monthrange(year, month)[1]
-                next_date = current_date.replace(year=year, month=month, day=last_day)
-
-        elif pattern.frequency == 'yearly':
-            # Calculate next occurrence on the specified month and day
-            year = current_date.year + pattern.interval
-            try:
-                next_date = current_date.replace(
-                    year=year,
-                    month=pattern.month_of_year,
-                    day=pattern.day_of_month
-                )
-            except ValueError:
-                # Handle Feb 29 on non-leap years
-                import calendar
-                last_day = calendar.monthrange(year, pattern.month_of_year)[1]
-                next_date = current_date.replace(
-                    year=year,
-                    month=pattern.month_of_year,
-                    day=min(pattern.day_of_month, last_day)
-                )
-
-        # Check if next occurrence is beyond end_date
+        next_date = RecurringPatternService._calculate_frequency_based_date(pattern, current_date)
         if pattern.end_date and next_date >= pattern.end_date:
             return None
-
         return next_date
+
+    @staticmethod
+    def _calculate_frequency_based_date(pattern: RecurringPattern, current_date: datetime) -> datetime:
+        """Calculate date based on frequency."""
+        if pattern.frequency == 'daily':
+            return current_date + timedelta(days=pattern.interval)
+        if pattern.frequency == 'weekly':
+            days_ahead = pattern.day_of_week - current_date.weekday()
+            if days_ahead <= 0:
+                days_ahead += 7 * pattern.interval
+            return current_date + timedelta(days=days_ahead)
+        if pattern.frequency == 'monthly':
+            return RecurringPatternService._calculate_monthly_date(pattern, current_date)
+        # yearly
+        return RecurringPatternService._calculate_yearly_date(pattern, current_date)
+
+    @staticmethod
+    def _calculate_monthly_date(pattern: RecurringPattern, current_date: datetime) -> datetime:
+        """Calculate next monthly occurrence."""
+        month = current_date.month + pattern.interval
+        year = current_date.year + (month - 1) // 12
+        month = ((month - 1) % 12) + 1
+        try:
+            return current_date.replace(year=year, month=month, day=pattern.day_of_month)
+        except ValueError:
+            import calendar
+            last_day = calendar.monthrange(year, month)[1]
+            return current_date.replace(year=year, month=month, day=last_day)
+
+    @staticmethod
+    def _calculate_yearly_date(pattern: RecurringPattern, current_date: datetime) -> datetime:
+        """Calculate next yearly occurrence."""
+        year = current_date.year + pattern.interval
+        try:
+            return current_date.replace(year=year, month=pattern.month_of_year, day=pattern.day_of_month)
+        except ValueError:
+            import calendar
+            last_day = calendar.monthrange(year, pattern.month_of_year)[1]
+            return current_date.replace(year=year, month=pattern.month_of_year, day=min(pattern.day_of_month, last_day))

@@ -27,51 +27,7 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}`;
-      try {
-        const errorData = await response.json();
-        // Handle different possible error response formats
-        if (typeof errorData === 'string') {
-          errorMessage = errorData;
-        } else if (errorData?.detail) {
-          if (Array.isArray(errorData.detail)) {
-            errorMessage = errorData.detail.map((err: { loc: (string | number)[], msg: string }) => {
-              const field = err.loc && err.loc.length > 1 ? String(err.loc[1]).replace(/_/g, ' ') : 'field';
-              return `${field.charAt(0).toUpperCase() + field.slice(1)}: ${err.msg}`;
-            }).join('; ');
-          } else {
-            errorMessage = String(errorData.detail);
-          }
-        } else if (errorData?.message) {
-          errorMessage = String(errorData.message);
-        } else if (errorData?.error) {
-          errorMessage = String(errorData.error);
-        } else if (typeof errorData === 'object') {
-          // Extract the most relevant field from the error object
-          const possibleFields = ['detail', 'message', 'error', 'msg', 'reason'];
-          for (const field of possibleFields) {
-            if (errorData[field]) {
-              errorMessage = String(errorData[field]);
-              break;
-            }
-          }
-          // If no known field found, try to create a readable string
-          if (errorMessage === `HTTP ${response.status}`) {
-            errorMessage = Object.entries(errorData)
-              .filter(([_, value]) => value != null && typeof value !== 'object' && typeof value !== 'function')
-              .map(([key, value]) => `${key}: ${value}`)
-              .join(', ');
-
-            if (!errorMessage) {
-              errorMessage = JSON.stringify(errorData, null, 2);
-            }
-          }
-        }
-      } catch (jsonError) {
-        // If parsing JSON fails, use status text or default message
-        errorMessage = response.statusText || 'Request failed';
-      }
-      throw new Error(errorMessage);
+      throw new Error(await this._parseError(response));
     }
 
     if (response.status === 204) {
@@ -79,6 +35,42 @@ class ApiClient {
     }
 
     return response.json();
+  }
+
+  private async _parseError(response: Response): Promise<string> {
+    try {
+      const errorData = await response.json();
+      return this._extractErrorMessage(errorData, response.status);
+    } catch {
+      return response.statusText || 'Request failed';
+    }
+  }
+
+  private _extractErrorMessage(errorData: any, status: number): string {
+    if (typeof errorData === 'string') return errorData;
+    if (errorData?.detail) {
+      if (Array.isArray(errorData.detail)) {
+        return errorData.detail.map((err: { loc: (string | number)[], msg: string }) => {
+          const field = err.loc && err.loc.length > 1 ? String(err.loc[1]).replace(/_/g, ' ') : 'field';
+          return `${field.charAt(0).toUpperCase() + field.slice(1)}: ${err.msg}`;
+        }).join('; ');
+      }
+      return String(errorData.detail);
+    }
+    if (errorData?.message) return String(errorData.message);
+    if (errorData?.error) return String(errorData.error);
+    if (typeof errorData === 'object') {
+      const possibleFields = ['detail', 'message', 'error', 'msg', 'reason'];
+      for (const field of possibleFields) {
+        if (errorData[field]) return String(errorData[field]);
+      }
+      const fallback = Object.entries(errorData)
+        .filter(([_, value]) => value != null && typeof value !== 'object' && typeof value !== 'function')
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+      return fallback || JSON.stringify(errorData, null, 2);
+    }
+    return `HTTP ${status}`;
   }
 
   // Auth endpoints

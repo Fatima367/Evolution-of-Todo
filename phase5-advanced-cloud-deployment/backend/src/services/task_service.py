@@ -4,10 +4,34 @@ from typing import List, Optional
 from uuid import UUID
 from fastapi import HTTPException, status
 from sqlmodel import Session, select, col, case
-from sqlalchemy import literal_column, func, text
+from sqlalchemy import literal_column, func, text, Select, nullslast
 from src.models.task import Task, TaskStatus, TaskPriority
 from src.models.user import User
 from src.schemas.task_schemas import TaskCreate, TaskUpdate, SortField, SortOrder
+
+
+def _apply_sorting(statement: Select, sort_by: SortField, sort_order: SortOrder) -> Select:
+    """Apply sorting to a select statement based on sort parameters."""
+    if sort_by == SortField.DUE_DATE:
+        due_col = col(Task.due_date)
+        return statement.order_by(
+            nullslast(due_col.asc()) if sort_order == SortOrder.ASC else nullslast(due_col.desc())
+        )
+    if sort_by == SortField.PRIORITY:
+        priority_case = case(
+            (Task.priority == TaskPriority.LOW, 1),
+            (Task.priority == TaskPriority.MEDIUM, 2),
+            (Task.priority == TaskPriority.HIGH, 3),
+            (Task.priority == TaskPriority.URGENT, 4),
+            else_=0
+        )
+        return statement.order_by(priority_case.asc() if sort_order == SortOrder.ASC else priority_case.desc())
+    if sort_by == SortField.TITLE:
+        title_col = col(Task.title)
+        return statement.order_by(title_col.asc() if sort_order == SortOrder.ASC else title_col.desc())
+    # Default: sort by created_at
+    created_at_col = Task.created_at
+    return statement.order_by(created_at_col.asc() if sort_order == SortOrder.ASC else created_at_col.desc())
 
 
 class TaskService:
@@ -109,40 +133,7 @@ class TaskService:
         total = session.exec(count_statement).one()
 
         # Apply sorting based on parameters
-        # NULL values handling: tasks without due dates appear last when sorting by due_date
-        if sort_by == SortField.DUE_DATE:
-            # For ascending: NULL values come last (PostgreSQL default)
-            # For descending: NULL values come last (we want tasks with due dates first)
-            if sort_order == SortOrder.ASC:
-                statement = statement.order_by(col(Task.due_date).asc().nulls_last())
-            else:
-                statement = statement.order_by(col(Task.due_date).desc().nulls_last())
-        elif sort_by == SortField.PRIORITY:
-            # Sort by TaskPriority enum order using CASE expression
-            # Priority order: LOW(1) < MEDIUM(2) < HIGH(3) < URGENT(4)
-            priority_case = case(
-                (Task.priority == TaskPriority.LOW, 1),
-                (Task.priority == TaskPriority.MEDIUM, 2),
-                (Task.priority == TaskPriority.HIGH, 3),
-                (Task.priority == TaskPriority.URGENT, 4),
-                else_=0  # Fallback
-            )
-            if sort_order == SortOrder.ASC:
-                statement = statement.order_by(priority_case.asc())
-            else:
-                statement = statement.order_by(priority_case.desc())
-        elif sort_by == SortField.TITLE:
-            # Case-insensitive alphabetical sort
-            if sort_order == SortOrder.ASC:
-                statement = statement.order_by(col(Task.title).asc())
-            else:
-                statement = statement.order_by(col(Task.title).desc())
-        else:
-            # Default: sort by created_at
-            if sort_order == SortOrder.ASC:
-                statement = statement.order_by(Task.created_at.asc())
-            else:
-                statement = statement.order_by(Task.created_at.desc())
+        statement = _apply_sorting(statement, sort_by, sort_order)
 
         # Apply pagination
         statement = statement.offset(offset).limit(limit)
