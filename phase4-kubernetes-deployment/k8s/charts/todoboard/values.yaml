@@ -272,6 +272,8 @@ migration:
 
 configMap:
   backend:
+    # SECURITY: Replace "your-database-password" with actual password before deployment
+    # See QUICKSTART.md for setup instructions
     DATABASE_URL: "postgresql://postgres:your-database-password@todoboard-postgres:5432/todoboard"
     CORS_ORIGINS: '["http://localhost:3000","http://localhost:30000"]'
     LOG_LEVEL: "INFO"
@@ -290,6 +292,8 @@ secrets:
   create: false
   data:
     # TODO: Change password before deployment
+    # SECURITY: Replace placeholders with strong, unique values before deployment
+    # See QUICKSTART.md Section: "Secrets Configuration" for setup instructions
     POSTGRES_PASSWORD: "your-database-password"
     JWT_SECRET_KEY: "your-jwt-secret-key-change-in-production"
     GROQ_API_KEY: ""
