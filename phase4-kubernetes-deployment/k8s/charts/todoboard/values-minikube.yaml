@@ -171,6 +171,8 @@ migration:
 
 configMap:
   backend:
+    # SECURITY: Replace "your-database-password" with actual password before deployment
+    # See QUICKSTART.md for setup instructions
     DATABASE_URL: "postgresql://postgres:your-database-password@todoboard-postgres:5432/todoboard"
     CORS_ORIGINS: '["http://localhost:3000","http://localhost:30000"]'
     LOG_LEVEL: "DEBUG"

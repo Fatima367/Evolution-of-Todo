@@ -143,7 +143,7 @@ phase4-kubernetes-deployment/
 ```bash
 kubectl create secret generic app-secrets \
   --from-literal=POSTGRES_PASSWORD=<password> \
-  --from-literal=JWT_SECRET=<secret> \
+  --from-literal=JWT_SECRET_KEY=<secret> \
   --from-literal=GROQ_API_KEY=<your-groq-api-key>
 ```
 
