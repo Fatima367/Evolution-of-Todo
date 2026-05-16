@@ -1,5 +1,5 @@
 """Reminder service for managing task reminders"""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from uuid import UUID
 from fastapi import HTTPException, status
@@ -7,6 +7,8 @@ from sqlmodel import Session, select
 from src.models.reminder import Reminder
 from src.models.user import User
 from src.schemas.reminder_schemas import ReminderCreate, ReminderUpdate
+
+REMINDER_NOT_FOUND = "Reminder not found"
 
 
 class ReminderService:
@@ -97,7 +99,7 @@ class ReminderService:
             List of pending reminders
         """
         if before is None:
-            before = datetime.utcnow()
+            before = datetime.now(timezone.utc)
 
         reminders = session.exec(
             select(Reminder).where(
@@ -133,7 +135,7 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         # Update fields
@@ -169,11 +171,11 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         reminder.sent = True
-        reminder.sent_at = datetime.utcnow()
+        reminder.sent_at = datetime.now(timezone.utc)
         session.add(reminder)
         session.commit()
         session.refresh(reminder)
@@ -199,7 +201,7 @@ class ReminderService:
         if not reminder or reminder.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reminder not found"
+                detail=REMINDER_NOT_FOUND
             )
 
         session.delete(reminder)
@@ -240,7 +242,7 @@ class ReminderService:
         remind_at = task.due_date - timedelta(minutes=task.reminder_offset)
 
         # Don't create reminder if remind_at is in the past
-        if remind_at < datetime.utcnow():
+        if remind_at < datetime.now(timezone.utc):
             return None
 
         reminder = Reminder(

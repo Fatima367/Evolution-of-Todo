@@ -1,5 +1,5 @@
 """Message model for ChatKit messages stored in PostgreSQL"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship
@@ -38,7 +38,7 @@ class Message(SQLModel, table=True):
     conversation_id: UUID = Field(foreign_key="conversations.id", nullable=False, index=True)
     role: MessageRole = Field(nullable=False)
     content: str = Field(min_length=1, max_length=10000, nullable=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False, index=True)
 
     # Relationships
     conversation: Optional["Conversation"] = Relationship(back_populates="messages")

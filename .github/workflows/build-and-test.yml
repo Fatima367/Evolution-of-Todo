@@ -20,7 +20,8 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: todoboard
-          POSTGRES_PASSWORD: todoboard
+          # TODO: Change password before deployment - see phase5-advanced-cloud-deployment/README.md
+          POSTGRES_PASSWORD: your-database-password
           POSTGRES_DB: todoboard_test
         options: >-
           --health-cmd pg_isready
@@ -49,7 +50,8 @@ jobs:
       - name: Run tests
         working-directory: ./phase5-advanced-cloud-deployment/backend
         env:
-          DATABASE_URL: postgresql://todoboard:todoboard@localhost:5432/todoboard_test
+          # TODO: Change password before deployment - see phase5-advanced-cloud-deployment/README.md
+          DATABASE_URL: postgresql://todoboard:your-database-password@localhost:5432/todoboard_test
         run: |
           pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
 

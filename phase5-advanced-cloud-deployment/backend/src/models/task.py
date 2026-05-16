@@ -1,5 +1,5 @@
 """Task entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, TYPE_CHECKING
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship, Column, JSON
@@ -71,8 +71,8 @@ class Task(SQLModel, table=True):
     is_favorite: bool = Field(default=False, nullable=False, index=True)
     recurring_type: RecurringType = Field(default=RecurringType.NONE, nullable=False, index=True)
     user_id: UUID = Field(foreign_key="users.id", nullable=False, index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False, index=True)
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
     completed_at: Optional[datetime] = Field(default=None)
 
     # Relationships

@@ -188,8 +188,9 @@ configMap:
 secrets:
   # Set to false - secrets should be created manually using kubectl
   # See QUICKSTART.md Step 3 for instructions:
+  # TODO: Change password before deployment
   # kubectl create secret generic app-secrets \
-  #   --from-literal=POSTGRES_PASSWORD=changeme \
+  #   --from-literal=POSTGRES_PASSWORD=your-database-password \
   #   --from-literal=JWT_SECRET_KEY=your-jwt-secret-key \
   #   --from-literal=GROQ_API_KEY=your-groq-api-key
   create: false

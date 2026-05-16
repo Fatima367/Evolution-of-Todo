@@ -165,8 +165,8 @@ kubectl apply -f infrastructure/dapr/config/
 
 # 8. Create secrets
 kubectl create secret generic todoboard-secrets \
-  --from-literal=POSTGRES_PASSWORD='todo_password' \
-  --from-literal=JWT_SECRET_KEY='dev-secret-key' \
+  --from-literal=POSTGRES_PASSWORD='your-database-password' \
+  --from-literal=JWT_SECRET_KEY='your-jwt-secret-key' \
   --from-literal=GROQ_API_KEY="${GROQ_API_KEY}" \
   -n todoboard
 

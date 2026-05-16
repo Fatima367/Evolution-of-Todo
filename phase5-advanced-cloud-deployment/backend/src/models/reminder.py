@@ -1,5 +1,5 @@
 """Reminder entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 from sqlmodel import Field, SQLModel, Relationship
@@ -30,7 +30,7 @@ class Reminder(SQLModel, table=True):
     remind_at: datetime = Field(nullable=False, index=True)
     sent: bool = Field(default=False, nullable=False, index=True)
     sent_at: Optional[datetime] = Field(default=None)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     task: Optional["Task"] = Relationship(back_populates="reminders")

@@ -1,5 +1,5 @@
 """Recurring pattern service for managing recurring tasks"""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 from fastapi import HTTPException, status
@@ -116,7 +116,7 @@ class RecurringPatternService:
         for key, value in update_data.items():
             setattr(pattern, key, value)
 
-        pattern.updated_at = datetime.utcnow()
+        pattern.updated_at = datetime.now(timezone.utc)
         session.add(pattern)
         session.commit()
         session.refresh(pattern)

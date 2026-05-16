@@ -96,7 +96,7 @@ yarn dev
 ### Backend (.env)
 ```
 DATABASE_URL=postgresql://user:password@localhost:5432/todo_db
-JWT_SECRET=your-super-secret-jwt-key-here
+JWT_SECRET=your-jwt-secret-jwt-key-here
 JWT_ALGORITHM=HS256
 JWT_EXPIRATION_MINUTES=30
 ```

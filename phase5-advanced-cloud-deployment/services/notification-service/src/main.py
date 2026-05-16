@@ -8,9 +8,8 @@ This service:
 import os
 import json
 import logging
-from datetime import datetime
-from typing import Dict, Any
-from fastapi import FastAPI, Request, Response, status
+from datetime import datetime, timezone
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import httpx
@@ -51,7 +50,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": SERVICE_NAME,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -201,7 +200,7 @@ async def publish_notification_sent_event(
             "task_id": task_id,
             "user_id": user_id,
             "notification_type": notification_type,
-            "sent_at": datetime.utcnow().isoformat(),
+            "sent_at": datetime.now(timezone.utc).isoformat(),
             "service": SERVICE_NAME
         }
 

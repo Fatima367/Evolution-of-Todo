@@ -1,7 +1,7 @@
 """Audit log writer for audit service"""
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
 import httpx
 
@@ -110,7 +110,7 @@ async def cleanup_old_audit_logs() -> int:
         Number of logs deleted
     """
     try:
-        cutoff_date = datetime.utcnow() - timedelta(days=RETENTION_DAYS)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=RETENTION_DAYS)
         logger.info(f"Cleaning up audit logs older than {cutoff_date}")
 
         async with httpx.AsyncClient(timeout=API_TIMEOUT) as client:

@@ -80,7 +80,8 @@ spec:
         - name: POSTGRES_USER
           value: "todo_user"
         - name: POSTGRES_PASSWORD
-          value: "todo_password"
+          # TODO: Change password before deployment
+          value: "your-database-password"
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
@@ -190,10 +191,11 @@ fi
 echo -e "${YELLOW}Creating/updating secrets...${NC}"
 kubectl delete secret todoboard-secrets -n todoboard 2>/dev/null || true
 kubectl create secret generic todoboard-secrets \
-  --from-literal=POSTGRES_PASSWORD='todo_password' \
+  # TODO: Change password before deployment
+  --from-literal=POSTGRES_PASSWORD='your-database-password' \
   --from-literal=JWT_SECRET_KEY='minikube-dev-secret-key-change-in-production' \
   --from-literal=GROQ_API_KEY='' \
-  --from-literal=DATABASE_URL='postgresql://todo_user:todo_password@postgres:5432/todo_db' \
+  --from-literal=DATABASE_URL='postgresql://todo_user:your-database-password@postgres:5432/todo_db' \
   -n todoboard
 
 # Build and load images into minikube
@@ -502,8 +504,9 @@ ingress:
 
 configMap:
   backend:
-    DATABASE_URL: "postgresql://todo_user:todo_password@postgres:5432/todo_db"
-    JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+    # TODO: Change database password before deployment
+    DATABASE_URL: "postgresql://todo_user:your-database-password@postgres:5432/todo_db"
+    JWT_SECRET_KEY: "your-jwt-secret-key-change-in-production"
     JWT_ALGORITHM: "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "10080"
     CORS_ORIGINS: '["http://todoboard.local", "http://localhost:3000", "http://$(minikube ip)", "http://host.docker.internal"]'
@@ -521,8 +524,9 @@ configMap:
     NEXT_PUBLIC_APP_NAME: "TodoBoard (Minikube)"
 
 secrets:
-  POSTGRES_PASSWORD: "todo_password"
-  JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+  # TODO: Change password before deployment
+  POSTGRES_PASSWORD: "your-database-password"
+  JWT_SECRET_KEY: "your-jwt-secret-key-change-in-production"
   GROQ_API_KEY: ""
 
 postgresql:

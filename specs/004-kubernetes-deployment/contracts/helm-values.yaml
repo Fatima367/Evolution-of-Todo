@@ -419,7 +419,8 @@ secrets:
   # Secret data (base64 encoded by Helm)
   data:
     # Database password
-    POSTGRES_PASSWORD: "changeme"
+    # TODO: Change password before deployment - see QUICKSTART.md
+    POSTGRES_PASSWORD: "your-database-password"
 
     # JWT secret for authentication
     JWT_SECRET: "your-jwt-secret-key-change-in-production"

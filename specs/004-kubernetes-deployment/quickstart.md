@@ -80,7 +80,7 @@ kubectl create namespace todoboard
 
 # Create secrets for sensitive data
 kubectl create secret generic app-secrets \
-  --from-literal=POSTGRES_PASSWORD=changeme \
+  --from-literal=POSTGRES_PASSWORD=your-database-password \
   --from-literal=JWT_SECRET=your-jwt-secret-key \
   --from-literal=OPENAI_API_KEY=your-openai-key \
   --from-literal=GROQ_API_KEY=your-groq-key
@@ -218,8 +218,9 @@ minikube image load todoboard-frontend:0.1.0
 
 ```bash
 # Create .env file with secrets (DO NOT COMMIT)
+# TODO: Change password before deployment - see docs/QUICKSTART.md
 cat > .env << EOF
-POSTGRES_PASSWORD=changeme
+POSTGRES_PASSWORD=your-database-password
 JWT_SECRET=$(openssl rand -base64 32)
 OPENAI_API_KEY=sk-your-openai-key
 GROQ_API_KEY=gsk_your-groq-key
@@ -233,8 +234,9 @@ EOF
 kubectl create secret generic app-secrets --from-env-file=.env
 
 # Option 2: From literal values
+# TODO: Change password before deployment - see docs/QUICKSTART.md
 kubectl create secret generic app-secrets \
-  --from-literal=POSTGRES_PASSWORD=changeme \
+  --from-literal=POSTGRES_PASSWORD=your-database-password \
   --from-literal=JWT_SECRET=$(openssl rand -base64 32) \
   --from-literal=OPENAI_API_KEY=sk-your-key \
   --from-literal=GROQ_API_KEY=gsk-your-key
@@ -561,7 +563,8 @@ kubectl logs <pod-name>
 
 # 4. Missing secrets
 kubectl get secrets
-kubectl create secret generic app-secrets --from-literal=POSTGRES_PASSWORD=changeme
+# TODO: Change password before deployment - see docs/QUICKSTART.md
+kubectl create secret generic app-secrets --from-literal=POSTGRES_PASSWORD=your-database-password
 ```
 
 ### Cannot Access Application

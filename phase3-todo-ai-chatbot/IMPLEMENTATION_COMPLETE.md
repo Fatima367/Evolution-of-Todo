@@ -139,7 +139,7 @@ Before running, set these environment variables in `.env`:
 DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/todo_db?sslmode=require
 
 # JWT (from Phase II)
-JWT_SECRET_KEY=your-secret-key-min-32-chars
+JWT_SECRET_KEY=your-jwt-secret-key-min-32-chars
 JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=10080
 

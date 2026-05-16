@@ -291,6 +291,7 @@ configMap:
 secrets:
   create: false
   data:
+    # TODO: Change password before deployment
     # SECURITY: Replace placeholders with strong, unique values before deployment
     # See QUICKSTART.md Section: "Secrets Configuration" for setup instructions
     POSTGRES_PASSWORD: "your-database-password"

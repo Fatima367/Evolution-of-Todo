@@ -62,8 +62,9 @@ echo ""
 # Create secrets
 echo "Creating secrets..."
 kubectl create secret generic todoboard-secrets \
-  --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-todoboard_password}" \
-  --from-literal=JWT_SECRET_KEY="${JWT_SECRET_KEY:-your-secret-key-change-in-production}" \
+  # TODO: Change password before deployment
+--from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-your-database-password}" \
+  --from-literal=JWT_SECRET_KEY="${JWT_SECRET_KEY:-your-jwt-secret-key-change-in-production}" \
   --from-literal=GROQ_API_KEY="${GROQ_API_KEY:-your-groq-api-key}" \
   --namespace=todoboard \
   --dry-run=client -o yaml | kubectl apply -f -

@@ -1,5 +1,5 @@
 """Audit Log entity model"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 from sqlmodel import Field, SQLModel, Relationship, Column, JSON
@@ -33,7 +33,7 @@ class AuditLog(SQLModel, table=True):
     request_id: Optional[str] = Field(default=None, max_length=255)
     ip_address: Optional[str] = Field(default=None, max_length=45)
     user_agent: Optional[str] = Field(default=None)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False, index=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False, index=True)
 
     # Relationships
     user: Optional["User"] = Relationship(back_populates="audit_logs")

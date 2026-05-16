@@ -416,7 +416,7 @@ def test_conversation_cascade_delete(session: Session, auth_token):
 
 def test_conversation_updated_at_changes(session: Session, auth_token):
     """Test that conversation updated_at changes when messages are added"""
-    from datetime import datetime
+    from datetime import datetime, timezone
     import time
 
     token, user = auth_token
@@ -441,7 +441,7 @@ def test_conversation_updated_at_changes(session: Session, auth_token):
     session.add(message)
 
     # Update conversation timestamp
-    conversation.updated_at = datetime.utcnow()
+    conversation.updated_at = datetime.now(timezone.utc)
     session.add(conversation)
     session.commit()
 

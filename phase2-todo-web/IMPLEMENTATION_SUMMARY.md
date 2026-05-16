@@ -426,7 +426,7 @@ npm run dev
 ### Backend (.env)
 ```env
 DATABASE_URL=postgresql://user:password@ep-xxx.neon.tech/todo_db?sslmode=require
-JWT_SECRET_KEY=your-super-secret-key-min-32-characters
+JWT_SECRET_KEY=your-jwt-secret-key
 JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=10080
 CORS_ORIGINS=["http://localhost:3000"]

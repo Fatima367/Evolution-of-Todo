@@ -9,9 +9,9 @@ This service:
 import os
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import httpx
@@ -53,7 +53,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": SERVICE_NAME,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -103,7 +103,7 @@ async def handle_task_event(request: Request):
         task_id = data.get("task_id")
         user_id = data.get("user_id")
         task_data = data.get("task_data", {})
-        timestamp = data.get("timestamp", datetime.utcnow().isoformat())
+        timestamp = data.get("timestamp", datetime.now(timezone.utc).isoformat())
 
         # Validate required fields
         if not all([event_type, task_id, user_id]):

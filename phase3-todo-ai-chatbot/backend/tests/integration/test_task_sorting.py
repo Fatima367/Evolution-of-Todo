@@ -1,8 +1,6 @@
 """Integration tests for task sorting functionality"""
-import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi.testclient import TestClient
-from src.models.task import TaskPriority
 
 
 def test_sort_tasks_by_due_date_ascending(client: TestClient, auth_token):
@@ -10,7 +8,7 @@ def test_sort_tasks_by_due_date_ascending(client: TestClient, auth_token):
     token, _ = auth_token
 
     # Create tasks with different due dates
-    base_date = datetime.utcnow()
+    base_date = datetime.now(timezone.utc)
     client.post(
         "/tasks/",
         json={
@@ -181,7 +179,7 @@ def test_sort_with_null_due_dates(client: TestClient, auth_token):
     """Test T005: Sort tasks with NULL due_date values"""
     token, _ = auth_token
 
-    base_date = datetime.utcnow()
+    base_date = datetime.now(timezone.utc)
 
     # Create tasks with and without due dates
     client.post(
@@ -228,7 +226,7 @@ def test_sort_combined_with_filters(client: TestClient, auth_token):
     """Test T006: Sort combined with existing filters"""
     token, _ = auth_token
 
-    base_date = datetime.utcnow()
+    base_date = datetime.now(timezone.utc)
 
     # Create tasks with various due dates
     task1 = client.post(

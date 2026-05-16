@@ -519,7 +519,7 @@ configMap:
   backend:
     # Use local PostgreSQL or Neon for development
     # DATABASE_URL will be set from secret
-    JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+    JWT_SECRET_KEY: "your-jwt-secret-key-change-in-production"
     JWT_ALGORITHM: "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "10080"
     CORS_ORIGINS: '["http://todoboard.local", "http://localhost:3000"]'
@@ -548,9 +548,11 @@ configMap:
 secrets:
   # For Minikube, use simple secrets
   # In production, use proper secret management
+  # TODO: Change database password before deployment - see README.md
   DATABASE_URL: "postgresql://your_neon_username:your_neon_password@your_neon_endpoint.neon.tech/neondb?sslmode=require"
-  POSTGRES_PASSWORD: "todo_password"
-  JWT_SECRET_KEY: "minikube-dev-secret-key-change-in-production"
+  # TODO: Change database password before deployment - see README.md
+  POSTGRES_PASSWORD: "your-database-password"
+  JWT_SECRET_KEY: "your-jwt-secret-key-change-in-production"
   GROQ_API_KEY: ""  # Add your Groq API key here
 
 #############################################################################
@@ -570,7 +572,8 @@ postgresql:
   env:
     POSTGRES_DB: "todo_db"
     POSTGRES_USER: "todo_user"
-    POSTGRES_PASSWORD: "todo_password"
+    # TODO: Change password before deployment - see README.md
+    POSTGRES_PASSWORD: "your-database-password"
 
   resources:
     requests:
