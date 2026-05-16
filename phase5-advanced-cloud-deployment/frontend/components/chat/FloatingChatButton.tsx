@@ -25,7 +25,7 @@ const hideSvgIcons = (button: Element) => {
   });
 }
 
-const addCustomIcon = (button: Element, document: Document) => {
+const addCustomIcon = (button: HTMLElement, document: Document) => {
   if (!button.querySelector('.custom-send-icon')) {
     const iconSpan = document.createElement('span');
     iconSpan.className = 'custom-send-icon';
